@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal Analysis Calculator - Enriched Properties LLC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1f2937',
+                        secondary: '#3b82f6',
+                        accent: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-primary">Deal Analysis Calculator</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-600">Real Estate Investment Tool</div>
+                    <button onclick="clearAnalysis()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Main Content -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Deal Analysis & Calculator</h2>
+            <button onclick="clearAnalysis()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                Clear Analysis
+            </button>
+        </div>
+
+        <!-- Property Information -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Property Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Property Address</label>
+                    <input type="text" id="propAddress" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123 Main St, City, State">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Square Footage</label>
+                    <input type="number" id="propSqft" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Bedrooms / Bathrooms</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="propBeds" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="3">
+                        <input type="number" step="0.5" id="propBaths" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="2">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- ARV Calculator -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">🏠 ARV Calculator</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 1</label>
+                        <input type="number" id="comp1" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="250000" onchange="calculateARV()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 2</label>
+                        <input type="number" id="comp2" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="245000" onchange="calculateARV()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 3</label>
+                        <input type="number" id="comp3" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="260000" onchange="calculateARV()">
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-green-800">Estimated ARV:</span>
+                            <span class="text-2xl font-bold text-green-600" id="calculatedARV">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simple Repair Cost Input -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">🔨 Estimated Repairs</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Estimated Repair Costs</label>
+                        <input type="number" id="totalRepairsInput" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-right" 
+                               placeholder="0" 
+                               onchange="updateSimpleRepairs()">
+                        <p class="text-xs text-gray-500 mt-1">Enter your total estimated repair costs for this property</p>
+                    </div>
+                    
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-orange-800">Total Repairs:</span>
+                            <span class="text-xl font-bold text-orange-600" id="totalRepairs">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rapid Offer System Calculator -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">⚡ Rapid Offer System Calculator</h3>
+            <p class="text-sm text-gray-600 mb-4">Based on Flip with Rick / Zach Ginn Wholesaling Formula - Automatic percentage based on ARV</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
+                        <div class="text-lg font-bold text-gray-800 mt-1" id="rapidARV">$0</div>
+                        <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
+                    </div>
+                </div>
+                
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Multiplier</span>
+                        <div class="text-lg font-bold text-orange-800 mt-1" id="rapidMultiplier">0%</div>
+                        <div class="text-xs text-orange-500 mt-1">Based on ARV</div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-green-600 uppercase tracking-wide">Max Offer (MAO)</span>
+                        <div class="text-lg font-bold text-green-600 mt-1" id="rapidMAO">$0</div>
+                        <div class="text-xs text-green-500 mt-1">Highest Offer</div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Initial Offer (LAO)</span>
+                        <div class="text-lg font-bold text-blue-600 mt-1" id="rapidLAO">$0</div>
+                        <div class="text-xs text-blue-500 mt-1">70% of MAO</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h4 class="font-semibold text-yellow-800 text-sm mb-2">🎯 Offer Strategy:</h4>
+                <div class="text-xs text-yellow-700 space-y-1">
+                    <div>• <strong>Start with Initial Offer (LAO)</strong> - Your opening lowball offer</div>
+                    <div>• <strong>Negotiate up to Max Offer (MAO)</strong> - Your absolute ceiling</div>
+                    <div>• <strong>Multiplier scales with ARV</strong> - Higher value properties use higher percentages</div>
+                    <div>• <strong>&lt;$120k: 70%</strong> | <strong>$120k-$220k: 80%</strong> | <strong>$220k-$300k: 81.5%</strong> | <strong>$300k-$400k: 82.9%</strong> | <strong>&gt;$400k: 84.9%</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Percentage Calculator -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">📊 Custom Percentage Calculator</h3>
+            <p class="text-sm text-gray-600 mb-4">Formula: (ARV × X%) - Repairs = Max Offer</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
+                        <div class="text-lg font-bold text-gray-800 mt-1" id="customARV">$0</div>
+                        <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Percentage</span>
+                        <input type="number" id="customPercentage" class="w-20 mx-auto text-center border-0 bg-transparent text-lg font-bold text-blue-800" 
+                               placeholder="75" min="50" max="90" step="0.5" onchange="calculateCustomOffer()">
+                        <div class="text-xs text-blue-500 mt-1">Adjust to Market</div>
+                    </div>
+                </div>
+                
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Repairs</span>
+                        <div class="text-lg font-bold text-orange-800 mt-1" id="customRepairs">$0</div>
+                        <div class="text-xs text-orange-500 mt-1">Total Repair Costs</div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-green-600 uppercase tracking-wide">Max Offer</span>
+                        <div class="text-lg font-bold text-green-600 mt-1" id="customMaxOffer">$0</div>
+                        <div class="text-xs text-green-500 mt-1">Your Ceiling</div>
+                    </div>
+                </div>
+                
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Spread</span>
+                        <div class="text-lg font-bold text-purple-600 mt-1" id="customSpread">$0</div>
+                        <div class="text-xs text-purple-500 mt-1">Profit Potential</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 class="font-semibold text-blue-800 text-sm mb-2">🎯 Usage Tips:</h4>
+                <div class="text-xs text-blue-700 space-y-1">
+                    <div>• <strong>Start with 75%</strong> - Use the ARV and repair estimates from above</div>
+                    <div>• <strong>Compare with Rapid Offer System</strong> - Use both calculators to validate your offers</div>
+                    <div>• <strong>Adjust percentage based on</strong> - Market conditions, competition, profit targets</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buyer-Focused Profit Calculator -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
+            <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
+                        <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedARV">$0</div>
+                        <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
+                        <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedRepairs">$0</div>
+                        <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
+                    </div>
+                </div>
+                
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Closing Costs</span>
+                        <div class="text-lg font-bold text-orange-800 mt-1" id="buyerFocusedClosing">$0</div>
+                        <div class="text-xs text-orange-500 mt-1">10% of ARV</div>
+                    </div>
+                </div>
+                
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Buyer Profit</span>
+                        <div class="text-lg font-bold text-purple-800 mt-1" id="buyerFocusedProfit">$0</div>
+                        <div class="text-xs text-purple-500 mt-1">Based on Repair Level</div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-green-600 uppercase tracking-wide">MAO</span>
+                        <div class="text-lg font-bold text-green-600 mt-1" id="buyerFocusedMAO">$0</div>
+                        <div class="text-xs text-green-500 mt-1">Max Allowable Offer</div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="text-center">
+                        <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">LAO</span>
+                        <div class="text-lg font-bold text-blue-600 mt-1" id="buyerFocusedLAO">$0</div>
+                        <div class="text-xs text-blue-500 mt-1">MAO × 70%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <h4 class="font-semibold text-green-800 text-sm mb-2">💰 Buyer Profit Structure:</h4>
+                <div class="text-xs text-green-700 space-y-1">
+                    <div>• <strong>Under $30k repairs:</strong> $30k buyer profit required</div>
+                    <div>• <strong>$30k-$50k repairs:</strong> Same as repair amount for profit</div>
+                    <div>• <strong>$50k-$80k repairs:</strong> $50k buyer profit required</div>
+                    <div>• <strong>Over $80k repairs:</strong> Contact for custom calculation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Comparables -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">🏘️ Market Comparables Research</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium mb-3">Quick Comp Analysis</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Neighborhood</label>
+                            <input type="text" id="neighborhood" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter zip code or neighborhood">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Price Range Low</label>
+                                <input type="number" id="priceRangeLow" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200000">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Price Range High</label>
+                                <input type="number" id="priceRangeHigh" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="300000">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Min Beds</label>
+                                <input type="number" id="minBeds" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="3">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Min Baths</label>
+                                <input type="number" id="minBaths" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="2">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Min Sqft</label>
+                                <input type="number" id="minSqft" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1200">
+                            </div>
+                        </div>
+                        <button onclick="researchComparables()" class="w-full bg-secondary text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                            Research Comparables
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-3">💡 Research Tips</h4>
+                    <div class="text-sm text-gray-600 space-y-2">
+                        <p>• Look for recent sales (last 3-6 months)</p>
+                        <p>• Find properties within 0.5-1 mile radius</p>
+                        <p>• Match similar bed/bath counts and square footage</p>
+                        <p>• Consider condition differences</p>
+                        <p>• Adjust for market trends</p>
+                        <p>• Use multiple sources for validation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the main.js script -->
+    <script src="main.js"></script>
+</body>
+</html>
