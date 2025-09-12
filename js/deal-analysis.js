@@ -504,40 +504,64 @@ function searchComparables() {
         return;
     }
     
-    // Build search URLs with parameters
-    const searchParams = new URLSearchParams();
-    if (priceRangeLow) searchParams.append('minPrice', priceRangeLow);
-    if (priceRangeHigh) searchParams.append('maxPrice', priceRangeHigh);
-    if (minBeds) searchParams.append('minBeds', minBeds);
-    if (minBaths) searchParams.append('minBaths', minBaths);
-    if (minSqft) searchParams.append('minSqft', minSqft);
+    // Build Zillow URL for SOLD properties (comparables research) - matching main dashboard structure
+    let zillowUrl = 'https://www.zillow.com/homes/recently_sold/';
+    if (neighborhood) {
+        zillowUrl += encodeURIComponent(neighborhood) + '_rb/';
+    }
     
-    const zillowUrl = `https://www.zillow.com/homes/${encodeURIComponent(neighborhood)}_rb/?${searchParams.toString()}`;
-    const realtorUrl = `https://www.realtor.com/realestateandhomes-search/${encodeURIComponent(neighborhood)}`;
+    // Add Zillow search parameters for sold homes
+    const zillowParams = [];
+    
+    // Add sold status filter - this is key for getting sold properties
+    zillowParams.push('rs_z');
+    
+    if (priceRangeLow && priceRangeHigh) {
+        zillowParams.push(`${priceRangeLow}-${priceRangeHigh}_price`);
+    } else if (priceRangeLow) {
+        zillowParams.push(`${priceRangeLow}-_price`);
+    } else if (priceRangeHigh) {
+        zillowParams.push(`0-${priceRangeHigh}_price`);
+    }
+    
+    if (minBeds) {
+        zillowParams.push(`${minBeds}-${minBeds}_beds`);
+    }
+    
+    if (minBaths) {
+        zillowParams.push(`${minBaths}-_baths`);
+    }
+    
+    if (minSqft) {
+        zillowParams.push(`${minSqft}-_size`);
+    }
+    
+    if (zillowParams.length > 0) {
+        zillowUrl += zillowParams.join('/') + '/';
+    }
     
     resultsDiv.innerHTML = `
         <div class="space-y-2">
-            <p class="font-medium text-gray-800">Search Results for: ${neighborhood}</p>
+            <p class="font-medium text-gray-800">Zillow Search Generated for: ${neighborhood}</p>
             <div class="space-y-1">
-                <a href="${zillowUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm block">→ View on Zillow</a>
-                <a href="${realtorUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm block">→ View on Realtor.com</a>
+                <a href="${zillowUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm block">→ View Sold Properties on Zillow</a>
             </div>
             <div class="text-xs text-gray-500 mt-2">
-                Search criteria: $${priceRangeLow || 'Any'} - $${priceRangeHigh || 'Any'}, ${minBeds || 'Any'}+ beds, ${minBaths || 'Any'}+ baths, ${minSqft || 'Any'}+ sq ft
+                Search criteria: $${priceRangeLow || 'Any'} - $${priceRangeHigh || 'Any'}, ${minBeds || 'Any'} beds (exact match), ${minBaths || 'Any'}+ baths, ${minSqft || 'Any'}+ sq ft
             </div>
         </div>
     `;
+    
+    // Update the button onclick handler to use the generated Zillow URL
+    const zillowButton = document.querySelector('button[onclick*="zillow.com"]');
+    
+    if (zillowButton) {
+        zillowButton.setAttribute('onclick', `window.open('${zillowUrl}', '_blank')`);
+        zillowButton.innerHTML = 'Open Zillow Search 🔗';
+    }
 }
 
-function openRedfinSearch() {
-    const neighborhood = document.getElementById('neighborhood').value || 'search';
-    window.open(`https://www.redfin.com/city/${encodeURIComponent(neighborhood)}`, '_blank');
-}
-
-function openHomesSearch() {
-    const neighborhood = document.getElementById('neighborhood').value || 'search';
-    window.open(`https://www.homes.com/search/${encodeURIComponent(neighborhood)}`, '_blank');
-}
+// Removed other search functions - using only Zillow for comparables research
 
 // ===========================================
 // CLEAR ANALYSIS
