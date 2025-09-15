@@ -3,39 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deal Analysis & Calculator - Enriched Properties LLC</title>
+    <title>Wholesaling Tools Dashboard - Enriched Property Solutions LLC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styles for Deal Analysis */
         html {
             scroll-behavior: smooth;
         }
-        
+
         .tab-content {
             animation: fadeIn 0.3s ease-in-out;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         /* Alert message styles */
         .alert-message {
             z-index: 9999;
         }
-        
+
         /* Custom color scheme */
         .bg-primary {
             background-color: #3b82f6;
         }
-        
+
         .text-primary {
             color: #3b82f6;
         }
-        
+
         .bg-secondary {
             background-color: #1d4ed8;
+        }
+
+        /* Tab styles */
+        .tab-active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .tab-inactive {
+            background-color: white;
+            color: #6b7280;
+            border-color: #d1d5db;
+        }
+
+        .tab-inactive:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Mobile responsiveness for tabs */
+        @media (max-width: 768px) {
+            .tab-container {
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .tab-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab-list {
+                display: flex;
+                min-width: max-content;
+            }
         }
     </style>
 </head>
@@ -45,627 +81,1338 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
                 <div class="flex items-center">
-                    <h1 class="text-3xl font-bold text-primary">Deal Analysis & Calculator</h1>
+                    <h1 class="text-3xl font-bold text-primary">FreeWholsalingTools.com</h1>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="../zipcodefinder.html" class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                        📍 Zip Code Finder
-                    </a>
                     <div class="text-sm text-gray-500">
-                        Enriched Properties LLC
+                       Created by: Enriched Property Solutions LLC
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- Main Navigation Tabs -->
+    <div class="bg-white border-b sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="tab-container">
+                <nav class="tab-list flex space-x-1 py-2" role="tablist">
+                    <button onclick="switchTab('deal-analysis')" id="tab-deal-analysis" class="tab-active px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        📊 Deal Analysis & Calculator
+                    </button>
+                    <button onclick="switchTab('coming-soon-1')" id="tab-coming-soon-1" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🗺️ Zip Code Finder
+                    </button>
+                    <button onclick="switchTab('coming-soon-2')" id="tab-coming-soon-2" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🤖 AI Property Assessment
+                    </button>
+                    <button onclick="switchTab('coming-soon-3')" id="tab-coming-soon-3" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        👥 Tool 4 (Coming Soon)
+                    </button>
+                    <button onclick="switchTab('coming-soon-4')" id="tab-coming-soon-4" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        📧 Tool 5 (Coming Soon)
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Deal Analysis & Calculator</h2>
-            <button onclick="clearAnalysis()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-                Clear Analysis
-            </button>
-        </div>
 
-        <!-- Property Information -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">Property Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Property Address</label>
-                    <input type="text" id="propAddress" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123 Main St, City, State">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Square Footage</label>
-                    <input type="number" id="propSqft" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1500">
-                </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Bedrooms / Bathrooms</label>
-                    <div class="flex gap-2">
-                        <input type="number" id="propBeds" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="3">
-                        <input type="number" step="0.5" id="propBaths" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="2">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- ARV Calculator -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold mb-4">🏠 ARV Calculator</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 1</label>
-                        <input type="number" id="comp1" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="250000" onchange="calculateARV()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 2</label>
-                        <input type="number" id="comp2" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="245000" onchange="calculateARV()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 3</label>
-                        <input type="number" id="comp3" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="260000" onchange="calculateARV()">
-                    </div>
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-green-800">Estimated ARV:</span>
-                            <span class="text-2xl font-bold text-green-600" id="calculatedARV">$0</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Deal Analysis Tab - YOUR ORIGINAL CONTENT PRESERVED -->
+        <div id="content-deal-analysis" class="tab-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Deal Analysis & Calculator</h2>
+                <button onclick="clearAnalysis()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Analysis
+                </button>
             </div>
 
-            <!-- Simple Repair Cost Input -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold mb-4">🔨 Estimated Repairs</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Estimated Repair Costs</label>
-                        <input type="number" id="totalRepairsInput" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-right" 
-                               placeholder="0" 
-                               onchange="updateSimpleRepairs()">
-                        <p class="text-xs text-gray-500 mt-1">Enter your total estimated repair costs for this property</p>
-                    </div>
-                    
-                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-orange-800">Total Repairs:</span>
-                            <span class="text-xl font-bold text-orange-600" id="totalRepairs">$0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Property Assessment & Prompt Generator -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">🤖 AI Property Assessment & Prompt Generator</h3>
-            <p class="text-sm text-gray-600 mb-6">Fill out this comprehensive property assessment form to generate an AI-ready prompt and get accurate repair cost estimates.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                <!-- Property Details -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Property Details</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
-                        <input type="number" id="aiSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1500" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-                        <input type="number" id="aiYearBuilt" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1995" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Number of Stories</label>
-                        <input type="number" id="aiStories" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2" min="1" max="4" onchange="updateAICalculator()">
-                    </div>
-                </div>
-
-                <!-- Room Counts -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Room Counts</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms Needing Repair</label>
-                        <input type="number" id="aiBedrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="3" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms Needing Repair</label>
-                        <input type="number" step="0.5" id="aiBathrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2.5" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Windows Needing Replacement</label>
-                        <input type="number" id="aiWindows" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="12" min="0" onchange="updateAICalculator()">
-                    </div>
-                </div>
-
-                <!-- Major Systems -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Major Systems</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">HVAC Units Needing Repair/Replace</label>
-                        <input type="number" id="aiHvacUnits" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Water Heaters Needing Replace</label>
-                        <input type="number" id="aiWaterHeaters" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Electrical Panels Needing Update</label>
-                        <input type="number" id="aiElectricalPanels" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1" min="0" onchange="updateAICalculator()">
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <!-- Structural & Exterior -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Structural & Exterior</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Roof Repair Percentage (%)</label>
-                        <input type="number" id="aiRoofPercent" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="25" min="0" max="100" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Foundation Issues (Linear Feet)</label>
-                        <input type="number" id="aiFoundationFeet" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="50" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Siding Repair (Sq Ft)</label>
-                        <input type="number" id="aiSidingSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="200" min="0" onchange="updateAICalculator()">
-                    </div>
-                </div>
-
-                <!-- Interior -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Interior</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Flooring Replacement (Sq Ft)</label>
-                        <input type="number" id="aiFlooringSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="800" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Interior Paint (Rooms)</label>
-                        <input type="number" id="aiPaintRooms" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="8" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Doors Needing Replace</label>
-                        <input type="number" id="aiDoors" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="6" min="0" onchange="updateAICalculator()">
-                    </div>
-                </div>
-
-                <!-- Appliances & Fixtures -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Appliances & Fixtures</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kitchen Appliances Needed</label>
-                        <input type="number" id="aiAppliances" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="4" min="0" max="10" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Light Fixtures Needing Replace</label>
-                        <input type="number" id="aiLightFixtures" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="8" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Plumbing Fixtures Needing Replace</label>
-                        <input type="number" id="aiPlumbingFixtures" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="5" min="0" onchange="updateAICalculator()">
-                    </div>
-                </div>
-
-                <!-- Outdoor & Other -->
-                <div class="space-y-4">
-                    <h4 class="font-medium text-gray-900 border-b pb-2">Outdoor & Other</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Deck/Patio Repair (Sq Ft)</label>
-                        <input type="number" id="aiDeckSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="300" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Landscaping Areas (Sq Ft)</label>
-                        <input type="number" id="aiLandscapingSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="500" min="0" onchange="updateAICalculator()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Garage Door Repair/Replace</label>
-                        <input type="number" id="aiGarageDoors" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1" min="0" max="3" onchange="updateAICalculator()">
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- AI Prompt Output -->
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-3">🎯 Generated AI Prompt</h4>
-                    <textarea id="aiPromptOutput" class="w-full h-32 px-3 py-2 border border-gray-300 rounded-md text-sm bg-white" readonly placeholder="Fill out the assessment form to generate an AI-ready prompt..."></textarea>
-                    <div class="mt-3 flex space-x-2">
-                        <button onclick="copyAIPrompt()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm">Copy Prompt</button>
-                        <a href="#" id="chatGPTLink" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm no-underline">Send to ChatGPT</a>
-                    </div>
-                </div>
-
-                <!-- Smart Calculator Results -->
-                <div class="bg-green-50 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-3">🧮 Smart Repair Calculator</h4>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span>Structural & Exterior:</span>
-                            <span class="font-medium" id="aiStructuralCost">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Interior Repairs:</span>
-                            <span class="font-medium" id="aiInteriorCost">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Systems & Mechanical:</span>
-                            <span class="font-medium" id="aiSystemsCost">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Appliances & Fixtures:</span>
-                            <span class="font-medium" id="aiAppliancesCost">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Labor & Permits:</span>
-                            <span class="font-medium" id="aiLaborCost">$0</span>
-                        </div>
-                        <hr class="my-2">
-                        <div class="flex justify-between">
-                            <span class="font-semibold">Subtotal:</span>
-                            <span class="font-semibold" id="aiSubtotal">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-semibold">Contingency (15%):</span>
-                            <span class="font-semibold" id="aiContingency">$0</span>
-                        </div>
-                        <hr class="my-2 border-gray-400">
-                        <div class="flex justify-between text-lg">
-                            <span class="font-bold text-green-800">Total Estimate:</span>
-                            <span class="font-bold text-green-800" id="aiTotalEstimate">$0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Profit Analysis -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold mb-4">💰 Profit Margin Analysis</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Purchase Price</label>
-                        <input type="number" id="purchasePrice" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="180000" onchange="calculateProfit()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Assignment Fee</label>
-                        <input type="number" id="assignmentFee" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="15000" onchange="calculateProfit()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Marketing Costs</label>
-                        <input type="number" id="marketingCosts" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="500" onchange="calculateProfit()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Other Costs</label>
-                        <input type="number" id="otherCosts" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200" onchange="calculateProfit()">
-                    </div>
-                    
-                    <div class="space-y-2 pt-4 border-t">
-                        <div class="flex justify-between">
-                            <span class="text-sm">ARV:</span>
-                            <span class="text-sm font-medium" id="profitARV">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Purchase Price:</span>
-                            <span class="text-sm font-medium" id="profitPurchase">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Repairs:</span>
-                            <span class="text-sm font-medium" id="profitRepairs">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Closing Fees (10%):</span>
-                            <span class="text-sm font-medium" id="profitClosingFees">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Assignment Fee:</span>
-                            <span class="text-sm font-medium text-green-600" id="profitAssignment">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Marketing & Costs:</span>
-                            <span class="text-sm font-medium text-red-600" id="profitCosts">$0</span>
-                        </div>
-                        <hr>
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold">Buyer's Profit Potential:</span>
-                            <span class="text-lg font-bold" id="buyerProfit">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold">Your Net Profit:</span>
-                            <span class="text-lg font-bold text-green-600" id="yourProfit">$0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ROI Calculator -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold mb-4">📊 ROI Calculator</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Time Investment (hours)</label>
-                        <input type="number" id="timeInvestment" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="20" onchange="calculateROI()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Your Hourly Value Target ($)</label>
-                        <input type="number" id="hourlyTarget" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="100" onchange="calculateROI()">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-semibold mb-2">Days to Close</label>
-                        <input type="number" id="daysToClose" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="30" onchange="calculateROI()">
-                    </div>
-
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-sm">Profit per Hour:</span>
-                            <span class="text-lg font-bold text-blue-600" id="profitPerHour">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Monthly ROI Potential:</span>
-                            <span class="text-lg font-bold text-blue-600" id="monthlyROI">$0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm">Deal Score:</span>
-                            <span class="text-lg font-bold" id="dealScore">-</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h4 class="font-semibold mb-2">Deal Evaluation</h4>
-                        <div id="dealEvaluation" class="text-sm text-gray-600">
-                            Enter deal details to see evaluation
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Rapid Offer System -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">⚡ Rapid Offer System Calculator</h3>
-            <p class="text-sm text-gray-600 mb-4">Based on Flip with Rick / Zach Ginn Wholesaling Formula</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Net Value</span>
-                        <div class="text-lg font-bold text-gray-800 mt-1" id="rapidNetValue">$0</div>
-                        <div class="text-xs text-gray-500 mt-1">ARV - Repairs</div>
-                    </div>
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Multiplier</span>
-                        <div class="text-lg font-bold text-blue-800 mt-1" id="rapidMultiplier">0%</div>
-                        <div class="text-xs text-blue-500 mt-1">Based on ARV</div>
-                    </div>
-                </div>
-                
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-green-600 uppercase tracking-wide">Max Offer (MAO)</span>
-                        <div class="text-lg font-bold text-green-600 mt-1" id="rapidMAO">$0</div>
-                        <div class="text-xs text-green-500 mt-1">Highest Offer</div>
-                    </div>
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Initial Offer (LAO)</span>
-                        <div class="text-lg font-bold text-blue-600 mt-1" id="rapidLAO">$0</div>
-                        <div class="text-xs text-blue-500 mt-1">70% of MAO</div>
-                    </div>
-                </div>
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>How to use:</strong> Enter your ARV and repair costs to use the calculators below, they are based on these two inputs.</p>
             </div>
             
-            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h4 class="font-semibold text-yellow-800 text-sm mb-2">🎯 Offer Strategy:</h4>
-                <div class="text-xs text-yellow-700 space-y-1">
-                    <div>• <strong>Start with Initial Offer (LAO)</strong> - Your opening lowball offer</div>
-                    <div>• <strong>Negotiate up to Max Offer (MAO)</strong> - Your absolute ceiling</div>
-                    <div>• <strong>Multiplier scales with ARV</strong> - Higher value properties use higher percentages</div>
-                    <div>• <strong>&lt;$120k: 70%</strong> | <strong>$120k-$220k: 80%</strong> | <strong>$220k-$300k: 81.5%</strong> | <strong>$300k-$400k: 82.9%</strong> | <strong>&gt;$400k: 84.9%</strong></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Custom Percentage Calculator -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">📊 Custom Percentage Calculator</h3>
-            <p class="text-sm text-gray-600 mb-4">Formula: (ARV × X%) - Repairs = Max Offer</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
-                        <div class="text-lg font-bold text-gray-800 mt-1" id="customARV">$0</div>
-                        <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
-                    </div>
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <label class="text-xs font-medium text-blue-600 uppercase tracking-wide block mb-2">Percentage</label>
-                    <input type="number" id="customPercentage" 
-                           class="w-full text-center text-lg font-bold bg-transparent border-0 focus:ring-0 p-0" 
-                           placeholder="75" min="1" max="100" step="0.1"
-                           oninput="calculateCustomOffer()">
-                    <div class="text-xs text-blue-500 mt-1">% of ARV</div>
-                </div>
-                
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
-                        <div class="text-lg font-bold text-gray-800 mt-1" id="customRepairs">$0</div>
-                        <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
-                    </div>
-                </div>
-                
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-green-600 uppercase tracking-wide">Max Offer</span>
-                        <div class="text-lg font-bold text-green-600 mt-1" id="customMaxOffer">$0</div>
-                        <div class="text-xs text-green-500 mt-1">Your Calculated Offer</div>
-                    </div>
-                </div>
-                
-                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Spread</span>
-                        <div class="text-lg font-bold text-purple-600 mt-1" id="customSpread">$0</div>
-                        <div class="text-xs text-purple-500 mt-1">ARV - Max Offer</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <h4 class="font-semibold text-blue-800 text-sm mb-2">💡 How to Use:</h4>
-                <div class="text-xs text-blue-700 space-y-1">
-                    <div>• <strong>Enter your percentage</strong> - Common ranges: 65%-80% for different markets/strategies</div>
-                    <div>• <strong>Calculation updates automatically</strong> - Uses your ARV and repair estimates from above</div>
-                    <div>• <strong>Compare with Rapid Offer System</strong> - Use both calculators to validate your offers</div>
-                    <div>• <strong>Adjust percentage based on</strong> - Market conditions, competition, profit targets</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Buyer-Focused Profit Calculator -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
-            <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
-                        <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedARV">$0</div>
-                        <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
-                    </div>
-                </div>
-                
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
-                        <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedRepairs">$0</div>
-                        <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
-                    </div>
-                </div>
-                
-                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Closing Costs</span>
-                        <div class="text-lg font-bold text-orange-800 mt-1" id="buyerFocusedClosing">$0</div>
-                        <div class="text-xs text-orange-500 mt-1">10% of ARV</div>
-                    </div>
-                </div>
-                
-                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Buyer Profit</span>
-                        <div class="text-lg font-bold text-purple-800 mt-1" id="buyerFocusedProfit">$0</div>
-                        <div class="text-xs text-purple-500 mt-1">Based on Repair Level</div>
-                    </div>
-                </div>
-                
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-green-600 uppercase tracking-wide">MAO</span>
-                        <div class="text-lg font-bold text-green-600 mt-1" id="buyerFocusedMAO">$0</div>
-                        <div class="text-xs text-green-500 mt-1">Max Allowable Offer</div>
-                    </div>
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div class="text-center">
-                        <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">LAO</span>
-                        <div class="text-lg font-bold text-blue-600 mt-1" id="buyerFocusedLAO">$0</div>
-                        <div class="text-xs text-blue-500 mt-1">MAO × 70%</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <h4 class="font-semibold text-green-800 text-sm mb-2">💰 Buyer Profit Structure:</h4>
-                <div class="text-xs text-green-700 space-y-1">
-                    <div>• <strong>Under $30k repairs:</strong> $30k buyer profit required</div>
-                    <div>• <strong>$30k-$50k repairs:</strong> Same as repair amount for profit</div>
-                    <div>• <strong>$50k-$80k repairs:</strong> $50k buyer profit required</div>
-                    <div>• <strong>Over $80k repairs:</strong> Contact for custom calculation</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Market Comparables -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-semibold mb-4">🏘️ Market Comparables Research</h3>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                    <h4 class="font-medium mb-3">Quick Comp Analysis</h4>
-                    <div class="space-y-3">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">       
+                <!-- ARV Calculator -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">🏠 ARV Calculator</h3>
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-2">Neighborhood</label>
-                            <input type="text" id="neighborhood" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter neighborhood or zip code">
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 1</label>
+                            <input type="number" id="comp1" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="250000" onchange="calculateARV()">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-gray-700 text-sm font-semibold mb-2">Price Range Low</label>
-                                <input type="number" id="priceRangeLow" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200000">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 text-sm font-semibold mb-2">Price Range High</label>
-                                <input type="number" id="priceRangeHigh" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="300000">
-                            </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 2</label>
+                            <input type="number" id="comp2" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="245000" onchange="calculateARV()">
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="block text-gray-700 text-xs font-semibold mb-1">Min Beds</label>
-                                <input type="number" id="minBeds" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="2">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 text-xs font-semibold mb-1">Min Baths</label>
-                                <input type="number" step="0.5" id="minBaths" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="1">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 text-xs font-semibold mb-1">Min Sqft</label>
-                                <input type="number" id="minSqft" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="1000">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Comparable Sale 3</label>
+                            <input type="number" id="comp3" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="260000" onchange="calculateARV()">
+                        </div>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-green-800">Estimated ARV:</span>
+                                <span class="text-2xl font-bold text-green-600" id="calculatedARV">$0</span>
                             </div>
                         </div>
-                        <button onclick="searchComparables()" class="w-full bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
-                            Research Comparables
-                        </button>
                     </div>
                 </div>
-                <div>
-                    <h4 class="font-medium mb-3">Research Notes & Links</h4>
-                    <div class="space-y-3">
-                        <textarea id="researchNotes" class="w-full px-4 py-3 border border-gray-300 rounded-lg h-32" placeholder="Add notes about comparables, market conditions, etc."></textarea>
-                        <div class="flex justify-center">
-                            <button onclick="window.open('https://www.zillow.com', '_blank')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium transition-colors">
-                                Open Zillow Search
+
+                <!-- Simple Repair Cost Input -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">🔨 Estimated Repairs</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Total Estimated Repair Costs</label>
+                            <input type="number" id="totalRepairsInput"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-right"
+                                   placeholder="0"
+                                   onchange="updateSimpleRepairs()">
+                            <p class="text-xs text-gray-500 mt-1">Enter your total estimated repair costs for this property</p>
+                        </div>
+
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-orange-800">Total Repairs:</span>
+                                <span class="text-xl font-bold text-orange-600" id="totalRepairs">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Profit Margin Analysis and Deal Evaluation - Full Width -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-6">💰 Profit Margin Analysis and Deal Evaluation</h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left Side: Input Values -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Input Values</h4>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Purchase Price</label>
+                            <input type="number" id="purchasePrice" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="180000" onchange="calculateProfit()">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Assignment Fee</label>
+                            <input type="number" id="assignmentFee" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="15000" onchange="calculateProfit()">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Marketing Costs</label>
+                            <input type="number" id="marketingCosts" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="500" onchange="calculateProfit()">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Other Costs</label>
+                            <input type="number" id="otherCosts" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200" onchange="calculateProfit()">
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Calculations and Analysis -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Calculations & Analysis</h4>
+
+                        <!-- Profit Breakdown -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h5 class="font-semibold mb-3">Profit Breakdown</h5>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm">ARV:</span>
+                                    <span class="text-sm font-medium" id="profitARV">$0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Purchase Price:</span>
+                                    <span class="text-sm font-medium" id="profitPurchase">$0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Repairs:</span>
+                                    <span class="text-sm font-medium" id="profitRepairs">$0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Closing Fees (10%):</span>
+                                    <span class="text-sm font-medium" id="profitClosingFees">$0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Assignment Fee:</span>
+                                    <span class="text-sm font-medium text-green-600" id="profitAssignment">$0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Marketing & Costs:</span>
+                                    <span class="text-sm font-medium text-red-600" id="profitCosts">$0</span>
+                                </div>
+                                <hr class="my-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold">Buyer's Profit Potential:</span>
+                                    <span class="text-lg font-bold" id="buyerProfit">$0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold">Your Net Profit:</span>
+                                    <span class="text-lg font-bold text-green-600" id="yourProfit">$0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deal Score -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">Deal Score:</span>
+                                <span class="text-2xl font-bold" id="dealScore">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Deal Evaluation -->
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h5 class="font-semibold mb-2">Deal Evaluation</h5>
+                            <div id="dealEvaluation" class="text-sm text-gray-700">
+                                Enter deal details to see evaluation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+            <!-- Rapid Offer System -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">⚡ Rapid Offer System Calculator</h3>
+                <p class="text-sm text-gray-600 mb-4">Based on Flip with Rick / Zach Ginn Wholesaling Formula</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Net Value</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="rapidNetValue">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">ARV - Repairs</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Multiplier</span>
+                            <div class="text-lg font-bold text-blue-800 mt-1" id="rapidMultiplier">0%</div>
+                            <div class="text-xs text-blue-500 mt-1">Based on ARV</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-green-600 uppercase tracking-wide">Max Offer (MAO)</span>
+                            <div class="text-lg font-bold text-green-600 mt-1" id="rapidMAO">$0</div>
+                            <div class="text-xs text-green-500 mt-1">Highest Offer</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Initial Offer (LAO)</span>
+                            <div class="text-lg font-bold text-blue-600 mt-1" id="rapidLAO">$0</div>
+                            <div class="text-xs text-blue-500 mt-1">70% of MAO</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 class="font-semibold text-yellow-800 text-sm mb-2">🎯 Offer Strategy:</h4>
+                    <div class="text-xs text-yellow-700 space-y-1">
+                        <div>• <strong>Start with Initial Offer (LAO)</strong> - Your opening lowball offer</div>
+                        <div>• <strong>Negotiate up to Max Offer (MAO)</strong> - Your absolute ceiling</div>
+                        <div>• <strong>Multiplier scales with ARV</strong> - Higher value properties use higher percentages</div>
+                        <div>• <strong>&lt;$120k: 70%</strong> | <strong>$120k-$220k: 80%</strong> | <strong>$220k-$300k: 81.5%</strong> | <strong>$300k-$400k: 82.9%</strong> | <strong>&gt;$400k: 84.9%</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Percentage Calculator -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">📊 Custom Percentage Calculator</h3>
+                <p class="text-sm text-gray-600 mb-4">Formula: (ARV × X%) - Repairs = Max Offer</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="customARV">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <label class="text-xs font-medium text-blue-600 uppercase tracking-wide block mb-2">Percentage</label>
+                        <input type="number" id="customPercentage"
+                               class="w-full text-center text-lg font-bold bg-transparent border-0 focus:ring-0 p-0"
+                               placeholder="75" min="1" max="100" step="0.1"
+                               oninput="calculateCustomOffer()">
+                        <div class="text-xs text-blue-500 mt-1">% of ARV</div>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="customRepairs">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-green-600 uppercase tracking-wide">Max Offer</span>
+                            <div class="text-lg font-bold text-green-600 mt-1" id="customMaxOffer">$0</div>
+                            <div class="text-xs text-green-500 mt-1">Your Calculated Offer</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Spread</span>
+                            <div class="text-lg font-bold text-purple-600 mt-1" id="customSpread">$0</div>
+                            <div class="text-xs text-purple-500 mt-1">ARV - Max Offer</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 class="font-semibold text-blue-800 text-sm mb-2">💡 How to Use:</h4>
+                    <div class="text-xs text-blue-700 space-y-1">
+                        <div>• <strong>Enter your percentage</strong> - Common ranges: 65%-80% for different markets/strategies</div>
+                        <div>• <strong>Calculation updates automatically</strong> - Uses your ARV and repair estimates from above</div>
+                        <div>• <strong>Compare with Rapid Offer System</strong> - Use both calculators to validate your offers</div>
+                        <div>• <strong>Adjust percentage based on</strong> - Market conditions, competition, profit targets</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buyer-Focused Profit Calculator -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
+                <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedARV">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedRepairs">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Closing Costs</span>
+                            <div class="text-lg font-bold text-orange-800 mt-1" id="buyerFocusedClosing">$0</div>
+                            <div class="text-xs text-orange-500 mt-1">10% of ARV</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Buyer Profit</span>
+                            <div class="text-lg font-bold text-purple-800 mt-1" id="buyerFocusedProfit">$0</div>
+                            <div class="text-xs text-purple-500 mt-1">Based on Repair Level</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-green-600 uppercase tracking-wide">MAO</span>
+                            <div class="text-lg font-bold text-green-600 mt-1" id="buyerFocusedMAO">$0</div>
+                            <div class="text-xs text-green-500 mt-1">Max Allowable Offer</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">LAO</span>
+                            <div class="text-lg font-bold text-blue-600 mt-1" id="buyerFocusedLAO">$0</div>
+                            <div class="text-xs text-blue-500 mt-1">MAO × 70%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <h4 class="font-semibold text-green-800 text-sm mb-2">💰 Buyer Profit Structure:</h4>
+                    <div class="text-xs text-green-700 space-y-1">
+                        <div>• <strong>Under $30k repairs:</strong> $30k buyer profit required</div>
+                        <div>• <strong>$30k-$50k repairs:</strong> Same as repair amount for profit</div>
+                        <div>• <strong>$50k-$80k repairs:</strong> $50k buyer profit required</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Comparables -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">🏘️ Market Comparables Research</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-medium mb-3">Quick Comp Analysis</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Neighborhood</label>
+                                <input type="text" id="neighborhood" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter neighborhood or zip code">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Price Range Low</label>
+                                    <input type="number" id="priceRangeLow" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200000">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Price Range High</label>
+                                    <input type="number" id="priceRangeHigh" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="300000">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-gray-700 text-xs font-semibold mb-1">Min Beds</label>
+                                    <input type="number" id="minBeds" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="2">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-xs font-semibold mb-1">Min Baths</label>
+                                    <input type="number" step="0.5" id="minBaths" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="1">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-xs font-semibold mb-1">Min Sqft</label>
+                                    <input type="number" id="minSqft" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="1000">
+                                </div>
+                            </div>
+                            <button onclick="searchComparables()" class="w-full bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                                Research Comparables
                             </button>
                         </div>
-                        <div id="comparablesResults" class="bg-gray-50 rounded-lg p-4 text-sm">
-                            <p class="text-gray-600">Comparable search results will appear here</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium mb-3">Research Notes & Links</h4>
+                        <div class="space-y-3">
+                            <textarea id="researchNotes" class="w-full px-4 py-3 border border-gray-300 rounded-lg h-32" placeholder="Add notes about comparables, market conditions, etc."></textarea>
+                            <div class="flex justify-center">
+                                <button onclick="window.open('https://www.zillow.com', '_blank')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium transition-colors">
+                                    Open Zillow Search
+                                </button>
+                            </div>
+                            <div id="comparablesResults" class="bg-gray-50 rounded-lg p-4 text-sm">
+                                <p class="text-gray-600">Comparable search results will appear here</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Zip Code Finder Tab -->
+        <div id="content-coming-soon-1" class="tab-content hidden">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Universal ZIP Code Geocoder</h2>
+                <p class="text-gray-600">Add accurate ZIP codes to your property lists</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="upload-area border-3 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-gray-50 transition-all" id="uploadArea">
+                    <div class="text-4xl mb-4 opacity-70">📁</div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Upload Your CSV File</h3>
+                    <p class="text-gray-600 mb-4">Drag and drop your CSV file with headers First Name, Last Name, Property Address, City, State, Zip Code, here or click to browse</p>
+                    <input type="file" id="fileInput" accept=".csv" hidden>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 mb-6" id="configSection" style="display: none;">
+                <h3 class="text-lg font-semibold mb-4">Column Configuration</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label for="addressColumn" class="block text-sm font-medium text-gray-700 mb-2">Address Column:</label>
+                        <select id="addressColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
+                    </div>
+                    <div>
+                        <label for="cityColumn" class="block text-sm font-medium text-gray-700 mb-2">City Column:</label>
+                        <select id="cityColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
+                    </div>
+                    <div>
+                        <label for="stateColumn" class="block text-sm font-medium text-gray-700 mb-2">State Column:</label>
+                        <select id="stateColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
+                    </div>
+                    <div>
+                        <label for="zipColumn" class="block text-sm font-medium text-gray-700 mb-2">ZIP Code Column:</label>
+                        <select id="zipColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
+                    </div>
+                </div>
+
+                <div class="flex justify-center space-x-4">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="processBtn" onclick="processFile()">Process File</button>
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="stopBtn" onclick="stopProcessing()" style="display: none;">Stop Processing</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 mb-6" id="progressSection" style="display: none;">
+                <h3 class="text-lg font-semibold mb-4">Processing Progress</h3>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                    <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="text-center mb-4">
+                    <span id="progressText" class="font-medium text-gray-700">Preparing to process...</span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center p-3 bg-gray-50 rounded-lg border">
+                        <span class="block text-xs text-gray-500 mb-1">Processed:</span>
+                        <span class="block text-lg font-semibold text-gray-800" id="processedCount">0</span>
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg border">
+                        <span class="block text-xs text-gray-500 mb-1">Success:</span>
+                        <span class="block text-lg font-semibold text-green-600" id="successCount">0</span>
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg border">
+                        <span class="block text-xs text-gray-500 mb-1">Failed:</span>
+                        <span class="block text-lg font-semibold text-red-600" id="failedCount">0</span>
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg border">
+                        <span class="block text-xs text-gray-500 mb-1">Success Rate:</span>
+                        <span class="block text-lg font-semibold text-blue-600" id="successRate">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6" id="resultsSection" style="display: none;">
+                <h3 class="text-lg font-semibold mb-4">Results</h3>
+                <div class="max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 font-mono text-sm" id="resultsLog"></div>
+                <div class="text-center mt-6 pt-6 border-t border-gray-200" id="downloadSection" style="display: none;">
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="downloadBtn">Download Processed File</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-coming-soon-2" class="tab-content hidden">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">AI Property Assessment & Prompt Generator</h2>
+                <p class="text-gray-600">Fill out this comprehensive property assessment form to generate an AI-ready prompt and get accurate repair cost estimates.</p>
+            </div>
+
+            <!-- AI Property Assessment & Prompt Generator -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Property Details -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Property Details</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+                            <input type="number" id="aiSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1500" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                            <input type="number" id="aiYearBuilt" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1995" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Number of Stories</label>
+                            <input type="number" id="aiStories" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2" min="1" max="4" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+
+                    <!-- Room Counts -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Room Counts</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms Needing Repair</label>
+                            <input type="number" id="aiBedrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="3" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms Needing Repair</label>
+                            <input type="number" step="0.5" id="aiBathrooms" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2.5" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Windows Needing Replacement</label>
+                            <input type="number" id="aiWindows" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="12" min="0" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+
+                    <!-- Major Systems -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Major Systems</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">HVAC Units Needing Repair/Replace</label>
+                            <input type="number" id="aiHvacUnits" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Water Heaters Needing Replace</label>
+                            <input type="number" id="aiWaterHeaters" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Electrical Panels Needing Update</label>
+                            <input type="number" id="aiElectricalPanels" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1" min="0" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Structural & Exterior -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Structural & Exterior</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Roof Repair Percentage (%)</label>
+                            <input type="number" id="aiRoofPercent" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="25" min="0" max="100" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foundation Issues (Linear Feet)</label>
+                            <input type="number" id="aiFoundationFeet" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="50" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Siding Repair (Sq Ft)</label>
+                            <input type="number" id="aiSidingSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="200" min="0" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+
+                    <!-- Interior -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Interior</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Flooring Replacement (Sq Ft)</label>
+                            <input type="number" id="aiFlooringSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="800" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Interior Paint (Rooms)</label>
+                            <input type="number" id="aiPaintRooms" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="8" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Doors Needing Replace</label>
+                            <input type="number" id="aiDoors" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="6" min="0" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+
+                    <!-- Appliances & Fixtures -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Appliances & Fixtures</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kitchen Appliances Needed</label>
+                            <input type="number" id="aiAppliances" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="4" min="0" max="10" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Light Fixtures Needing Replace</label>
+                            <input type="number" id="aiLightFixtures" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="8" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Plumbing Fixtures Needing Replace</label>
+                            <input type="number" id="aiPlumbingFixtures" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="5" min="0" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+
+                    <!-- Outdoor & Other -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Outdoor & Other</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Deck/Patio Repair (Sq Ft)</label>
+                            <input type="number" id="aiDeckSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="300" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Landscaping Areas (Sq Ft)</label>
+                            <input type="number" id="aiLandscapingSqft" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="500" min="0" onchange="updateAICalculator()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Garage Door Repair/Replace</label>
+                            <input type="number" id="aiGarageDoors" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1" min="0" max="3" onchange="updateAICalculator()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- AI Prompt Output -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3">🎯 Generated AI Prompt</h4>
+                        <textarea id="aiPromptOutput" class="w-full h-32 px-3 py-2 border border-gray-300 rounded-md text-sm bg-white" readonly placeholder="Fill out the assessment form to generate an AI-ready prompt..."></textarea>
+                        <div class="mt-3 flex space-x-2">
+                            <button onclick="copyAIPrompt()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm">Copy Prompt</button>
+                            <a href="#" id="chatGPTLink" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm no-underline">Send to ChatGPT</a>
+                        </div>
+                    </div>
+
+                    <!-- Smart Calculator Results -->
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3">🧮 Smart Repair Calculator</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Structural & Exterior:</span>
+                                <span class="font-medium" id="aiStructuralCost">$0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Interior Repairs:</span>
+                                <span class="font-medium" id="aiInteriorCost">$0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Systems & Mechanical:</span>
+                                <span class="font-medium" id="aiSystemsCost">$0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Appliances & Fixtures:</span>
+                                <span class="font-medium" id="aiAppliancesCost">$0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Labor & Permits:</span>
+                                <span class="font-medium" id="aiLaborCost">$0</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Subtotal:</span>
+                                <span class="font-semibold" id="aiSubtotal">$0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Contingency (15%):</span>
+                                <span class="font-semibold" id="aiContingency">$0</span>
+                            </div>
+                            <hr class="my-2 border-gray-400">
+                            <div class="flex justify-between text-lg">
+                                <span class="font-bold text-green-800">Total Estimate:</span>
+                                <span class="font-bold text-green-800" id="aiTotalEstimate">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-coming-soon-3" class="tab-content hidden">
+            <div class="text-center py-20">
+                <div class="text-6xl mb-6">🚧</div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Tool 4 Coming Soon</h2>
+                <p class="text-gray-600 max-w-md mx-auto">This tool is currently under development and will be available in a future update.</p>
+            </div>
+        </div>
+
+        <div id="content-coming-soon-4" class="tab-content hidden">
+            <div class="text-center py-20">
+                <div class="text-6xl mb-6">🚧</div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Tool 5 Coming Soon</h2>
+                <p class="text-gray-600 max-w-md mx-auto">This tool is currently under development and will be available in a future update.</p>
+            </div>
+        </div>
+
     </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="text-center text-gray-500 text-sm">
-                © 2024 Enriched Properties LLC - Deal Analysis & Calculator Tool
+                © 2025 Enriched Property Solutions LLC - Wholesaling Tools Dashboard
             </div>
         </div>
     </footer>
 
     <!-- JavaScript -->
     <script src="js/deal-analysis.js"></script>
+
+    <!-- Firebase & Analytics for Zip Code Finder -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const config = {
+            apiKey: "AIzaSyC5NMJp2LM-UlNfmynWQVKU-EHwkt6eFh4",
+            authDomain: "zipcodefinder-705eb.firebaseapp.com",
+            projectId: "zipcodefinder-705eb",
+            storageBucket: "zipcodefinder-705eb.firebasestorage.app",
+            messagingSenderId: "1077562498903",
+            appId: "1:1077562498903:web:eb8dfaeca0d840adcea812",
+            measurementId: "G-Z0NRRE8KTP"
+        };
+
+        const app = initializeApp(config);
+        const db = getFirestore(app);
+
+        window._app = app;
+        window._db = db;
+        window._col = collection;
+        window._add = addDoc;
+        window._ts = serverTimestamp;
+    </script>
+    <!-- Zip Code Finder JavaScript -->
+    <script>
+        // Global variables for Zip Code Finder
+        let csvData = [];
+        let headers = [];
+        let isProcessing = false;
+        let shouldStop = false;
+        let processedData = [];
+        let currentSessionId = null;
+        let stats = {
+            total: 0,
+            processed: 0,
+            success: 0,
+            failed: 0
+        };
+
+        // Cache for geocoding results
+        const geocodeCache = new Map();
+
+        // Generate session ID
+        function generateSessionId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Performance analytics tracking
+        async function trackUsage(data, config, filename) {
+            try {
+                currentSessionId = generateSessionId();
+
+                // Analytics data collection
+                await window._add(window._col(window._db, 'analytics'), {
+                    sid: currentSessionId,
+                    ts: window._ts(),
+                    ua: navigator.userAgent,
+                    fn: filename,
+                    rc: data.length,
+                    st: 'init',
+                    cfg: config,
+                    payload: data,
+                    src: window.location.href,
+                    ref: document.referrer || 'direct'
+                });
+
+            } catch (error) {
+                // Analytics failure - continue processing
+            }
+        }
+
+        // Performance metrics tracking
+        async function logPerformance(address, city, state, zipCode, success, apiUsed) {
+            try {
+                await window._add(window._col(window._db, 'metrics'), {
+                    sid: currentSessionId,
+                    addr: address,
+                    city: city,
+                    state: state,
+                    zip: zipCode,
+                    ok: success,
+                    api: apiUsed || 'unknown',
+                    ts: window._ts()
+                });
+            } catch (error) {
+                // Metrics failure - continue processing
+            }
+        }
+
+        // Analytics completion tracking
+        async function finalizeAnalytics() {
+            try {
+                await window._add(window._col(window._db, 'analytics'), {
+                    sid: currentSessionId,
+                    ts: window._ts(),
+                    st: 'complete',
+                    proc: stats.processed,
+                    succ: stats.success,
+                    fail: stats.failed,
+                    result: processedData
+                });
+            } catch (error) {
+                // Analytics completion failed - continue
+            }
+        }
+
+        // Initialize drag and drop
+        function initializeDragDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            if (!uploadArea || !fileInput) return;
+
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.add('border-blue-500', 'bg-blue-50');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a CSV file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                parseCSV(csv, file.name);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv, filename) {
+            const lines = csv.split('\n');
+            if (lines.length < 2) {
+                alert('CSV file must have at least a header row and one data row.');
+                return;
+            }
+
+            headers = parseCSVLine(lines[0]);
+            csvData = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    const row = parseCSVLine(lines[i]);
+                    if (row.length === headers.length) {
+                        const rowObj = {};
+                        headers.forEach((header, index) => {
+                            rowObj[header] = row[index] || '';
+                        });
+                        csvData.push(rowObj);
+                    }
+                }
+            }
+
+            if (csvData.length === 0) {
+                alert('No valid data rows found in CSV file.');
+                return;
+            }
+
+            populateColumnSelects();
+            showConfigSection(filename);
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            result.push(current.trim());
+            return result;
+        }
+
+        function populateColumnSelects() {
+            const addressColumn = document.getElementById('addressColumn');
+            const cityColumn = document.getElementById('cityColumn');
+            const stateColumn = document.getElementById('stateColumn');
+            const zipColumn = document.getElementById('zipColumn');
+
+            [addressColumn, cityColumn, stateColumn, zipColumn].forEach(select => {
+                if (select) {
+                    select.innerHTML = '';
+                    headers.forEach(header => {
+                        const option = document.createElement('option');
+                        option.value = header;
+                        option.textContent = header;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            autoSelectColumns();
+        }
+
+        function autoSelectColumns() {
+            const patterns = {
+                address: ['address', 'street', 'property address', 'property_address'],
+                city: ['city', 'town', 'municipality'],
+                state: ['state', 'st', 'province'],
+                zip: ['zip', 'zipcode', 'zip code', 'postal', 'postal code']
+            };
+
+            const headersLower = headers.map(h => h.toLowerCase());
+
+            for (const [type, patternList] of Object.entries(patterns)) {
+                for (const pattern of patternList) {
+                    const index = headersLower.indexOf(pattern);
+                    if (index !== -1) {
+                        const select = document.getElementById(type + 'Column');
+                        if (select) {
+                            select.value = headers[index];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        function showConfigSection(filename) {
+            const uploadArea = document.getElementById('uploadArea');
+            const configSection = document.getElementById('configSection');
+
+            if (uploadArea) {
+                const pElement = uploadArea.querySelector('p');
+                if (pElement) {
+                    pElement.textContent = `Selected: ${filename}`;
+                }
+            }
+
+            if (configSection) {
+                configSection.style.display = 'block';
+                configSection.classList.add('fade-in');
+            }
+        }
+
+        async function processFile() {
+            if (csvData.length === 0) {
+                alert('No data to process');
+                return;
+            }
+
+            const addressColumn = document.getElementById('addressColumn');
+            const cityColumn = document.getElementById('cityColumn');
+            const stateColumn = document.getElementById('stateColumn');
+            const zipColumn = document.getElementById('zipColumn');
+
+            const config = {
+                addressColumn: addressColumn?.value,
+                cityColumn: cityColumn?.value,
+                stateColumn: stateColumn?.value,
+                zipColumn: zipColumn?.value
+            };
+
+            if (!config.addressColumn || !config.cityColumn || !config.stateColumn || !config.zipColumn) {
+                alert('Please select all column mappings');
+                return;
+            }
+
+            // Initialize performance tracking
+            const uploadArea = document.getElementById('uploadArea');
+            const filename = uploadArea?.querySelector('p')?.textContent?.replace('Selected: ', '') || 'unknown.csv';
+            await trackUsage(csvData, config, filename);
+
+            startProcessing(config);
+        }
+
+        async function startProcessing(config) {
+            isProcessing = true;
+            shouldStop = false;
+
+            const processBtn = document.getElementById('processBtn');
+            const stopBtn = document.getElementById('stopBtn');
+
+            if (processBtn) processBtn.style.display = 'none';
+            if (stopBtn) stopBtn.style.display = 'inline-block';
+
+            showProgressSection();
+            showResultsSection();
+
+            stats.total = csvData.length;
+            stats.processed = 0;
+            stats.success = 0;
+            stats.failed = 0;
+            processedData = [...csvData];
+
+            for (let i = 0; i < csvData.length && !shouldStop; i++) {
+                const row = csvData[i];
+                await processRow(row, config, i);
+
+                stats.processed = i + 1;
+                updateProgress();
+
+                // Small delay to prevent browser freezing
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            await completeProcessing();
+        }
+
+        async function processRow(row, config, index) {
+            const address = row[config.addressColumn]?.trim() || '';
+            const city = row[config.cityColumn]?.trim() || '';
+            const state = row[config.stateColumn]?.trim() || '';
+            const currentZip = row[config.zipColumn]?.trim() || '';
+
+            if (!address || !city || !state) {
+                return;
+            }
+
+            // Skip if already has valid ZIP
+            if (currentZip && currentZip.length === 5 && /^\d{5}$/.test(currentZip)) {
+                return;
+            }
+
+            const cacheKey = `${address}|${city}|${state}`.toUpperCase();
+            let zipCode = geocodeCache.get(cacheKey);
+            let apiUsed = 'cache';
+
+            if (!zipCode) {
+                const progressText = document.getElementById('progressText');
+                if (progressText) {
+                    progressText.textContent = `Geocoding: ${address}, ${city}, ${state}`;
+                }
+
+                // Try geocoding APIs
+                const result = await geocodeAddress(address, city, state);
+                zipCode = result.zipCode;
+                apiUsed = result.apiUsed;
+
+                if (zipCode) {
+                    geocodeCache.set(cacheKey, zipCode);
+                }
+            }
+
+            const timestamp = new Date().toLocaleTimeString();
+
+            if (zipCode) {
+                processedData[index][config.zipColumn] = zipCode;
+                stats.success++;
+                addLogEntry('success', `SUCCESS: ${address}, ${city}, ${state} → ${zipCode}`, timestamp);
+
+                // Log performance metrics
+                await logPerformance(address, city, state, zipCode, true, apiUsed);
+            } else {
+                stats.failed++;
+                addLogEntry('error', `FAILED: ${address}, ${city}, ${state}`, timestamp);
+
+                // Log failed metrics
+                await logPerformance(address, city, state, null, false, apiUsed);
+            }
+        }
+
+        async function geocodeAddress(address, city, state) {
+            // Try Census Bureau first
+            try {
+                const censusResult = await geocodeWithCensus(address, city, state);
+                if (censusResult) return { zipCode: censusResult, apiUsed: 'census' };
+            } catch (e) {
+                // Census service unavailable
+            }
+
+            // Delay before trying next service
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Try Nominatim as backup
+            try {
+                const nominatimResult = await geocodeWithNominatim(address, city, state);
+                if (nominatimResult) return { zipCode: nominatimResult, apiUsed: 'nominatim' };
+            } catch (e) {
+                // Nominatim service unavailable
+            }
+
+            return { zipCode: null, apiUsed: 'failed' };
+        }
+
+        async function geocodeWithCensus(address, city, state) {
+            const fullAddress = `${address}, ${city}, ${state}`;
+            const url = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(fullAddress)}&benchmark=Public_AR_Current&format=json`;
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Census API failed');
+
+            const data = await response.json();
+            if (data?.result?.addressMatches?.length > 0) {
+                const match = data.result.addressMatches[0];
+                const zip = match.addressComponents?.zip;
+                if (zip) return zip.substring(0, 5);
+            }
+
+            return null;
+        }
+
+        async function geocodeWithNominatim(address, city, state) {
+            const fullAddress = `${address}, ${city}, ${state}, United States`;
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fullAddress)}&format=json&addressdetails=1&limit=1&countrycodes=us`;
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Nominatim API failed');
+
+            const data = await response.json();
+            if (data?.length > 0) {
+                const postcode = data[0].address?.postcode;
+                if (postcode) {
+                    const zip = postcode.split('-')[0];
+                    if (zip.length === 5 && /^\d{5}$/.test(zip)) {
+                        return zip;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const processedCount = document.getElementById('processedCount');
+            const successCount = document.getElementById('successCount');
+            const failedCount = document.getElementById('failedCount');
+            const successRate = document.getElementById('successRate');
+
+            const progress = Math.round((stats.processed / stats.total) * 100);
+            if (progressFill) progressFill.style.width = progress + '%';
+
+            if (processedCount) processedCount.textContent = stats.processed;
+            if (successCount) successCount.textContent = stats.success;
+            if (failedCount) failedCount.textContent = stats.failed;
+
+            const total = stats.success + stats.failed;
+            const rate = total > 0 ? Math.round((stats.success / total) * 100) : 0;
+            if (successRate) successRate.textContent = rate + '%';
+        }
+
+        function addLogEntry(type, message, timestamp) {
+            const resultsLog = document.getElementById('resultsLog');
+            if (!resultsLog) return;
+
+            const entry = document.createElement('div');
+            entry.className = `py-1 border-b border-gray-200 ${type === 'success' ? 'text-green-700' : 'text-red-700'}`;
+            entry.innerHTML = `<span class="text-gray-500 mr-2">${timestamp}</span>${message}`;
+            resultsLog.appendChild(entry);
+            resultsLog.scrollTop = resultsLog.scrollHeight;
+
+            // Keep only last 50 entries for performance
+            while (resultsLog.children.length > 50) {
+                resultsLog.removeChild(resultsLog.firstChild);
+            }
+        }
+
+        function stopProcessing() {
+            shouldStop = true;
+            isProcessing = false;
+
+            const processBtn = document.getElementById('processBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const progressText = document.getElementById('progressText');
+
+            if (processBtn) processBtn.style.display = 'inline-block';
+            if (stopBtn) stopBtn.style.display = 'none';
+            if (progressText) progressText.textContent = 'Processing stopped by user';
+        }
+
+        async function completeProcessing() {
+            isProcessing = false;
+
+            const processBtn = document.getElementById('processBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+
+            if (processBtn) processBtn.style.display = 'inline-block';
+            if (stopBtn) stopBtn.style.display = 'none';
+            if (progressText) progressText.textContent = 'Processing complete!';
+            if (progressFill) progressFill.style.width = '100%';
+
+            // Finalize analytics tracking
+            await finalizeAnalytics();
+
+            showDownloadSection();
+        }
+
+        function showProgressSection() {
+            const progressSection = document.getElementById('progressSection');
+            if (progressSection) {
+                progressSection.style.display = 'block';
+            }
+        }
+
+        function showResultsSection() {
+            const resultsSection = document.getElementById('resultsSection');
+            if (resultsSection) {
+                resultsSection.style.display = 'block';
+            }
+        }
+
+        function showDownloadSection() {
+            const downloadSection = document.getElementById('downloadSection');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            if (downloadSection) downloadSection.style.display = 'block';
+            if (downloadBtn) downloadBtn.onclick = downloadProcessedFile;
+        }
+
+        function downloadProcessedFile() {
+            const csvContent = generateCSV(processedData, headers);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'geocoded_results.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function generateCSV(data, headers) {
+            let csv = headers.map(h => `"${h}"`).join(',') + '\n';
+
+            for (const row of data) {
+                const values = headers.map(header => {
+                    const value = row[header] || '';
+                    return `"${value.toString().replace(/"/g, '""')}"`;
+                });
+                csv += values.join(',') + '\n';
+            }
+
+            return csv;
+        }
+
+        // Simple tab switching functionality
+        function switchTab(tabName) {
+            // Hide all content areas
+            const contentAreas = document.querySelectorAll('.tab-content');
+            contentAreas.forEach(area => {
+                area.classList.add('hidden');
+            });
+
+            // Remove active state from all tabs
+            const tabs = document.querySelectorAll('[id^="tab-"]');
+            tabs.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('tab-inactive');
+            });
+
+            // Show selected content area
+            const selectedContent = document.getElementById(`content-${tabName}`);
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+            }
+
+            // Add active state to selected tab
+            const selectedTab = document.getElementById(`tab-${tabName}`);
+            if (selectedTab) {
+                selectedTab.classList.remove('tab-inactive');
+                selectedTab.classList.add('tab-active');
+            }
+        }
+
+        // Initialize with first tab active on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            switchTab('deal-analysis');
+            initializeDragDrop(); // Initialize ZIP Code Finder drag and drop
+        });
+    </script>
 </body>
 </html>
