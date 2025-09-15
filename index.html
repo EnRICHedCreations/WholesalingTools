@@ -104,8 +104,8 @@
     <!-- Main Navigation Tabs -->
     <div class="bg-white border-b sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="tab-container">
-                <nav class="tab-list flex space-x-1 py-2" role="tablist">
+            <div class="tab-container overflow-x-auto whitespace-nowrap">
+                <nav class="tab-list flex space-x-2 py-2 min-w-max" role="tablist">
                     <button onclick="switchTab('deal-analysis')" id="tab-deal-analysis" class="tab-active px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         📊 Deal Analysis & Calculator
                     </button>
@@ -133,7 +133,7 @@
         <div id="content-deal-analysis" class="tab-content">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-900">Deal Analysis & Calculator</h2>
-                <button onclick="clearAnalysis()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                <button onclick="clearAnalysis()" class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
                     Clear Analysis
                 </button>
             </div>
@@ -142,7 +142,7 @@
                 <p class="text-sm text-blue-800"><strong>How to use:</strong> Enter your ARV and repair costs to use the calculators below, they are based on these two inputs.</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">       
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">       
                 <!-- ARV Calculator -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold mb-4">🏠 ARV Calculator</h3>
@@ -196,7 +196,7 @@
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h3 class="text-lg font-semibold mb-6">💰 Profit Margin Analysis and Deal Evaluation</h3>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
                     <!-- Left Side: Input Values -->
                     <div class="space-y-4">
                         <h4 class="font-medium text-gray-900 border-b pb-2">Input Values</h4>
@@ -286,7 +286,7 @@
                 <h3 class="text-lg font-semibold mb-4">⚡ Rapid Offer System Calculator</h3>
                 <p class="text-sm text-gray-600 mb-4">Based on Flip with Rick / Zach Ginn Wholesaling Formula</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="text-center">
                             <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Net Value</span>
@@ -336,7 +336,7 @@
                 <h3 class="text-lg font-semibold mb-4">📊 Custom Percentage Calculator</h3>
                 <p class="text-sm text-gray-600 mb-4">Formula: (ARV × X%) - Repairs = Max Offer</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="text-center">
                             <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
@@ -395,7 +395,7 @@
                 <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
                 <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="text-center">
                             <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
@@ -458,7 +458,7 @@
             <!-- Market Comparables -->
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="text-lg font-semibold mb-4">🏘️ Market Comparables Research</h3>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                     <div>
                         <h4 class="font-medium mb-3">Quick Comp Analysis</h4>
                         <div class="space-y-3">
@@ -490,7 +490,7 @@
                                     <input type="number" id="minSqft" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="1000">
                                 </div>
                             </div>
-                            <button onclick="searchComparables()" class="w-full bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            <button onclick="searchComparables()" class="w-full sm:w-auto bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
                                 Research Comparables
                             </button>
                         </div>
@@ -500,7 +500,7 @@
                         <div class="space-y-3">
                             <textarea id="researchNotes" class="w-full px-4 py-3 border border-gray-300 rounded-lg h-32" placeholder="Add notes about comparables, market conditions, etc."></textarea>
                             <div class="flex justify-center">
-                                <button onclick="window.open('https://www.zillow.com', '_blank')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium transition-colors">
+                                <button onclick="window.open('https://www.zillow.com', '_blank')" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium transition-colors">
                                     Open Zillow Search
                                 </button>
                             </div>
@@ -528,13 +528,13 @@
                     <h3 class="text-xl font-semibold mb-2 text-gray-800">Upload Your CSV File</h3>
                     <p class="text-gray-600 mb-4">Drag and drop your CSV file with headers First Name, Last Name, Property Address, City, State, Zip Code, here or click to browse</p>
                     <input type="file" id="fileInput" accept=".csv" hidden>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                    <button class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="document.getElementById('fileInput').click()">Browse Files</button>
                 </div>
             </div>
 
             <div class="bg-white rounded-lg shadow p-6 mb-6" id="configSection" style="display: none;">
                 <h3 class="text-lg font-semibold mb-4">Column Configuration</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div>
                         <label for="addressColumn" class="block text-sm font-medium text-gray-700 mb-2">Address Column:</label>
                         <select id="addressColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
@@ -554,8 +554,8 @@
                 </div>
 
                 <div class="flex justify-center space-x-4">
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="processBtn" onclick="processFile()">Process File</button>
-                    <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="stopBtn" onclick="stopProcessing()" style="display: none;">Stop Processing</button>
+                    <button class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="processBtn" onclick="processFile()">Process File</button>
+                    <button class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="stopBtn" onclick="stopProcessing()" style="display: none;">Stop Processing</button>
                 </div>
             </div>
 
@@ -589,9 +589,9 @@
 
             <div class="bg-white rounded-lg shadow p-6" id="resultsSection" style="display: none;">
                 <h3 class="text-lg font-semibold mb-4">Results</h3>
-                <div class="max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 font-mono text-sm" id="resultsLog"></div>
+                <div class="max-h-60 sm:max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 font-mono text-sm" id="resultsLog"></div>
                 <div class="text-center mt-6 pt-6 border-t border-gray-200" id="downloadSection" style="display: none;">
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="downloadBtn">Download Processed File</button>
+                    <button class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="downloadBtn">Download Processed File</button>
                 </div>
             </div>
         </div>
@@ -604,7 +604,7 @@
 
             <!-- AI Property Assessment & Prompt Generator -->
             <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     <!-- Property Details -->
                     <div class="space-y-4">
                         <h4 class="font-medium text-gray-900 border-b pb-2">Property Details</h4>
@@ -657,7 +657,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <!-- Structural & Exterior -->
                     <div class="space-y-4">
                         <h4 class="font-medium text-gray-900 border-b pb-2">Structural & Exterior</h4>
@@ -727,7 +727,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                     <!-- AI Prompt Output -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h4 class="font-medium text-gray-900 mb-3">🎯 Generated AI Prompt</h4>
