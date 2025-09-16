@@ -62,6 +62,9 @@ function calculateARV() {
     const avgARV = getARVValue();
     document.getElementById('calculatedARV').textContent = formatCurrency(avgARV);
     updateProfitDisplay();
+    updateRapidOfferSystem();
+    calculateCustomOffer();
+    calculateBuyerFocusedOffer();
 }
 
 // ===========================================
@@ -75,10 +78,13 @@ function getRepairsValue() {
 
 function updateSimpleRepairs() {
     const { totalRepairs } = getRepairsValue();
-    
+
     document.getElementById('totalRepairs').textContent = formatCurrency(totalRepairs);
-    
+
     updateProfitDisplay();
+    updateRapidOfferSystem();
+    calculateCustomOffer();
+    calculateBuyerFocusedOffer();
 }
 
 function calculateRepairs() {
@@ -120,17 +126,8 @@ function updateProfitDisplay() {
     document.getElementById('buyerProfit').textContent = formatCurrency(buyerProfit);
     document.getElementById('yourProfit').textContent = formatCurrency(yourProfit);
     
-    // Update ROI display
+    // Update Deal Score and Evaluation
     updateROIDisplay();
-    
-    // Update Rapid Offer System
-    updateRapidOfferSystem();
-    
-    // Calculate Custom Offer automatically
-    calculateCustomOffer();
-    
-    // Calculate Buyer-Focused Offer automatically
-    calculateBuyerFocusedOffer();
 }
 
 // ===========================================
@@ -142,65 +139,78 @@ function calculateROI() {
 }
 
 function updateROIDisplay() {
+    const arv = getARVValue();
+    const { totalRepairs } = getRepairsValue();
     const assignmentFee = parseFloat(document.getElementById('assignmentFee').value) || 0;
     const marketingCosts = parseFloat(document.getElementById('marketingCosts').value) || 0;
     const otherCosts = parseFloat(document.getElementById('otherCosts').value) || 0;
-    const timeInvestment = parseFloat(document.getElementById('timeInvestment').value) || 0;
-    const hourlyTarget = parseFloat(document.getElementById('hourlyTarget').value) || 0;
-    const daysToClose = parseFloat(document.getElementById('daysToClose').value) || 30;
-    
+    const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
+
     const totalCosts = marketingCosts + otherCosts;
     const netProfit = assignmentFee - totalCosts;
-    
-    // Calculate metrics
-    const profitPerHour = timeInvestment > 0 ? netProfit / timeInvestment : 0;
-    const monthlyROI = daysToClose > 0 ? (netProfit / daysToClose) * 30 : 0;
-    
-    // Calculate deal score
+    const closingFees = arv * 0.1;
+    const buyerProfit = arv - purchasePrice - totalRepairs - closingFees - assignmentFee;
+
+    // Calculate deal score based on multiple factors
     let dealScore = 'F';
     let dealColor = 'text-red-600';
-    
-    if (profitPerHour >= hourlyTarget * 2) {
+
+    // Scoring criteria based on profit margins and deal quality
+    const profitMargin = arv > 0 ? (netProfit / arv) * 100 : 0; // Your profit as % of ARV
+    const buyerMargin = arv > 0 ? (buyerProfit / arv) * 100 : 0; // Buyer profit as % of ARV
+    const totalSpread = arv - purchasePrice - totalRepairs; // Total potential profit in deal
+
+    // Grade based on combined factors
+    if (netProfit >= 15000 && buyerProfit >= 30000 && profitMargin >= 4) {
         dealScore = 'A+';
         dealColor = 'text-green-600';
-    } else if (profitPerHour >= hourlyTarget * 1.5) {
+    } else if (netProfit >= 10000 && buyerProfit >= 25000 && profitMargin >= 3) {
         dealScore = 'A';
         dealColor = 'text-green-600';
-    } else if (profitPerHour >= hourlyTarget) {
+    } else if (netProfit >= 7500 && buyerProfit >= 20000 && profitMargin >= 2.5) {
         dealScore = 'B';
         dealColor = 'text-blue-600';
-    } else if (profitPerHour >= hourlyTarget * 0.75) {
+    } else if (netProfit >= 5000 && buyerProfit >= 15000 && profitMargin >= 2) {
         dealScore = 'C';
         dealColor = 'text-yellow-600';
-    } else if (profitPerHour >= hourlyTarget * 0.5) {
+    } else if (netProfit >= 2500 && buyerProfit >= 10000 && profitMargin >= 1) {
         dealScore = 'D';
         dealColor = 'text-orange-600';
     }
-    
-    // Update display
-    document.getElementById('profitPerHour').textContent = formatCurrency(profitPerHour);
-    document.getElementById('monthlyROI').textContent = formatCurrency(monthlyROI);
+
+    // Update deal score display
     const dealScoreEl = document.getElementById('dealScore');
-    dealScoreEl.textContent = dealScore;
-    dealScoreEl.className = `text-lg font-bold ${dealColor}`;
-    
+    if (dealScoreEl) {
+        dealScoreEl.textContent = dealScore;
+        dealScoreEl.className = `text-2xl font-bold ${dealColor}`;
+    }
+
     // Update evaluation text
     let evaluation = '';
-    if (netProfit <= 0) {
+    if (arv === 0 || totalRepairs === 0) {
+        evaluation = 'Enter ARV and repair costs to see evaluation';
+    } else if (netProfit <= 0) {
         evaluation = 'This deal will lose money. Not recommended.';
-    } else if (dealScore === 'A+' || dealScore === 'A') {
-        evaluation = 'Excellent deal! High profit per hour and great ROI.';
+    } else if (buyerProfit <= 0) {
+        evaluation = 'Buyer has no profit potential. Deal will not sell.';
+    } else if (dealScore === 'A+') {
+        evaluation = `Excellent deal! $${formatCurrency(netProfit).replace('$', '')} profit with strong buyer margins. High priority.`;
+    } else if (dealScore === 'A') {
+        evaluation = `Great deal! $${formatCurrency(netProfit).replace('$', '')} profit with good buyer appeal. Recommended.`;
     } else if (dealScore === 'B') {
-        evaluation = 'Good deal. Meets your hourly target.';
+        evaluation = `Good deal! $${formatCurrency(netProfit).replace('$', '')} profit. Solid wholesale opportunity.`;
     } else if (dealScore === 'C') {
-        evaluation = 'Average deal. Consider if you have better options.';
+        evaluation = `Average deal. $${formatCurrency(netProfit).replace('$', '')} profit. Consider if you need cash flow.`;
     } else if (dealScore === 'D') {
-        evaluation = 'Below target deal. Only take if needed for cash flow.';
+        evaluation = `Below average. $${formatCurrency(netProfit).replace('$', '')} profit. Low priority unless needed.`;
     } else {
-        evaluation = 'Poor deal. Very low profit per hour.';
+        evaluation = `Poor deal. Very low profit margins. Not recommended.`;
     }
-    
-    document.getElementById('dealEvaluation').textContent = evaluation;
+
+    const evalEl = document.getElementById('dealEvaluation');
+    if (evalEl) {
+        evalEl.textContent = evaluation;
+    }
 }
 
 // ===========================================
@@ -569,22 +579,16 @@ function searchComparables() {
 
 function clearAnalysis() {
     if (confirm('Clear all deal analysis data?')) {
-        // Property info
-        document.getElementById('propAddress').value = '';
-        document.getElementById('propSqft').value = '';
-        document.getElementById('propBeds').value = '';
-        document.getElementById('propBaths').value = '';
-        
         // ARV Calculator
         document.getElementById('comp1').value = '';
         document.getElementById('comp2').value = '';
         document.getElementById('comp3').value = '';
         document.getElementById('calculatedARV').textContent = '$0';
-        
+
         // Repairs
         document.getElementById('totalRepairsInput').value = '';
         document.getElementById('totalRepairs').textContent = '$0';
-        
+
         // AI Form
         const aiFields = [
             'aiSqft', 'aiYearBuilt', 'aiStories', 'aiBedrooms', 'aiBathrooms', 'aiWindows',
@@ -593,36 +597,32 @@ function clearAnalysis() {
             'aiAppliances', 'aiLightFixtures', 'aiPlumbingFixtures', 'aiDeckSqft',
             'aiLandscapingSqft', 'aiGarageDoors'
         ];
-        
+
         aiFields.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
-        
-        document.getElementById('aiPromptOutput').value = '';
-        
+
+        const promptOutput = document.getElementById('aiPromptOutput');
+        if (promptOutput) promptOutput.value = '';
+
         // Reset AI calculator results
         const aiResultFields = [
             'aiStructuralCost', 'aiInteriorCost', 'aiSystemsCost', 'aiAppliancesCost',
             'aiLaborCost', 'aiSubtotal', 'aiContingency', 'aiTotalEstimate'
         ];
-        
+
         aiResultFields.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.textContent = '$0';
         });
-        
+
         // Profit Analysis
         document.getElementById('purchasePrice').value = '';
         document.getElementById('assignmentFee').value = '';
         document.getElementById('marketingCosts').value = '';
         document.getElementById('otherCosts').value = '';
-        
-        // ROI Calculator
-        document.getElementById('timeInvestment').value = '';
-        document.getElementById('hourlyTarget').value = '';
-        document.getElementById('daysToClose').value = '';
-        
+
         // Comparables
         document.getElementById('neighborhood').value = '';
         document.getElementById('priceRangeLow').value = '';
@@ -632,13 +632,15 @@ function clearAnalysis() {
         document.getElementById('minSqft').value = '';
         document.getElementById('researchNotes').value = '';
         document.getElementById('comparablesResults').innerHTML = '<p class="text-gray-600">Comparable search results will appear here</p>';
-        
+
         // Custom percentage
         document.getElementById('customPercentage').value = '';
-        
+
         // Reset all calculated displays
+        calculateARV();
+        updateSimpleRepairs();
         updateProfitDisplay();
-        
+
         showSuccessMessage('All deal analysis data cleared!');
     }
 }
@@ -651,8 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all calculations when page loads
     calculateARV();
     updateSimpleRepairs();
-    calculateProfit();
-    calculateROI();
+    updateProfitDisplay();
     updateRapidOfferSystem();
     calculateCustomOffer();
     calculateBuyerFocusedOffer();
