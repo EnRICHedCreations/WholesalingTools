@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wholesaling Tools Dashboard - Enriched Property Solutions LLC</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         /* Custom styles for Deal Analysis */
         html {
@@ -79,7 +80,27 @@
     <!-- Header -->
     <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-8">
+            <!-- Mobile Header -->
+            <div class="flex flex-col space-y-4 py-6 md:hidden">
+                <div class="flex items-center justify-center space-x-3">
+                    <div class="bg-white rounded-lg p-2 shadow-md">
+                        <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <div class="text-center">
+                        <h1 class="text-xl font-bold text-white">Free Wholesaling Tools</h1>
+                        <p class="text-blue-100 text-xs font-medium">Real Estate Analysis Platform</p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white font-semibold text-xs">Created by</div>
+                    <div class="text-blue-100 text-xs">Enriched Property Solutions LLC</div>
+                </div>
+            </div>
+
+            <!-- Desktop Header -->
+            <div class="hidden md:flex justify-between items-center py-8">
                 <div class="flex items-center space-x-4">
                     <div class="bg-white rounded-lg p-2 shadow-md">
                         <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -104,8 +125,8 @@
     <!-- Main Navigation Tabs -->
     <div class="bg-white border-b sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="tab-container overflow-x-auto whitespace-nowrap">
-                <nav class="tab-list flex space-x-2 py-2 min-w-max" role="tablist">
+            <div class="tab-container">
+                <nav class="tab-list flex space-x-1 py-2" role="tablist">
                     <button onclick="switchTab('deal-analysis')" id="tab-deal-analysis" class="tab-active px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         📊 Deal Analysis & Calculator
                     </button>
@@ -115,11 +136,14 @@
                     <button onclick="switchTab('coming-soon-2')" id="tab-coming-soon-2" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         🤖 AI Property Assessment
                     </button>
-                    <button onclick="switchTab('coming-soon-3')" id="tab-coming-soon-3" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
-                        👥 Tool 4 (Coming Soon)
+                    <button onclick="switchTab('contracts-generator')" id="tab-contracts-generator" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        📄 Contract Generator
                     </button>
-                    <button onclick="switchTab('coming-soon-4')" id="tab-coming-soon-4" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
-                        📧 Tool 5 (Coming Soon)
+                    <button onclick="switchTab('rental-calculator')" id="tab-rental-calculator" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🏠 Rental Calculator
+                    </button>
+                    <button onclick="switchTab('seller-finance')" id="tab-seller-finance" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        💰 Seller Finance Calculator
                     </button>
                 </nav>
             </div>
@@ -133,7 +157,7 @@
         <div id="content-deal-analysis" class="tab-content">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-900">Deal Analysis & Calculator</h2>
-                <button onclick="clearAnalysis()" class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                <button onclick="clearAnalysis()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
                     Clear Analysis
                 </button>
             </div>
@@ -142,7 +166,7 @@
                 <p class="text-sm text-blue-800"><strong>How to use:</strong> Enter your ARV and repair costs to use the calculators below, they are based on these two inputs.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">       
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">       
                 <!-- ARV Calculator -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold mb-4">🏠 ARV Calculator</h3>
@@ -196,7 +220,7 @@
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h3 class="text-lg font-semibold mb-6">💰 Profit Margin Analysis and Deal Evaluation</h3>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Left Side: Input Values -->
                     <div class="space-y-4">
                         <h4 class="font-medium text-gray-900 border-b pb-2">Input Values</h4>
@@ -286,7 +310,7 @@
                 <h3 class="text-lg font-semibold mb-4">⚡ Rapid Offer System Calculator</h3>
                 <p class="text-sm text-gray-600 mb-4">Based on Flip with Rick / Zach Ginn Wholesaling Formula</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="text-center">
                             <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Net Value</span>
@@ -336,7 +360,7 @@
                 <h3 class="text-lg font-semibold mb-4">📊 Custom Percentage Calculator</h3>
                 <p class="text-sm text-gray-600 mb-4">Formula: (ARV × X%) - Repairs = Max Offer</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="text-center">
                             <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
@@ -395,7 +419,7 @@
                 <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
                 <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
                     <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="text-center">
                             <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
@@ -458,7 +482,7 @@
             <!-- Market Comparables -->
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="text-lg font-semibold mb-4">🏘️ Market Comparables Research</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-medium mb-3">Quick Comp Analysis</h4>
                         <div class="space-y-3">
@@ -490,7 +514,7 @@
                                     <input type="number" id="minSqft" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="1000">
                                 </div>
                             </div>
-                            <button onclick="searchComparables()" class="w-full sm:w-auto bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            <button onclick="searchComparables()" class="w-full bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
                                 Research Comparables
                             </button>
                         </div>
@@ -500,7 +524,7 @@
                         <div class="space-y-3">
                             <textarea id="researchNotes" class="w-full px-4 py-3 border border-gray-300 rounded-lg h-32" placeholder="Add notes about comparables, market conditions, etc."></textarea>
                             <div class="flex justify-center">
-                                <button onclick="window.open('https://www.zillow.com', '_blank')" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium transition-colors">
+                                <button onclick="window.open('https://www.zillow.com', '_blank')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium transition-colors">
                                     Open Zillow Search
                                 </button>
                             </div>
@@ -528,13 +552,13 @@
                     <h3 class="text-xl font-semibold mb-2 text-gray-800">Upload Your CSV File</h3>
                     <p class="text-gray-600 mb-4">Drag and drop your CSV file with headers First Name, Last Name, Property Address, City, State, Zip Code, here or click to browse</p>
                     <input type="file" id="fileInput" accept=".csv" hidden>
-                    <button class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="document.getElementById('fileInput').click()">Browse Files</button>
                 </div>
             </div>
 
             <div class="bg-white rounded-lg shadow p-6 mb-6" id="configSection" style="display: none;">
                 <h3 class="text-lg font-semibold mb-4">Column Configuration</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div>
                         <label for="addressColumn" class="block text-sm font-medium text-gray-700 mb-2">Address Column:</label>
                         <select id="addressColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
@@ -554,8 +578,8 @@
                 </div>
 
                 <div class="flex justify-center space-x-4">
-                    <button class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="processBtn" onclick="processFile()">Process File</button>
-                    <button class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="stopBtn" onclick="stopProcessing()" style="display: none;">Stop Processing</button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="processBtn" onclick="processFile()">Process File</button>
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="stopBtn" onclick="stopProcessing()" style="display: none;">Stop Processing</button>
                 </div>
             </div>
 
@@ -589,9 +613,9 @@
 
             <div class="bg-white rounded-lg shadow p-6" id="resultsSection" style="display: none;">
                 <h3 class="text-lg font-semibold mb-4">Results</h3>
-                <div class="max-h-60 sm:max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 font-mono text-sm" id="resultsLog"></div>
+                <div class="max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 font-mono text-sm" id="resultsLog"></div>
                 <div class="text-center mt-6 pt-6 border-t border-gray-200" id="downloadSection" style="display: none;">
-                    <button class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="downloadBtn">Download Processed File</button>
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" id="downloadBtn">Download Processed File</button>
                 </div>
             </div>
         </div>
@@ -604,7 +628,7 @@
 
             <!-- AI Property Assessment & Prompt Generator -->
             <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     <!-- Property Details -->
                     <div class="space-y-4">
                         <h4 class="font-medium text-gray-900 border-b pb-2">Property Details</h4>
@@ -657,7 +681,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <!-- Structural & Exterior -->
                     <div class="space-y-4">
                         <h4 class="font-medium text-gray-900 border-b pb-2">Structural & Exterior</h4>
@@ -727,7 +751,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- AI Prompt Output -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h4 class="font-medium text-gray-900 mb-3">🎯 Generated AI Prompt</h4>
@@ -782,20 +806,1466 @@
             </div>
         </div>
 
-        <div id="content-coming-soon-3" class="tab-content hidden">
-            <div class="text-center py-20">
-                <div class="text-6xl mb-6">🚧</div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Tool 4 Coming Soon</h2>
-                <p class="text-gray-600 max-w-md mx-auto">This tool is currently under development and will be available in a future update.</p>
+        <div id="content-contracts-generator" class="tab-content hidden">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">📄 Real Estate Contract Generator</h2>
+                <p class="text-gray-600">Generate professional Purchase & Sale Agreements and Assignment of Contract documents</p>
+            </div>
+
+            <!-- Important Legal Disclaimer -->
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="w-5 h-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Legal Disclaimer</h3>
+                        <p class="text-sm text-red-700 mt-1">
+                            <strong>FOR EXAMPLE PURPOSES ONLY!</strong> Always seek the advice of a real estate attorney in your state before using any contract. This tool generates example documents only.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract Type Selection -->
+            <div class="mb-6 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Select Contract Type</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors" onclick="selectContract('purchase')" id="purchase-card">
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="contractType" value="purchase" id="purchase-radio" class="mr-3">
+                            <h4 class="font-medium">Purchase and Sale Agreement</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">Contract between buyer and seller for property purchase</p>
+                    </div>
+                    <div class="border rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors" onclick="selectContract('assignment')" id="assignment-card">
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="contractType" value="assignment" id="assignment-radio" class="mr-3">
+                            <h4 class="font-medium">Assignment of Contract</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">Assign purchase rights to another buyer (wholesaling)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase and Sale Agreement Form -->
+            <div id="purchase-form" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-6">Purchase and Sale Agreement Details</h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Contract Date & Parties</h4>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Day</label>
+                                <input type="number" id="contractDay" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="15" min="1" max="31">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                                <select id="contractMonth" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                    <option value="">Month</option>
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                                <input type="number" id="contractYear" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="2025" min="2020" max="2030">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Seller(s)</label>
+                            <input type="text" id="sellers" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="John Doe and Jane Doe">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Buyer(s)</label>
+                            <input type="text" id="buyers" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="ABC Investments LLC">
+                        </div>
+
+                        <h4 class="font-medium text-gray-900 border-b pb-2 mt-6">Property Information</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                            <input type="text" id="streetAddress" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="123 Main Street">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">City, State, Zip</label>
+                            <input type="text" id="cityStateZip" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Dallas, TX 75001">
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Financial Terms</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Deposit (Earnest Money)</label>
+                            <input type="number" id="totalDeposit" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="5000" step="0.01">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cash Due to Seller at Closing</label>
+                            <input type="number" id="cashDue" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="195000" step="0.01">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Purchase Price</label>
+                            <input type="number" id="totalPrice" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="200000" step="0.01">
+                        </div>
+
+                        <h4 class="font-medium text-gray-900 border-b pb-2 mt-6">Closing Details</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Closing Date</label>
+                            <input type="date" id="closingDate" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Closing Location</label>
+                            <input type="text" id="closingLocation" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="ABC Title Company">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Inspection Period (Days)</label>
+                            <input type="number" id="inspectionDays" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="7" min="0" max="30">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">State (for governing law)</label>
+                            <select id="purchaseState" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="updateClosingLanguage()">
+                                <option value="">Select State</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut - Attorney State</option>
+                                <option value="Delaware">Delaware - Attorney State</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia - Attorney State</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts - Attorney State</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New Mexico">New Mexico</option>
+                                <option value="New York">New York - Attorney State</option>
+                                <option value="North Carolina">North Carolina - Attorney State</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina - Attorney State</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont - Attorney State</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia - Attorney State</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Additional Terms (Optional)</label>
+                            <textarea id="additionalTerms" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="4" placeholder="Any additional terms and conditions..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment of Contract Form -->
+            <div id="assignment-form" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-6">Assignment of Contract Details</h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Assignment Parties</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Assignor (You)</label>
+                            <input type="text" id="assignor" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="ABC Investments LLC">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Assignee (New Buyer)</label>
+                            <input type="text" id="assignee" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="XYZ Properties Inc">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Original Seller</label>
+                            <input type="text" id="originalSeller" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="John Doe">
+                        </div>
+
+                        <h4 class="font-medium text-gray-900 border-b pb-2 mt-6">Property Information</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Property Address</label>
+                            <input type="text" id="assignmentPropertyAddress" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="123 Main Street, Dallas, TX 75001">
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-900 border-b pb-2">Financial Terms</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Assignment Deposit</label>
+                            <input type="number" id="assignmentDeposit" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="1000" step="0.01">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Assignment Fee</label>
+                            <input type="number" id="assignmentFee" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="15000" step="0.01">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Assignment Fee at Closing</label>
+                            <input type="number" id="assignmentFeeAtClosing" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="15000" step="0.01">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Original Purchase Price</label>
+                            <input type="number" id="originalPurchasePrice" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="200000" step="0.01">
+                        </div>
+
+                        <h4 class="font-medium text-gray-900 border-b pb-2 mt-6">Closing Details</h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Closing Deadline</label>
+                            <input type="date" id="assignmentClosingDate" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Deposit Deadline</label>
+                            <input type="date" id="depositDeadline" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">State (for governing law)</label>
+                            <select id="assignmentState" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Select State</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut - Attorney State</option>
+                                <option value="Delaware">Delaware - Attorney State</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia - Attorney State</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts - Attorney State</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New Mexico">New Mexico</option>
+                                <option value="New York">New York - Attorney State</option>
+                                <option value="North Carolina">North Carolina - Attorney State</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina - Attorney State</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont - Attorney State</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia - Attorney State</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button and Preview -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Generate Contract</h3>
+                    <button onclick="generateContract()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        📄 Generate DOCX
+                    </button>
+                </div>
+
+                <!-- Contract Preview -->
+                <div id="contractPreview" class="hidden">
+                    <h4 class="font-medium text-gray-900 mb-3">Document Preview</h4>
+                    <div class="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <pre id="previewContent" class="text-sm whitespace-pre-wrap font-mono"></pre>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="content-coming-soon-4" class="tab-content hidden">
-            <div class="text-center py-20">
-                <div class="text-6xl mb-6">🚧</div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Tool 5 Coming Soon</h2>
-                <p class="text-gray-600 max-w-md mx-auto">This tool is currently under development and will be available in a future update.</p>
+        <div id="content-rental-calculator" class="tab-content hidden">
+            <style>
+                .rental-calc-container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 20px;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                }
+
+                .rental-calc-header {
+                    background: linear-gradient(135deg, #2c3e50, #34495e);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                }
+
+                .rental-calc-header h1 {
+                    font-size: 2.5em;
+                    margin-bottom: 10px;
+                    font-weight: 300;
+                }
+
+                .rental-calc-header p {
+                    opacity: 0.9;
+                    font-size: 1.1em;
+                }
+
+                .rental-main-content {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0;
+                    min-height: 600px;
+                }
+
+                .rental-inputs-section, .rental-results-section {
+                    padding: 40px;
+                }
+
+                .rental-inputs-section {
+                    background: #f8f9fa;
+                    border-right: 1px solid #e9ecef;
+                }
+
+                .rental-section-title {
+                    font-size: 1.4em;
+                    color: #2c3e50;
+                    margin-bottom: 25px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .rental-section-title::before {
+                    content: '';
+                    width: 4px;
+                    height: 25px;
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    border-radius: 2px;
+                }
+
+                .rental-input-group {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                    border-left: 4px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+                .rental-input-group:hover {
+                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+                    border-left-color: #667eea;
+                }
+
+                .rental-input-group h3 {
+                    color: #2c3e50;
+                    margin-bottom: 20px;
+                    font-size: 1.2em;
+                    font-weight: 600;
+                }
+
+                .rental-form-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                    margin-bottom: 15px;
+                }
+
+                .rental-form-field {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .rental-form-field.full-width {
+                    grid-column: 1 / -1;
+                }
+
+                .rental-form-field label {
+                    font-weight: 500;
+                    color: #495057;
+                    margin-bottom: 6px;
+                    font-size: 0.95em;
+                }
+
+                .rental-form-field input[type="number"] {
+                    padding: 12px 15px;
+                    border: 2px solid #e9ecef;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                    background: #fff;
+                }
+
+                .rental-form-field input[type="number"]:focus {
+                    outline: none;
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                }
+
+                .rental-results-section {
+                    background: white;
+                }
+
+                .rental-result-card {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+                }
+
+                .rental-result-card h3 {
+                    font-size: 1.1em;
+                    margin-bottom: 10px;
+                    opacity: 0.9;
+                    font-weight: 400;
+                }
+
+                .rental-result-card .value {
+                    font-size: 2.2em;
+                    font-weight: 700;
+                    margin-bottom: 5px;
+                }
+
+                .rental-result-card .subtitle {
+                    opacity: 0.8;
+                    font-size: 0.9em;
+                }
+
+                .rental-metrics-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin-bottom: 25px;
+                }
+
+                .rental-metric-item {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 12px;
+                    text-align: center;
+                    border: 2px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+                .rental-metric-item:hover {
+                    border-color: #667eea;
+                    background: white;
+                }
+
+                .rental-metric-item .label {
+                    font-size: 0.9em;
+                    color: #6c757d;
+                    margin-bottom: 8px;
+                    font-weight: 500;
+                }
+
+                .rental-metric-item .value {
+                    font-size: 1.5em;
+                    font-weight: 700;
+                    color: #2c3e50;
+                }
+
+                .rental-cap-rate-indicator {
+                    text-align: center;
+                    padding: 20px;
+                    border-radius: 12px;
+                    margin-top: 20px;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                }
+
+                .rental-cap-rate-excellent {
+                    background: linear-gradient(135deg, #00c851, #007e33);
+                    color: white;
+                }
+
+                .rental-cap-rate-good {
+                    background: linear-gradient(135deg, #ffbb33, #ff8800);
+                    color: white;
+                }
+
+                .rental-cap-rate-fair {
+                    background: linear-gradient(135deg, #ff4444, #cc0000);
+                    color: white;
+                }
+
+                .rental-breakdown {
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-top: 25px;
+                }
+
+                .rental-breakdown h4 {
+                    color: #2c3e50;
+                    margin-bottom: 15px;
+                    font-size: 1.1em;
+                }
+
+                .rental-breakdown-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #e9ecef;
+                }
+
+                .rental-breakdown-item:last-child {
+                    border-bottom: none;
+                    font-weight: 600;
+                    color: #2c3e50;
+                }
+
+                @media (max-width: 768px) {
+                    .rental-main-content {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .rental-inputs-section {
+                        border-right: none;
+                        border-bottom: 1px solid #e9ecef;
+                    }
+
+                    .rental-form-row {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .rental-metrics-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .rental-calc-header h1 {
+                        font-size: 2em;
+                    }
+                }
+            </style>
+
+            <div class="rental-calc-container">
+                <div class="rental-calc-header">
+                    <h1>Rental Profit Calculator</h1>
+                    <p>Analyze NOI, Cap Rate & Cash Flow for Investment Properties</p>
+                </div>
+
+                <div class="rental-main-content">
+                    <div class="rental-inputs-section">
+                        <h2 class="rental-section-title">Property Analysis</h2>
+
+                        <div class="rental-input-group">
+                            <h3>Property Information</h3>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalPurchasePrice">Purchase Price ($)</label>
+                                    <input type="number" id="rentalPurchasePrice" value="300000" min="0">
+                                </div>
+                                <div class="rental-form-field">
+                                    <label for="rentalDownPayment">Down Payment ($)</label>
+                                    <input type="number" id="rentalDownPayment" value="60000" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rental-input-group">
+                            <h3>Income</h3>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalMonthlyRent">Monthly Rent ($)</label>
+                                    <input type="number" id="rentalMonthlyRent" value="2500" min="0">
+                                </div>
+                                <div class="rental-form-field">
+                                    <label for="rentalOtherIncome">Other Monthly Income ($)</label>
+                                    <input type="number" id="rentalOtherIncome" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalVacancyRate">Vacancy Rate (%)</label>
+                                    <input type="number" id="rentalVacancyRate" value="5" min="0" max="100" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rental-input-group">
+                            <h3>Operating Expenses (Annual)</h3>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalPropertyTaxes">Property Taxes ($)</label>
+                                    <input type="number" id="rentalPropertyTaxes" value="3600" min="0">
+                                </div>
+                                <div class="rental-form-field">
+                                    <label for="rentalInsurance">Insurance ($)</label>
+                                    <input type="number" id="rentalInsurance" value="1200" min="0">
+                                </div>
+                            </div>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalMaintenance">Maintenance & Repairs ($)</label>
+                                    <input type="number" id="rentalMaintenance" value="2400" min="0">
+                                </div>
+                                <div class="rental-form-field">
+                                    <label for="rentalManagement">Property Management ($)</label>
+                                    <input type="number" id="rentalManagement" value="1800" min="0">
+                                </div>
+                            </div>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalUtilities">Utilities (Owner Paid) ($)</label>
+                                    <input type="number" id="rentalUtilities" value="0" min="0">
+                                </div>
+                                <div class="rental-form-field">
+                                    <label for="rentalHoaFees">HOA Fees ($)</label>
+                                    <input type="number" id="rentalHoaFees" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="rental-form-row">
+                                <div class="rental-form-field">
+                                    <label for="rentalOtherExpenses">Other Expenses ($)</label>
+                                    <input type="number" id="rentalOtherExpenses" value="600" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rental-results-section">
+                        <h2 class="rental-section-title">Analysis Results</h2>
+
+                        <div class="rental-result-card">
+                            <h3>Net Operating Income (NOI)</h3>
+                            <div class="value" id="rentalNoiResult">$19,200</div>
+                            <div class="subtitle">Annual cash flow before debt service</div>
+                        </div>
+
+                        <div class="rental-metrics-grid">
+                            <div class="rental-metric-item">
+                                <div class="label">Cap Rate</div>
+                                <div class="value" id="rentalCapRateResult">6.40%</div>
+                            </div>
+                            <div class="rental-metric-item">
+                                <div class="label">Cash-on-Cash Return</div>
+                                <div class="value" id="rentalCocResult">32.00%</div>
+                            </div>
+                            <div class="rental-metric-item">
+                                <div class="label">Monthly Cash Flow</div>
+                                <div class="value" id="rentalMonthlyCashFlow">$1,600</div>
+                            </div>
+                            <div class="rental-metric-item">
+                                <div class="label">Annual Gross Income</div>
+                                <div class="value" id="rentalGrossIncome">$28,500</div>
+                            </div>
+                        </div>
+
+                        <div id="rentalCapRateIndicator" class="rental-cap-rate-indicator rental-cap-rate-good">
+                            Good Investment Opportunity
+                        </div>
+
+                        <div class="rental-breakdown">
+                            <h4>Income Breakdown</h4>
+                            <div class="rental-breakdown-item">
+                                <span>Gross Rental Income:</span>
+                                <span id="rentalGrossRentalIncome">$28,500</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Vacancy Loss:</span>
+                                <span id="rentalVacancyLoss">($1,425)</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Effective Gross Income:</span>
+                                <span id="rentalEffectiveGrossIncome">$27,075</span>
+                            </div>
+                        </div>
+
+                        <div class="rental-breakdown">
+                            <h4>Expense Breakdown</h4>
+                            <div class="rental-breakdown-item">
+                                <span>Property Taxes:</span>
+                                <span id="rentalTaxesDisplay">$3,600</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Insurance:</span>
+                                <span id="rentalInsuranceDisplay">$1,200</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Maintenance:</span>
+                                <span id="rentalMaintenanceDisplay">$2,400</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Management:</span>
+                                <span id="rentalManagementDisplay">$1,800</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Other Expenses:</span>
+                                <span id="rentalOtherExpensesDisplay">$600</span>
+                            </div>
+                            <div class="rental-breakdown-item">
+                                <span>Total Operating Expenses:</span>
+                                <span id="rentalTotalExpenses">$9,600</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <script>
+                function formatRentalCurrency(amount) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(amount);
+                }
+
+                function formatRentalPercentage(rate) {
+                    return (rate * 100).toFixed(2) + '%';
+                }
+
+                function updateRentalCapRateIndicator(capRate) {
+                    const indicator = document.getElementById('rentalCapRateIndicator');
+                    const rate = capRate * 100;
+
+                    if (rate >= 8) {
+                        indicator.className = 'rental-cap-rate-indicator rental-cap-rate-excellent';
+                        indicator.textContent = 'Excellent Investment Opportunity';
+                    } else if (rate >= 6) {
+                        indicator.className = 'rental-cap-rate-indicator rental-cap-rate-good';
+                        indicator.textContent = 'Good Investment Opportunity';
+                    } else {
+                        indicator.className = 'rental-cap-rate-indicator rental-cap-rate-fair';
+                        indicator.textContent = 'Fair Investment - Consider Carefully';
+                    }
+                }
+
+                function calculateRentalMetrics() {
+                    // Get input values
+                    const purchasePrice = parseFloat(document.getElementById('rentalPurchasePrice').value) || 0;
+                    const downPayment = parseFloat(document.getElementById('rentalDownPayment').value) || 0;
+                    const monthlyRent = parseFloat(document.getElementById('rentalMonthlyRent').value) || 0;
+                    const otherIncome = parseFloat(document.getElementById('rentalOtherIncome').value) || 0;
+                    const vacancyRate = parseFloat(document.getElementById('rentalVacancyRate').value) / 100 || 0;
+
+                    // Operating expenses
+                    const propertyTaxes = parseFloat(document.getElementById('rentalPropertyTaxes').value) || 0;
+                    const insurance = parseFloat(document.getElementById('rentalInsurance').value) || 0;
+                    const maintenance = parseFloat(document.getElementById('rentalMaintenance').value) || 0;
+                    const management = parseFloat(document.getElementById('rentalManagement').value) || 0;
+                    const utilities = parseFloat(document.getElementById('rentalUtilities').value) || 0;
+                    const hoaFees = parseFloat(document.getElementById('rentalHoaFees').value) || 0;
+                    const otherExpenses = parseFloat(document.getElementById('rentalOtherExpenses').value) || 0;
+
+                    // Calculations
+                    const annualRent = monthlyRent * 12;
+                    const annualOtherIncome = otherIncome * 12;
+                    const grossRentalIncome = annualRent + annualOtherIncome;
+                    const vacancyLoss = grossRentalIncome * vacancyRate;
+                    const effectiveGrossIncome = grossRentalIncome - vacancyLoss;
+
+                    const totalOperatingExpenses = propertyTaxes + insurance + maintenance + management + utilities + hoaFees + otherExpenses;
+                    const noi = effectiveGrossIncome - totalOperatingExpenses;
+
+                    const capRate = purchasePrice > 0 ? noi / purchasePrice : 0;
+                    const cashOnCashReturn = downPayment > 0 ? noi / downPayment : 0;
+                    const monthlyCashFlow = noi / 12;
+
+                    // Update display
+                    document.getElementById('rentalNoiResult').textContent = formatRentalCurrency(noi);
+                    document.getElementById('rentalCapRateResult').textContent = formatRentalPercentage(capRate);
+                    document.getElementById('rentalCocResult').textContent = formatRentalPercentage(cashOnCashReturn);
+                    document.getElementById('rentalMonthlyCashFlow').textContent = formatRentalCurrency(monthlyCashFlow);
+                    document.getElementById('rentalGrossIncome').textContent = formatRentalCurrency(effectiveGrossIncome);
+
+                    // Income breakdown
+                    document.getElementById('rentalGrossRentalIncome').textContent = formatRentalCurrency(grossRentalIncome);
+                    document.getElementById('rentalVacancyLoss').textContent = formatRentalCurrency(-vacancyLoss);
+                    document.getElementById('rentalEffectiveGrossIncome').textContent = formatRentalCurrency(effectiveGrossIncome);
+
+                    // Expense breakdown
+                    document.getElementById('rentalTaxesDisplay').textContent = formatRentalCurrency(propertyTaxes);
+                    document.getElementById('rentalInsuranceDisplay').textContent = formatRentalCurrency(insurance);
+                    document.getElementById('rentalMaintenanceDisplay').textContent = formatRentalCurrency(maintenance);
+                    document.getElementById('rentalManagementDisplay').textContent = formatRentalCurrency(management);
+                    document.getElementById('rentalOtherExpensesDisplay').textContent = formatRentalCurrency(utilities + hoaFees + otherExpenses);
+                    document.getElementById('rentalTotalExpenses').textContent = formatRentalCurrency(totalOperatingExpenses);
+
+                    // Update cap rate indicator
+                    updateRentalCapRateIndicator(capRate);
+                }
+
+                // Add event listeners to all rental calculator input fields
+                document.addEventListener('DOMContentLoaded', function() {
+                    const rentalInputs = document.querySelectorAll('#content-rental-calculator input[type="number"]');
+                    rentalInputs.forEach(input => {
+                        input.addEventListener('input', calculateRentalMetrics);
+                    });
+
+                    // Initial calculation
+                    calculateRentalMetrics();
+                });
+            </script>
+        </div>
+
+        <div id="content-seller-finance" class="tab-content hidden">
+            <style>
+                .seller-finance-container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 20px;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                }
+
+                .seller-finance-header {
+                    background: linear-gradient(135deg, #1a472a, #2d7431);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                }
+
+                .seller-finance-header h1 {
+                    font-size: 2.5em;
+                    margin-bottom: 10px;
+                    font-weight: 300;
+                }
+
+                .seller-finance-header p {
+                    opacity: 0.9;
+                    font-size: 1.1em;
+                }
+
+                .seller-finance-main-content {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0;
+                    min-height: 600px;
+                }
+
+                .seller-finance-inputs-section, .seller-finance-results-section {
+                    padding: 40px;
+                }
+
+                .seller-finance-inputs-section {
+                    background: #f8f9fa;
+                    border-right: 1px solid #e9ecef;
+                }
+
+                .seller-finance-section-title {
+                    font-size: 1.4em;
+                    color: #1a472a;
+                    margin-bottom: 25px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .seller-finance-section-title::before {
+                    content: '';
+                    width: 4px;
+                    height: 25px;
+                    background: linear-gradient(135deg, #22c55e, #16a34a);
+                    border-radius: 2px;
+                }
+
+                .seller-finance-input-group {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                    border-left: 4px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+                .seller-finance-input-group:hover {
+                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+                    border-left-color: #22c55e;
+                }
+
+                .seller-finance-input-group h3 {
+                    color: #1a472a;
+                    margin-bottom: 20px;
+                    font-size: 1.2em;
+                    font-weight: 600;
+                }
+
+                .seller-finance-form-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                    margin-bottom: 15px;
+                }
+
+                .seller-finance-form-field {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .seller-finance-form-field.full-width {
+                    grid-column: 1 / -1;
+                }
+
+                .seller-finance-form-field label {
+                    font-weight: 500;
+                    color: #495057;
+                    margin-bottom: 6px;
+                    font-size: 0.95em;
+                }
+
+                .seller-finance-form-field input[type="number"],
+                .seller-finance-form-field select {
+                    padding: 12px 15px;
+                    border: 2px solid #e9ecef;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                    background: #fff;
+                }
+
+                .seller-finance-form-field input[type="number"]:focus,
+                .seller-finance-form-field select:focus {
+                    outline: none;
+                    border-color: #22c55e;
+                    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+                }
+
+                .seller-finance-results-section {
+                    background: white;
+                }
+
+                .seller-finance-result-card {
+                    background: linear-gradient(135deg, #22c55e, #16a34a);
+                    color: white;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+                }
+
+                .seller-finance-result-card h3 {
+                    font-size: 1.1em;
+                    margin-bottom: 10px;
+                    opacity: 0.9;
+                    font-weight: 400;
+                }
+
+                .seller-finance-result-card .value {
+                    font-size: 2.2em;
+                    font-weight: 700;
+                    margin-bottom: 5px;
+                }
+
+                .seller-finance-result-card .subtitle {
+                    opacity: 0.8;
+                    font-size: 0.9em;
+                }
+
+                .seller-finance-metrics-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin-bottom: 25px;
+                }
+
+                .seller-finance-metric-item {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 12px;
+                    text-align: center;
+                    border: 2px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+                .seller-finance-metric-item:hover {
+                    border-color: #22c55e;
+                    background: white;
+                }
+
+                .seller-finance-metric-item .label {
+                    font-size: 0.9em;
+                    color: #6c757d;
+                    margin-bottom: 8px;
+                    font-weight: 500;
+                }
+
+                .seller-finance-metric-item .value {
+                    font-size: 1.5em;
+                    font-weight: 700;
+                    color: #1a472a;
+                }
+
+                .seller-finance-comparison {
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-top: 25px;
+                }
+
+                .seller-finance-comparison h4 {
+                    color: #1a472a;
+                    margin-bottom: 15px;
+                    font-size: 1.1em;
+                }
+
+                .seller-finance-comparison-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #e9ecef;
+                }
+
+                .seller-finance-comparison-item:last-child {
+                    border-bottom: none;
+                    font-weight: 600;
+                    color: #1a472a;
+                }
+
+                .seller-finance-amortization {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-top: 25px;
+                    border: 1px solid #e9ecef;
+                }
+
+                .seller-finance-amortization h4 {
+                    color: #1a472a;
+                    margin-bottom: 15px;
+                    font-size: 1.1em;
+                }
+
+                .seller-finance-amortization-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.9em;
+                }
+
+                .seller-finance-amortization-table th,
+                .seller-finance-amortization-table td {
+                    padding: 8px 12px;
+                    text-align: right;
+                    border-bottom: 1px solid #e9ecef;
+                }
+
+                .seller-finance-amortization-table th {
+                    background: #f8f9fa;
+                    font-weight: 600;
+                    color: #1a472a;
+                }
+
+                @media (max-width: 768px) {
+                    .seller-finance-main-content {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .seller-finance-inputs-section {
+                        border-right: none;
+                        border-bottom: 1px solid #e9ecef;
+                    }
+
+                    .seller-finance-form-row {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .seller-finance-metrics-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .seller-finance-header h1 {
+                        font-size: 2em;
+                    }
+                }
+            </style>
+
+            <div class="seller-finance-container">
+                <div class="seller-finance-header">
+                    <h1>Seller Finance Calculator</h1>
+                    <p>Analyze Deal Structure, Payments & ROI for Owner Financing</p>
+                </div>
+
+                <div class="seller-finance-main-content">
+                    <div class="seller-finance-inputs-section">
+                        <h2 class="seller-finance-section-title">Deal Structure</h2>
+
+                        <div class="seller-finance-input-group">
+                            <h3>Property & Financing Terms</h3>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfPropertyPrice">Property Price ($)</label>
+                                    <input type="number" id="sfPropertyPrice" value="400000" min="0">
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfDownPayment">Down Payment ($)</label>
+                                    <input type="number" id="sfDownPayment" value="80000" min="0">
+                                </div>
+                            </div>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfInterestRate">Interest Rate (%)</label>
+                                    <input type="number" id="sfInterestRate" value="6.5" min="0" max="20" step="0.1">
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfLoanTerm">Loan Term (Years)</label>
+                                    <input type="number" id="sfLoanTerm" value="10" min="1" max="30">
+                                </div>
+                            </div>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfPaymentFreq">Payment Frequency</label>
+                                    <select id="sfPaymentFreq">
+                                        <option value="monthly">Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="annually">Annually</option>
+                                    </select>
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfAmortization">Amortization (Years)</label>
+                                    <input type="number" id="sfAmortization" value="30" min="5" max="30">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="seller-finance-input-group">
+                            <h3>Advanced Terms</h3>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfBalloonPayment">Balloon Payment ($)</label>
+                                    <input type="number" id="sfBalloonPayment" value="0" min="0">
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfInterestOnlyMonths">Interest-Only Period (Months)</label>
+                                    <input type="number" id="sfInterestOnlyMonths" value="0" min="0" max="60">
+                                </div>
+                            </div>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfPrepaymentPenalty">Prepayment Penalty (%)</label>
+                                    <input type="number" id="sfPrepaymentPenalty" value="0" min="0" max="5" step="0.1">
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfLateFee">Late Fee ($)</label>
+                                    <input type="number" id="sfLateFee" value="50" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="seller-finance-input-group">
+                            <h3>Comparison Analysis</h3>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfMarketRate">Market Interest Rate (%)</label>
+                                    <input type="number" id="sfMarketRate" value="7.5" min="0" max="15" step="0.1">
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfCashDiscount">Cash Sale Discount (%)</label>
+                                    <input type="number" id="sfCashDiscount" value="5" min="0" max="20" step="0.5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="seller-finance-results-section">
+                        <h2 class="seller-finance-section-title">Analysis Results</h2>
+
+                        <div class="seller-finance-result-card">
+                            <h3>Monthly Payment</h3>
+                            <div class="value" id="sfMonthlyPayment">$2,456</div>
+                            <div class="subtitle">Principal & Interest</div>
+                        </div>
+
+                        <div class="seller-finance-metrics-grid">
+                            <div class="seller-finance-metric-item">
+                                <div class="label">Seller IRR</div>
+                                <div class="value" id="sfSellerIRR">8.2%</div>
+                            </div>
+                            <div class="seller-finance-metric-item">
+                                <div class="label">Total Interest Received</div>
+                                <div class="value" id="sfTotalInterest">$174,720</div>
+                            </div>
+                            <div class="seller-finance-metric-item">
+                                <div class="label">Financed Amount</div>
+                                <div class="value" id="sfFinancedAmount">$320,000</div>
+                            </div>
+                            <div class="seller-finance-metric-item">
+                                <div class="label">Final Balloon</div>
+                                <div class="value" id="sfFinalBalloon">$265,432</div>
+                            </div>
+                        </div>
+
+                        <div class="seller-finance-comparison">
+                            <h4>vs. Cash Sale Comparison</h4>
+                            <div class="seller-finance-comparison-item">
+                                <span>Cash Sale Amount (after discount):</span>
+                                <span id="sfCashSaleAmount">$380,000</span>
+                            </div>
+                            <div class="seller-finance-comparison-item">
+                                <span>Total Seller Finance Returns:</span>
+                                <span id="sfTotalReturns">$494,720</span>
+                            </div>
+                            <div class="seller-finance-comparison-item">
+                                <span>Additional Income vs Cash:</span>
+                                <span id="sfAdditionalIncome">$114,720</span>
+                            </div>
+                        </div>
+
+                        <div class="seller-finance-amortization">
+                            <h4>First Year Amortization Schedule</h4>
+                            <table class="seller-finance-amortization-table">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Payment</th>
+                                        <th>Interest</th>
+                                        <th>Principal</th>
+                                        <th>Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sfAmortizationTable">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function formatSFCurrency(amount) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(amount);
+                }
+
+                function formatSFPercentage(rate) {
+                    return (rate * 100).toFixed(2) + '%';
+                }
+
+                function calculateMonthlyPayment(principal, annualRate, years, amortizationYears) {
+                    const monthlyRate = annualRate / 12 / 100;
+                    const numPayments = amortizationYears * 12;
+
+                    if (monthlyRate === 0) {
+                        return principal / numPayments;
+                    }
+
+                    return principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
+                           (Math.pow(1 + monthlyRate, numPayments) - 1);
+                }
+
+                function calculateRemainingBalance(principal, monthlyPayment, monthlyRate, paymentsMode) {
+                    if (monthlyRate === 0) {
+                        return principal - (monthlyPayment * paymentsMode);
+                    }
+
+                    return principal * Math.pow(1 + monthlyRate, paymentsMode) -
+                           monthlyPayment * ((Math.pow(1 + monthlyRate, paymentsMode) - 1) / monthlyRate);
+                }
+
+                function calculateIRR(cashFlows) {
+                    // Simple IRR calculation using Newton-Raphson method
+                    let rate = 0.1;
+                    for (let i = 0; i < 100; i++) {
+                        let npv = 0;
+                        let dnpv = 0;
+
+                        for (let j = 0; j < cashFlows.length; j++) {
+                            npv += cashFlows[j] / Math.pow(1 + rate, j);
+                            dnpv -= j * cashFlows[j] / Math.pow(1 + rate, j + 1);
+                        }
+
+                        if (Math.abs(npv) < 0.01) break;
+                        rate = rate - npv / dnpv;
+                    }
+
+                    return rate;
+                }
+
+                function generateAmortizationSchedule(principal, monthlyPayment, monthlyRate, months) {
+                    const schedule = [];
+                    let balance = principal;
+
+                    for (let month = 1; month <= months; month++) {
+                        const interestPayment = balance * monthlyRate;
+                        const principalPayment = monthlyPayment - interestPayment;
+                        balance -= principalPayment;
+
+                        schedule.push({
+                            month: month,
+                            payment: monthlyPayment,
+                            interest: interestPayment,
+                            principal: principalPayment,
+                            balance: Math.max(0, balance)
+                        });
+                    }
+
+                    return schedule;
+                }
+
+                function calculateSellerFinanceMetrics() {
+                    // Get input values
+                    const propertyPrice = parseFloat(document.getElementById('sfPropertyPrice').value) || 0;
+                    const downPayment = parseFloat(document.getElementById('sfDownPayment').value) || 0;
+                    const interestRate = parseFloat(document.getElementById('sfInterestRate').value) || 0;
+                    const loanTerm = parseFloat(document.getElementById('sfLoanTerm').value) || 0;
+                    const amortizationYears = parseFloat(document.getElementById('sfAmortization').value) || 30;
+                    const balloonPayment = parseFloat(document.getElementById('sfBalloonPayment').value) || 0;
+                    const interestOnlyMonths = parseFloat(document.getElementById('sfInterestOnlyMonths').value) || 0;
+                    const cashDiscount = parseFloat(document.getElementById('sfCashDiscount').value) || 0;
+
+                    // Calculations
+                    const financedAmount = propertyPrice - downPayment;
+                    const monthlyRate = interestRate / 12 / 100;
+                    const monthlyPayment = calculateMonthlyPayment(financedAmount, interestRate, loanTerm, amortizationYears);
+
+                    // Calculate remaining balance at end of loan term
+                    const paymentsMode = loanTerm * 12;
+                    const remainingBalance = calculateRemainingBalance(financedAmount, monthlyPayment, monthlyRate, paymentsMode);
+                    const finalBalloon = Math.max(balloonPayment, remainingBalance);
+
+                    // Total returns calculation
+                    const totalPayments = monthlyPayment * paymentsMode;
+                    const totalInterest = totalPayments + finalBalloon - financedAmount;
+                    const totalReturns = downPayment + totalPayments + finalBalloon;
+
+                    // Cash sale comparison
+                    const cashSaleAmount = propertyPrice * (1 - cashDiscount / 100);
+                    const additionalIncome = totalReturns - cashSaleAmount;
+
+                    // IRR calculation
+                    const cashFlows = [-financedAmount]; // Initial investment (negative)
+                    for (let i = 0; i < paymentsMode; i++) {
+                        cashFlows.push(monthlyPayment);
+                    }
+                    cashFlows[cashFlows.length - 1] += finalBalloon; // Add balloon to final payment
+
+                    const sellerIRR = calculateIRR(cashFlows);
+
+                    // Update display
+                    document.getElementById('sfMonthlyPayment').textContent = formatSFCurrency(monthlyPayment);
+                    document.getElementById('sfSellerIRR').textContent = formatSFPercentage(sellerIRR);
+                    document.getElementById('sfTotalInterest').textContent = formatSFCurrency(totalInterest);
+                    document.getElementById('sfFinancedAmount').textContent = formatSFCurrency(financedAmount);
+                    document.getElementById('sfFinalBalloon').textContent = formatSFCurrency(finalBalloon);
+
+                    // Comparison
+                    document.getElementById('sfCashSaleAmount').textContent = formatSFCurrency(cashSaleAmount);
+                    document.getElementById('sfTotalReturns').textContent = formatSFCurrency(totalReturns);
+                    document.getElementById('sfAdditionalIncome').textContent = formatSFCurrency(additionalIncome);
+
+                    // Generate amortization table for first 12 months
+                    const schedule = generateAmortizationSchedule(financedAmount, monthlyPayment, monthlyRate, 12);
+                    const tableBody = document.getElementById('sfAmortizationTable');
+                    tableBody.innerHTML = '';
+
+                    schedule.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.month}</td>
+                            <td>${formatSFCurrency(row.payment)}</td>
+                            <td>${formatSFCurrency(row.interest)}</td>
+                            <td>${formatSFCurrency(row.principal)}</td>
+                            <td>${formatSFCurrency(row.balance)}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                }
+
+                // Add event listeners to all seller finance input fields
+                document.addEventListener('DOMContentLoaded', function() {
+                    const sellerFinanceInputs = document.querySelectorAll('#content-seller-finance input, #content-seller-finance select');
+                    sellerFinanceInputs.forEach(input => {
+                        input.addEventListener('input', calculateSellerFinanceMetrics);
+                        input.addEventListener('change', calculateSellerFinanceMetrics);
+                    });
+
+                    // Initial calculation
+                    calculateSellerFinanceMetrics();
+                });
+            </script>
         </div>
 
     </div>
@@ -1415,6 +2885,347 @@
                 selectedTab.classList.remove('tab-inactive');
                 selectedTab.classList.add('tab-active');
             }
+        }
+
+        // Contract Generator Functions
+        function selectContract(type) {
+            // Clear previous selections
+            document.getElementById('purchase-card').classList.remove('bg-blue-50', 'border-blue-500');
+            document.getElementById('assignment-card').classList.remove('bg-blue-50', 'border-blue-500');
+            document.getElementById('purchase-form').classList.add('hidden');
+            document.getElementById('assignment-form').classList.add('hidden');
+
+            // Set radio button
+            document.getElementById('purchase-radio').checked = (type === 'purchase');
+            document.getElementById('assignment-radio').checked = (type === 'assignment');
+
+            if (type === 'purchase') {
+                document.getElementById('purchase-card').classList.add('bg-blue-50', 'border-blue-500');
+                document.getElementById('purchase-form').classList.remove('hidden');
+            } else if (type === 'assignment') {
+                document.getElementById('assignment-card').classList.add('bg-blue-50', 'border-blue-500');
+                document.getElementById('assignment-form').classList.remove('hidden');
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function isAttorneyState(state) {
+            const attorneyStates = ['Connecticut', 'Delaware', 'Georgia', 'Massachusetts', 'New York', 'North Carolina', 'South Carolina', 'Vermont', 'West Virginia'];
+            return attorneyStates.includes(state);
+        }
+
+        function getClosingAgent(state) {
+            return isAttorneyState(state) ? 'attorney' : 'licensed title company or attorney';
+        }
+
+        function updateClosingLanguage() {
+            // This function can be used for real-time updates if needed
+            // Currently, the closing agent language is updated in the contract generation
+        }
+
+        function generatePurchaseContract() {
+            const contractDay = document.getElementById('contractDay').value || '_____';
+            const contractMonth = document.getElementById('contractMonth').value || '_____________';
+            const contractYear = document.getElementById('contractYear').value || '____';
+            const sellers = document.getElementById('sellers').value || '_________________________________________________________________';
+            const buyers = document.getElementById('buyers').value || '_____________________________________________________________________';
+            const streetAddress = document.getElementById('streetAddress').value || '__________________________________________________________________';
+            const cityStateZip = document.getElementById('cityStateZip').value || '__________________________________________________________________';
+            const totalDeposit = document.getElementById('totalDeposit').value ? formatCurrency(document.getElementById('totalDeposit').value) : '____________________';
+            const cashDue = document.getElementById('cashDue').value ? formatCurrency(document.getElementById('cashDue').value) : '____________________';
+            const totalPrice = document.getElementById('totalPrice').value ? formatCurrency(document.getElementById('totalPrice').value) : '____________________';
+            const closingDateValue = document.getElementById('closingDate').value;
+            const closingDate = closingDateValue ? formatDate(closingDateValue) : '_______________, 20___';
+            const closingLocation = document.getElementById('closingLocation').value || '____________________________';
+            const inspectionDays = document.getElementById('inspectionDays').value || '_______';
+            const additionalTerms = document.getElementById('additionalTerms').value ||
+                '_________________________________________________________________________________\n' +
+                '_________________________________________________________________________________\n' +
+                '_________________________________________________________________________________\n' +
+                '_________________________________________________________________________________\n' +
+                '_________________________________________________________________________________';
+            const stateValue = document.getElementById('purchaseState').value || '[STATE]';
+            const state = stateValue.replace(' - Attorney State', '');
+            const closingAgent = getClosingAgent(state);
+
+            return `THIS DOCUMENT IS FOR EXAMPLE PURPOSES ONLY!!! ALWAYS SEEK THE ADVICE OF A REAL ESTATE ATTORNEY IN THE STATE WHERE YOU ARE PERFORMING TRANSACTIONS PRIOR TO UTILIZING ANY PART OF THE WORDING FROM THIS EXAMPLE DOCUMENT.
+
+Purchase and Sale Agreement
+
+This agreement is made this ${contractDay} day of ${contractMonth}, ${contractYear}
+between Seller(s) ${sellers}
+and Buyer(s) ${buyers}
+
+Seller agrees to sell and buyer agrees to buy the following described real property together with all improvements and fixtures and the personal property described below:
+
+Street Address: ${streetAddress}
+City, State, Zip: ${cityStateZip}
+
+The purchase price to be paid as follows:
+Total Deposit                                                      ${totalDeposit}
+Cash due to Seller at Closing                                     ${cashDue}
+Total Price                                                        ${totalPrice}
+
+1. EARNEST MONEY to be deposited with a ${closingAgent} within 48 hours of acceptance and ratification of offer.
+
+2. PRORATIONS, IMPOUNDS & SECURITY DEPOSITS: Loan interest, property taxes, insurance, and rents shall be prorated as of the date of closing. All security deposits shall be transferred to buyer at closing. All impound accounts for taxes and insurance are included in the purchase price and shall be transferred to buyer at closing. Any shortage in these accounts shall be charged to seller at closing.
+
+3. CLOSING DATE AND TRANSFER OF TITLE: This transaction shall close on or before ${closingDate}. Closing will be held at ${closingLocation} and Seller(s) agree to transfer marketable title free and clear of all encumbrances except those listed and pay any required state taxes or stamps required to record deed and mortgage. Seller agrees to furnish title insurance in the amount of the purchase price, showing no encumbrances or exceptions other than previously noted.
+
+4. DAMAGE TO PROPERTY: Seller shall maintain property in its current condition and keep it insured against all loss until closing. In the event of destruction covered by insurance, buyer may elect to close and collect the insurance proceeds.
+
+5. DEFAULTS: If buyer defaults under this contract, any and all monies deposited by buyer(s) shall be retained by seller as full liquidated damages. If seller defaults, buyer may pursue all remedies allowed by law and seller agrees to be responsible for all costs incurred by buyer as a result of sellers default.
+
+6. SUCCESSORS AND ASSIGNEES: The terms and conditions of this contract shall bind all successors, heirs, administrators, trustees, executors and assignees of the respective parties.
+
+7. ACCESS: Sellers agree that buyers may advertise property and have access during reasonable hours to show property to others.
+
+8. ASSIGNABLE: This contract is assignable by the buyer.
+
+9. INSPECTION: (a) Buyer shall have ${inspectionDays} days from Effective Date ("Inspection Period") within which to have such inspections of the Property performed as Buyer shall desire and utilities service shall be made available by the Seller during the Inspection Period; (b) Buyer shall be responsible for prompt payment for such inspections and repair of damage to and restoration of the Property resulting from such inspections; and (c) if Buyer determines, in Buyer's sole discretion, that the condition of the Property is not acceptable to Buyer, Buyer may cancel this Contract by delivering written notice of such election to Seller prior to the expiration of the Inspection Period. If Buyer timely cancels this Contract, the deposit(s) paid shall be immediately returned to Buyer; thereupon, Buyer and Seller shall be released of all further obligations under this Contract.
+
+10. ADDITIONAL TERMS AND CONDITIONS:
+${additionalTerms}
+
+11. ENTIRE AGREEMENT: This agreement constitutes the entire agreement between the parties and shall be governed by the laws of the State of ${state}.
+
+The undersigned have read the above information, understand it and verify that it is correct.
+
+Date: __________________________________                Date: _____________________________
+Seller: __________________________________              Buyer: ____________________________
+Seller: __________________________________              Buyer: ____________________________`;
+        }
+
+        function generateAssignmentContract() {
+            const assignor = document.getElementById('assignor').value || '__________________';
+            const assignee = document.getElementById('assignee').value || '_________________';
+            const originalSeller = document.getElementById('originalSeller').value || '_____________________';
+            const propertyAddress = document.getElementById('assignmentPropertyAddress').value || '';
+            const assignmentDeposit = document.getElementById('assignmentDeposit').value ? formatCurrency(document.getElementById('assignmentDeposit').value) : '__________';
+            const assignmentFee = document.getElementById('assignmentFee').value ? formatCurrency(document.getElementById('assignmentFee').value) : '________';
+            const assignmentFeeAtClosing = document.getElementById('assignmentFeeAtClosing').value ? formatCurrency(document.getElementById('assignmentFeeAtClosing').value) : '___________';
+            const originalPurchasePrice = document.getElementById('originalPurchasePrice').value ? formatCurrency(document.getElementById('originalPurchasePrice').value) : '_________';
+            const closingDeadlineValue = document.getElementById('assignmentClosingDate').value;
+            const closingDeadline = closingDeadlineValue ? formatDate(closingDeadlineValue) : '__________';
+            const depositDeadlineValue = document.getElementById('depositDeadline').value;
+            const depositDeadline = depositDeadlineValue ? formatDate(depositDeadlineValue) : '___________';
+            const stateValue = document.getElementById('assignmentState').value || '[STATE]';
+            const state = stateValue.replace(' - Attorney State', '');
+
+            const totalDue = document.getElementById('originalPurchasePrice').value && document.getElementById('assignmentFee').value && document.getElementById('assignmentDeposit').value ?
+                formatCurrency(parseFloat(document.getElementById('originalPurchasePrice').value) + parseFloat(document.getElementById('assignmentFee').value) - parseFloat(document.getElementById('assignmentDeposit').value)) :
+                '___________';
+
+            return `ASSIGNMENT OF CONTRACT
+
+This agreement is between ${assignor} ("Assignor"), and ${assignee} ("Assignee"). The Assignor and Assignee, when mentioned together may be referred to as Parties.
+
+Assignor has entered into an agreement to purchase real estate with ${originalSeller} on _______ ("Contract" or "Underlying Transaction"). The Contract is attached hereto as Exhibit "A." Under the Contract, the Assignor has certain rights in the property commonly known as:
+
+${propertyAddress}
+
+Assignor wants to assign the rights that he acquired under the Contract to Assignee.
+
+TERMS AND CONDITIONS
+The parties agree to the following terms and conditions:
+
+1. Assignor assigns all rights that he acquired under the Contract to Assignee.
+
+2. Assignee accepts all terms and conditions of the Contract. Assignee has reviewed the Contract, which is attached hereto as Exhibit "A." Assignee fully understands the terms and conditions in the Contract and represents to Assignor that it is willing and able to close the Underlying Transaction.
+
+3. Assignee will deliver to Assignor a cashier's check, money, or wire transfer as a deposit in the amount of ${assignmentDeposit} as the initial deposit on this transaction. This Assignment is not effective until the deposit is paid and both Parties sign the Assignment.
+
+4. Assignee will pay Assignor a total assignment fee of ${assignmentFee}. This amount includes the deposit listed in paragraph 3. This fee will be paid at closing of the Underlying Transaction.
+
+5. At Closing the Assignor will receive ${assignmentFeeAtClosing} of the assignment fees.
+
+6. The assignment fee will be added to the purchase price identified in the Contract. The total amounts owed by Assignee are as follows:
+${originalPurchasePrice}                Purchase price in Underlying Transaction
+${assignmentFee}                         Assignment Fee
+(${assignmentDeposit})                   Minus Deposit
+${totalDue}                              Total Due at Closing by Assignee
+
+7. Assignee must close the Underlying Transaction on or before ${closingDeadline} at 5:00 p.m. Time is of the essence and Assignor will be harmed if Assignee fails to timely close. Assignor will select the closing agent.
+
+8. If Assignee fails to close the Underlying Transaction by the date indicated in paragraph 7, Assignee will forfeit its deposit and all rights to the Property under the Contract will automatically revert back to Assignor.
+
+9. If the Assignee attempts to communicate to the sellers in any form it will immediately terminate this agreement and forfeit their deposit for liquidated damages.
+
+10. Assignor must deliver clear title at closing. If clear title cannot be given, then this Assignment will be canceled and the deposit will be refunded to Assignee.
+
+11. Assignee will not contact the Seller identified in the Contract. Assignee agrees to communicate solely with and through Assignor.
+
+12. Assignor may at any time before closing renegotiate the underlying purchase price in the Contract with the original seller. Assignor is entitled to the entire difference between the Contract purchase price and this Assignment. The difference, if any, will be paid as an additional assignment fee at closing. Assignor's negotiation of the purchase price will not affect the Total Due at Closing by Assignee.
+
+13. The Property is sold as is. Assignor makes no representation of the Property condition. This includes permitting, major structures, foundations, occupancy, mold, and any other property defect. Assignee must do their own due diligence. Assignee acknowledges that they are not relying on any representation of the condition of the Property by Assignor and Assignee has willfully agreed to assume all risks related to the condition of the Property.
+
+14. This agreement is null and void if a deposit of (${assignmentDeposit}) is NOT received on or before ${depositDeadline}.
+
+15. ENTIRE AGREEMENT: This agreement constitutes the entire agreement between the parties and shall be governed by the laws of the State of ${state}.
+
+Date:___________________________________
+
+ASSIGNOR:_____________________________
+
+Please Print: _____________________________
+
+Date:___________________Time:___________
+
+ASSIGNEE:______________________________
+
+Please Print: _____________________________`;
+        }
+
+        function generateContract() {
+            const contractType = document.querySelector('input[name="contractType"]:checked');
+
+            if (!contractType) {
+                alert('Please select a contract type first.');
+                return;
+            }
+
+            let contractText = '';
+
+            if (contractType.value === 'purchase') {
+                contractText = generatePurchaseContract();
+            } else if (contractType.value === 'assignment') {
+                contractText = generateAssignmentContract();
+            }
+
+            // Show preview
+            document.getElementById('previewContent').textContent = contractText;
+            document.getElementById('contractPreview').classList.remove('hidden');
+
+            // Generate and download DOCX file
+            generateDocx(contractText, contractType.value);
+        }
+
+        function generateDocx(content, type) {
+            // Create a professional RTF file that can be opened by Word as a .doc file
+            const filename = type === 'purchase' ? 'Purchase_Sale_Agreement.doc' : 'Assignment_of_Contract.doc';
+
+            // Process content for better RTF formatting
+            const processedContent = formatContentForRTF(content);
+
+            // Enhanced RTF format with professional styling
+            const rtfContent = `{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\froman\\fprq2\\fcharset0 Times New Roman;}}
+{\\colortbl ;\\red0\\green0\\blue0;}
+{\\*\\generator RTF Contract Generator;}
+\\viewkind4\\uc1\\pard\\cf1\\f0\\fs24
+${processedContent}
+}`;
+
+            try {
+                // Create blob and download
+                const blob = new Blob([rtfContent], { type: 'application/rtf' });
+
+                if (window.saveAs) {
+                    // Use FileSaver.js if available
+                    saveAs(blob, filename);
+                } else {
+                    // Fallback method
+                    const element = document.createElement('a');
+                    element.href = URL.createObjectURL(blob);
+                    element.download = filename;
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                }
+
+                setTimeout(() => {
+                    alert(`Contract generated successfully! File saved as: ${filename}\n\nThis file can be opened in Microsoft Word for professional formatting.`);
+                }, 100);
+
+            } catch (error) {
+                console.error('Document generation failed, falling back to text file:', error);
+
+                // Ultimate fallback to text file
+                const textFilename = type === 'purchase' ? 'Purchase_Sale_Agreement.txt' : 'Assignment_of_Contract.txt';
+                const element = document.createElement('a');
+                const file = new Blob([content], { type: 'text/plain' });
+                element.href = URL.createObjectURL(file);
+                element.download = textFilename;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+
+                setTimeout(() => {
+                    alert(`Contract generated as text file: ${textFilename}\n\nNote: Copy the content into a Word document for proper formatting.`);
+                }, 100);
+            }
+        }
+
+        function formatContentForRTF(content) {
+            // Split content into lines for better processing
+            const lines = content.split('\n');
+            let formattedContent = '';
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                if (line === '') {
+                    // Empty line - add paragraph break
+                    formattedContent += '\\par ';
+                } else if (line.includes('THIS DOCUMENT IS FOR EXAMPLE PURPOSES ONLY')) {
+                    // Disclaimer - bold, centered, larger font
+                    formattedContent += `\\pard\\qc\\b\\fs28 ${escapeRTF(line)}\\b0\\fs24\\par\\par `;
+                } else if (line.includes('Purchase and Sale Agreement') || line.includes('ASSIGNMENT OF CONTRACT')) {
+                    // Title - bold, centered, large font
+                    formattedContent += `\\pard\\qc\\b\\fs32 ${escapeRTF(line)}\\b0\\fs24\\par\\par `;
+                } else if (line.match(/^\\d+\\./)) {
+                    // Numbered sections - bold number, indent
+                    const match = line.match(/^(\\d+\\.\\s*[^:]+:?)(.*)/);
+                    if (match) {
+                        formattedContent += `\\pard\\li0\\b ${escapeRTF(match[1])}\\b0 ${escapeRTF(match[2])}\\par\\par `;
+                    } else {
+                        formattedContent += `\\pard\\li0\\b ${escapeRTF(line)}\\b0\\par\\par `;
+                    }
+                } else if (line.includes('TERMS AND CONDITIONS') || line.includes('The parties agree to the following')) {
+                    // Section headers - bold, slightly larger
+                    formattedContent += `\\pard\\qc\\b\\fs26 ${escapeRTF(line)}\\b0\\fs24\\par `;
+                } else if (line.includes('Date:') || line.includes('Seller:') || line.includes('Buyer:') ||
+                          line.includes('ASSIGNOR:') || line.includes('ASSIGNEE:') || line.includes('Please Print:')) {
+                    // Signature lines - add more space
+                    formattedContent += `\\pard\\li0 ${escapeRTF(line)}\\par\\par `;
+                } else if (line.includes('Street Address:') || line.includes('City, State, Zip:') ||
+                          line.includes('Total Deposit') || line.includes('Cash due to Seller') ||
+                          line.includes('Total Price') || line.includes('Purchase price in Underlying Transaction')) {
+                    // Form fields - slight indent
+                    formattedContent += `\\pard\\li360 ${escapeRTF(line)}\\par `;
+                } else if (line.startsWith('This agreement is made') || line.startsWith('This agreement is between')) {
+                    // Opening line - justified, proper spacing
+                    formattedContent += `\\pard\\qj ${escapeRTF(line)}\\par\\par `;
+                } else {
+                    // Regular paragraph - justified text
+                    formattedContent += `\\pard\\qj ${escapeRTF(line)}\\par `;
+                }
+            }
+
+            return formattedContent;
+        }
+
+        function escapeRTF(text) {
+            // Escape special RTF characters
+            return text.replace(/\\\\/g, '\\\\\\\\')
+                      .replace(/\\{/g, '\\\\{')
+                      .replace(/\\}/g, '\\\\}')
+                      .replace(/\\n/g, '\\\\par ')
+                      .replace(/\\t/g, '\\\\tab ');
         }
 
         // Initialize with first tab active on page load
