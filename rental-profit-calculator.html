@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Profit Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        .inputs-section, .results-section {
+            padding: 40px;
+        }
+        
+        .inputs-section {
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .input-group {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group:hover {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-left-color: #667eea;
+        }
+        
+        .input-group h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-field.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+        
+        input[type="number"] {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .results-section {
+            background: white;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .result-card h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        .result-card .value {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .result-card .subtitle {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .metric-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-item:hover {
+            border-color: #667eea;
+            background: white;
+        }
+        
+        .metric-item .label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .metric-item .value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .cap-rate-indicator {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .cap-rate-excellent {
+            background: linear-gradient(135deg, #00c851, #007e33);
+            color: white;
+        }
+        
+        .cap-rate-good {
+            background: linear-gradient(135deg, #ffbb33, #ff8800);
+            color: white;
+        }
+        
+        .cap-rate-fair {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+        }
+        
+        .breakdown {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+        
+        .breakdown h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .inputs-section {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Rental Profit Calculator</h1>
+            <p>Analyze NOI, Cap Rate & Cash Flow for Investment Properties</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="inputs-section">
+                <h2 class="section-title">Property Analysis</h2>
+                
+                <div class="input-group">
+                    <h3>Property Information</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="purchasePrice">Purchase Price ($)</label>
+                            <input type="number" id="purchasePrice" value="300000" min="0">
+                        </div>
+                        <div class="form-field">
+                            <label for="downPayment">Down Payment ($)</label>
+                            <input type="number" id="downPayment" value="60000" min="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <h3>Income</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="monthlyRent">Monthly Rent ($)</label>
+                            <input type="number" id="monthlyRent" value="2500" min="0">
+                        </div>
+                        <div class="form-field">
+                            <label for="otherIncome">Other Monthly Income ($)</label>
+                            <input type="number" id="otherIncome" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="vacancyRate">Vacancy Rate (%)</label>
+                            <input type="number" id="vacancyRate" value="5" min="0" max="100" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <h3>Operating Expenses (Annual)</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="propertyTaxes">Property Taxes ($)</label>
+                            <input type="number" id="propertyTaxes" value="3600" min="0">
+                        </div>
+                        <div class="form-field">
+                            <label for="insurance">Insurance ($)</label>
+                            <input type="number" id="insurance" value="1200" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="maintenance">Maintenance & Repairs ($)</label>
+                            <input type="number" id="maintenance" value="2400" min="0">
+                        </div>
+                        <div class="form-field">
+                            <label for="management">Property Management ($)</label>
+                            <input type="number" id="management" value="1800" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="utilities">Utilities (Owner Paid) ($)</label>
+                            <input type="number" id="utilities" value="0" min="0">
+                        </div>
+                        <div class="form-field">
+                            <label for="hoaFees">HOA Fees ($)</label>
+                            <input type="number" id="hoaFees" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="otherExpenses">Other Expenses ($)</label>
+                            <input type="number" id="otherExpenses" value="600" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">Analysis Results</h2>
+                
+                <div class="result-card">
+                    <h3>Net Operating Income (NOI)</h3>
+                    <div class="value" id="noiResult">$19,200</div>
+                    <div class="subtitle">Annual cash flow before debt service</div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="label">Cap Rate</div>
+                        <div class="value" id="capRateResult">6.40%</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="label">Cash-on-Cash Return</div>
+                        <div class="value" id="cocResult">32.00%</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="label">Monthly Cash Flow</div>
+                        <div class="value" id="monthlyCashFlow">$1,600</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="label">Annual Gross Income</div>
+                        <div class="value" id="grossIncome">$28,500</div>
+                    </div>
+                </div>
+                
+                <div id="capRateIndicator" class="cap-rate-indicator cap-rate-good">
+                    Good Investment Opportunity
+                </div>
+                
+                <div class="breakdown">
+                    <h4>Income Breakdown</h4>
+                    <div class="breakdown-item">
+                        <span>Gross Rental Income:</span>
+                        <span id="grossRentalIncome">$28,500</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Vacancy Loss:</span>
+                        <span id="vacancyLoss">($1,425)</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Effective Gross Income:</span>
+                        <span id="effectiveGrossIncome">$27,075</span>
+                    </div>
+                </div>
+                
+                <div class="breakdown">
+                    <h4>Expense Breakdown</h4>
+                    <div class="breakdown-item">
+                        <span>Property Taxes:</span>
+                        <span id="taxesDisplay">$3,600</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Insurance:</span>
+                        <span id="insuranceDisplay">$1,200</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Maintenance:</span>
+                        <span id="maintenanceDisplay">$2,400</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Management:</span>
+                        <span id="managementDisplay">$1,800</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Other Expenses:</span>
+                        <span id="otherExpensesDisplay">$600</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Total Operating Expenses:</span>
+                        <span id="totalExpenses">$9,600</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function formatPercentage(rate) {
+            return (rate * 100).toFixed(2) + '%';
+        }
+
+        function updateCapRateIndicator(capRate) {
+            const indicator = document.getElementById('capRateIndicator');
+            const rate = capRate * 100;
+            
+            if (rate >= 8) {
+                indicator.className = 'cap-rate-indicator cap-rate-excellent';
+                indicator.textContent = 'Excellent Investment Opportunity';
+            } else if (rate >= 6) {
+                indicator.className = 'cap-rate-indicator cap-rate-good';
+                indicator.textContent = 'Good Investment Opportunity';
+            } else {
+                indicator.className = 'cap-rate-indicator cap-rate-fair';
+                indicator.textContent = 'Fair Investment - Consider Carefully';
+            }
+        }
+
+        function calculateMetrics() {
+            // Get input values
+            const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
+            const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+            const monthlyRent = parseFloat(document.getElementById('monthlyRent').value) || 0;
+            const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
+            const vacancyRate = parseFloat(document.getElementById('vacancyRate').value) / 100 || 0;
+            
+            // Operating expenses
+            const propertyTaxes = parseFloat(document.getElementById('propertyTaxes').value) || 0;
+            const insurance = parseFloat(document.getElementById('insurance').value) || 0;
+            const maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
+            const management = parseFloat(document.getElementById('management').value) || 0;
+            const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+            const hoaFees = parseFloat(document.getElementById('hoaFees').value) || 0;
+            const otherExpenses = parseFloat(document.getElementById('otherExpenses').value) || 0;
+            
+            // Calculations
+            const annualRent = monthlyRent * 12;
+            const annualOtherIncome = otherIncome * 12;
+            const grossRentalIncome = annualRent + annualOtherIncome;
+            const vacancyLoss = grossRentalIncome * vacancyRate;
+            const effectiveGrossIncome = grossRentalIncome - vacancyLoss;
+            
+            const totalOperatingExpenses = propertyTaxes + insurance + maintenance + management + utilities + hoaFees + otherExpenses;
+            const noi = effectiveGrossIncome - totalOperatingExpenses;
+            
+            const capRate = purchasePrice > 0 ? noi / purchasePrice : 0;
+            const cashOnCashReturn = downPayment > 0 ? noi / downPayment : 0;
+            const monthlyCashFlow = noi / 12;
+            
+            // Update display
+            document.getElementById('noiResult').textContent = formatCurrency(noi);
+            document.getElementById('capRateResult').textContent = formatPercentage(capRate);
+            document.getElementById('cocResult').textContent = formatPercentage(cashOnCashReturn);
+            document.getElementById('monthlyCashFlow').textContent = formatCurrency(monthlyCashFlow);
+            document.getElementById('grossIncome').textContent = formatCurrency(effectiveGrossIncome);
+            
+            // Income breakdown
+            document.getElementById('grossRentalIncome').textContent = formatCurrency(grossRentalIncome);
+            document.getElementById('vacancyLoss').textContent = formatCurrency(-vacancyLoss);
+            document.getElementById('effectiveGrossIncome').textContent = formatCurrency(effectiveGrossIncome);
+            
+            // Expense breakdown
+            document.getElementById('taxesDisplay').textContent = formatCurrency(propertyTaxes);
+            document.getElementById('insuranceDisplay').textContent = formatCurrency(insurance);
+            document.getElementById('maintenanceDisplay').textContent = formatCurrency(maintenance);
+            document.getElementById('managementDisplay').textContent = formatCurrency(management);
+            document.getElementById('otherExpensesDisplay').textContent = formatCurrency(utilities + hoaFees + otherExpenses);
+            document.getElementById('totalExpenses').textContent = formatCurrency(totalOperatingExpenses);
+            
+            // Update cap rate indicator
+            updateCapRateIndicator(capRate);
+        }
+
+        // Add event listeners to all input fields
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', calculateMetrics);
+        });
+
+        // Initial calculation
+        calculateMetrics();
+    </script>
+</body>
+</html>
