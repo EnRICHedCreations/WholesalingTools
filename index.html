@@ -126,7 +126,7 @@
     <div class="bg-white border-b sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="tab-container">
-                <nav class="tab-list flex space-x-1 py-2" role="tablist">
+                <nav class="tab-list flex flex-wrap gap-2 py-2" role="tablist">
                     <button onclick="switchTab('deal-analysis')" id="tab-deal-analysis" class="tab-active px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         📊 Deal Analysis & Calculator
                     </button>
@@ -144,6 +144,9 @@
                     </button>
                     <button onclick="switchTab('seller-finance')" id="tab-seller-finance" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         💰 Seller Finance Calculator
+                    </button>
+                    <button onclick="switchTab('land-value')" id="tab-land-value" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🌍 Land Value Estimator
                     </button>
                 </nav>
             </div>
@@ -1977,7 +1980,7 @@
                                 </div>
                                 <div class="seller-finance-form-field">
                                     <label for="sfDownPayment">Down Payment ($)</label>
-                                    <input type="number" id="sfDownPayment" value="80000" min="0">
+                                    <input type="number" id="sfDownPayment" value="100000" min="0">
                                 </div>
                             </div>
                             <div class="seller-finance-form-row">
@@ -1987,7 +1990,7 @@
                                 </div>
                                 <div class="seller-finance-form-field">
                                     <label for="sfLoanTerm">Loan Term (Years)</label>
-                                    <input type="number" id="sfLoanTerm" value="10" min="1" max="30">
+                                    <input type="number" id="sfLoanTerm" value="25" min="1" max="30">
                                 </div>
                             </div>
                             <div class="seller-finance-form-row">
@@ -2001,7 +2004,7 @@
                                 </div>
                                 <div class="seller-finance-form-field">
                                     <label for="sfAmortization">Amortization (Years)</label>
-                                    <input type="number" id="sfAmortization" value="30" min="5" max="30">
+                                    <input type="number" id="sfAmortization" value="25" min="5" max="30">
                                 </div>
                             </div>
                         </div>
@@ -2146,22 +2149,47 @@
                 }
 
                 function calculateIRR(cashFlows) {
-                    // Simple IRR calculation using Newton-Raphson method
-                    let rate = 0.1;
-                    for (let i = 0; i < 100; i++) {
-                        let npv = 0;
-                        let dnpv = 0;
+                    if (cashFlows.length < 2) return 0;
 
-                        for (let j = 0; j < cashFlows.length; j++) {
-                            npv += cashFlows[j] / Math.pow(1 + rate, j);
-                            dnpv -= j * cashFlows[j] / Math.pow(1 + rate, j + 1);
+                    // Check if we have both positive and negative cash flows
+                    const hasPositive = cashFlows.some(cf => cf > 0);
+                    const hasNegative = cashFlows.some(cf => cf < 0);
+                    if (!hasPositive || !hasNegative) return 0;
+
+                    // Simple bisection method - more reliable than Newton-Raphson
+                    let lowRate = -0.99;
+                    let highRate = 5.0;
+                    let tolerance = 0.0001;
+
+                    function npv(rate) {
+                        let result = 0;
+                        for (let i = 0; i < cashFlows.length; i++) {
+                            result += cashFlows[i] / Math.pow(1 + rate, i);
                         }
-
-                        if (Math.abs(npv) < 0.01) break;
-                        rate = rate - npv / dnpv;
+                        return result;
                     }
 
-                    return rate;
+                    // Bisection method
+                    for (let iteration = 0; iteration < 100; iteration++) {
+                        const midRate = (lowRate + highRate) / 2;
+                        const midNPV = npv(midRate);
+
+                        if (Math.abs(midNPV) < tolerance) {
+                            return midRate;
+                        }
+
+                        if (npv(lowRate) * midNPV < 0) {
+                            highRate = midRate;
+                        } else {
+                            lowRate = midRate;
+                        }
+
+                        if (Math.abs(highRate - lowRate) < tolerance) {
+                            return (lowRate + highRate) / 2;
+                        }
+                    }
+
+                    return 0; // Failed to converge
                 }
 
                 function generateAmortizationSchedule(principal, monthlyPayment, monthlyRate, months) {
@@ -2193,36 +2221,73 @@
                     const loanTerm = parseFloat(document.getElementById('sfLoanTerm').value) || 0;
                     const amortizationYears = parseFloat(document.getElementById('sfAmortization').value) || 30;
                     const balloonPayment = parseFloat(document.getElementById('sfBalloonPayment').value) || 0;
-                    const interestOnlyMonths = parseFloat(document.getElementById('sfInterestOnlyMonths').value) || 0;
                     const cashDiscount = parseFloat(document.getElementById('sfCashDiscount').value) || 0;
 
-                    // Calculations
+                    // Basic calculations
                     const financedAmount = propertyPrice - downPayment;
                     const monthlyRate = interestRate / 12 / 100;
-                    const monthlyPayment = calculateMonthlyPayment(financedAmount, interestRate, loanTerm, amortizationYears);
+                    const amortizationMonths = amortizationYears * 12;
+                    const loanTermMonths = loanTerm * 12;
 
-                    // Calculate remaining balance at end of loan term
-                    const paymentsMode = loanTerm * 12;
-                    const remainingBalance = calculateRemainingBalance(financedAmount, monthlyPayment, monthlyRate, paymentsMode);
+                    // Calculate monthly payment based on amortization schedule
+                    let monthlyPayment = 0;
+                    if (monthlyRate > 0) {
+                        monthlyPayment = financedAmount * (monthlyRate * Math.pow(1 + monthlyRate, amortizationMonths)) /
+                                       (Math.pow(1 + monthlyRate, amortizationMonths) - 1);
+                    } else {
+                        monthlyPayment = financedAmount / amortizationMonths;
+                    }
+
+                    // Calculate remaining balance at end of loan term (for balloon)
+                    let remainingBalance = 0;
+                    if (loanTermMonths < amortizationMonths) {
+                        // There will be a balloon payment
+                        if (monthlyRate > 0) {
+                            remainingBalance = financedAmount *
+                                             (Math.pow(1 + monthlyRate, amortizationMonths) - Math.pow(1 + monthlyRate, loanTermMonths)) /
+                                             (Math.pow(1 + monthlyRate, amortizationMonths) - 1);
+                        } else {
+                            remainingBalance = financedAmount - (monthlyPayment * loanTermMonths);
+                        }
+                    }
+
                     const finalBalloon = Math.max(balloonPayment, remainingBalance);
 
-                    // Total returns calculation
-                    const totalPayments = monthlyPayment * paymentsMode;
-                    const totalInterest = totalPayments + finalBalloon - financedAmount;
-                    const totalReturns = downPayment + totalPayments + finalBalloon;
+                    // Total calculations
+                    const totalMonthlyPayments = monthlyPayment * loanTermMonths;
+                    const totalReceived = downPayment + totalMonthlyPayments + finalBalloon;
+                    const totalInterest = totalReceived - propertyPrice;
 
                     // Cash sale comparison
                     const cashSaleAmount = propertyPrice * (1 - cashDiscount / 100);
-                    const additionalIncome = totalReturns - cashSaleAmount;
+                    const additionalIncome = totalReceived - cashSaleAmount;
 
-                    // IRR calculation
-                    const cashFlows = [-financedAmount]; // Initial investment (negative)
-                    for (let i = 0; i < paymentsMode; i++) {
-                        cashFlows.push(monthlyPayment);
+                    // IRR calculation - treat seller as making a loan investment
+                    let sellerIRR = 0;
+
+                    if (loanTermMonths > 0 && financedAmount > 0) {
+                        // From seller's perspective: they "lend" the financed amount and receive payments
+                        const cashFlows = [];
+
+                        // Period 0: Seller "invests" the financed amount (what they're not getting in cash)
+                        cashFlows.push(-financedAmount);
+
+                        // Monthly payments received
+                        for (let i = 1; i <= loanTermMonths; i++) {
+                            cashFlows.push(monthlyPayment);
+                        }
+
+                        // Add balloon to final payment if any
+                        if (finalBalloon > 0) {
+                            cashFlows[cashFlows.length - 1] += finalBalloon;
+                        }
+
+                        // Calculate monthly IRR and annualize
+                        const monthlyIRR = calculateIRR(cashFlows);
+                        if (monthlyIRR > -0.99 && monthlyIRR < 10) {
+                            sellerIRR = Math.pow(1 + monthlyIRR, 12) - 1;
+                        }
                     }
-                    cashFlows[cashFlows.length - 1] += finalBalloon; // Add balloon to final payment
-
-                    const sellerIRR = calculateIRR(cashFlows);
 
                     // Update display
                     document.getElementById('sfMonthlyPayment').textContent = formatSFCurrency(monthlyPayment);
@@ -2233,7 +2298,7 @@
 
                     // Comparison
                     document.getElementById('sfCashSaleAmount').textContent = formatSFCurrency(cashSaleAmount);
-                    document.getElementById('sfTotalReturns').textContent = formatSFCurrency(totalReturns);
+                    document.getElementById('sfTotalReturns').textContent = formatSFCurrency(totalReceived);
                     document.getElementById('sfAdditionalIncome').textContent = formatSFCurrency(additionalIncome);
 
                     // Generate amortization table for first 12 months
@@ -2264,6 +2329,883 @@
 
                     // Initial calculation
                     calculateSellerFinanceMetrics();
+                });
+            </script>
+        </div>
+
+        <!-- Land Value Estimator Tab -->
+        <div id="content-land-value" class="tab-content hidden">
+            <style>
+                .land-value-container {
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    background: rgba(255, 255, 255, 0.98);
+                    border-radius: 20px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                    overflow: hidden;
+                }
+
+                .land-value-header {
+                    background: linear-gradient(135deg, #1e3a1f, #2c5f2d);
+                    color: white;
+                    padding: 40px;
+                    text-align: center;
+                }
+
+                .land-value-header h1 {
+                    font-size: 2.8em;
+                    margin-bottom: 10px;
+                    font-weight: 300;
+                }
+
+                .land-value-header p {
+                    opacity: 0.9;
+                    font-size: 1.2em;
+                }
+
+                .land-value-main-content {
+                    display: grid;
+                    grid-template-columns: 1.2fr 1fr;
+                    gap: 0;
+                    min-height: 700px;
+                }
+
+                .land-value-inputs-section {
+                    background: #f8f9fa;
+                    border-right: 1px solid #e9ecef;
+                    padding: 40px;
+                    overflow-y: auto;
+                    max-height: 800px;
+                }
+
+                .land-value-results-section {
+                    padding: 40px;
+                    background: white;
+                }
+
+                .land-value-section-title {
+                    font-size: 1.5em;
+                    color: #2c5f2d;
+                    margin-bottom: 30px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .land-value-section-title::before {
+                    content: '';
+                    width: 5px;
+                    height: 30px;
+                    background: linear-gradient(135deg, #2c5f2d, #97bc62);
+                    border-radius: 3px;
+                }
+
+                .land-value-input-group {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+                    border-left: 4px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+                .land-value-input-group:hover {
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                    border-left-color: #2c5f2d;
+                }
+
+                .land-value-input-group h3 {
+                    color: #2c5f2d;
+                    margin-bottom: 20px;
+                    font-size: 1.2em;
+                    font-weight: 600;
+                }
+
+                .land-value-form-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                    margin-bottom: 15px;
+                }
+
+                .land-value-form-field {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .land-value-form-field.full-width {
+                    grid-column: 1 / -1;
+                }
+
+                .land-value-form-field label {
+                    font-weight: 500;
+                    color: #495057;
+                    margin-bottom: 6px;
+                    font-size: 0.95em;
+                }
+
+                .land-value-form-field input[type="number"],
+                .land-value-form-field select {
+                    padding: 12px 15px;
+                    border: 2px solid #e9ecef;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                    background: white;
+                }
+
+                .land-value-form-field input[type="number"]:focus,
+                .land-value-form-field select:focus {
+                    outline: none;
+                    border-color: #2c5f2d;
+                    box-shadow: 0 0 0 3px rgba(44, 95, 45, 0.1);
+                }
+
+                .land-value-slider-container {
+                    margin-top: 10px;
+                }
+
+                .land-value-form-field input[type="range"] {
+                    width: 100%;
+                    height: 6px;
+                    border-radius: 3px;
+                    background: #e9ecef;
+                    outline: none;
+                    -webkit-appearance: none;
+                }
+
+                .land-value-form-field input[type="range"]::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #2c5f2d;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .land-value-form-field input[type="range"]::-webkit-slider-thumb:hover {
+                    background: #1e3a1f;
+                    transform: scale(1.2);
+                }
+
+                .land-value-value-display {
+                    text-align: center;
+                    font-weight: 600;
+                    color: #2c5f2d;
+                    margin-top: 5px;
+                }
+
+                .land-value-result-hero {
+                    background: linear-gradient(135deg, #2c5f2d, #97bc62);
+                    color: white;
+                    padding: 35px;
+                    border-radius: 15px;
+                    margin-bottom: 30px;
+                    box-shadow: 0 10px 30px rgba(44, 95, 45, 0.3);
+                    text-align: center;
+                }
+
+                .land-value-result-hero h3 {
+                    font-size: 1.2em;
+                    margin-bottom: 15px;
+                    opacity: 0.9;
+                    font-weight: 400;
+                }
+
+                .land-value-result-hero .value-range {
+                    font-size: 2.5em;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                }
+
+                .land-value-result-hero .per-unit {
+                    font-size: 1.2em;
+                    opacity: 0.9;
+                }
+
+                .land-value-confidence-bar {
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                    height: 10px;
+                    margin-top: 15px;
+                    overflow: hidden;
+                }
+
+                .land-value-confidence-fill {
+                    height: 100%;
+                    background: white;
+                    border-radius: 10px;
+                    transition: width 0.5s ease;
+                }
+
+                .land-value-metrics-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin-bottom: 30px;
+                }
+
+                .land-value-metric-card {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 12px;
+                    text-align: center;
+                    border: 2px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+                .land-value-metric-card:hover {
+                    border-color: #2c5f2d;
+                    background: white;
+                    transform: translateY(-2px);
+                }
+
+                .land-value-metric-card .label {
+                    font-size: 0.9em;
+                    color: #6c757d;
+                    margin-bottom: 10px;
+                    font-weight: 500;
+                }
+
+                .land-value-metric-card .value {
+                    font-size: 1.8em;
+                    font-weight: 700;
+                    color: #2c5f2d;
+                }
+
+                .land-value-drivers {
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                }
+
+                .land-value-drivers h4 {
+                    color: #2c5f2d;
+                    margin-bottom: 20px;
+                    font-size: 1.1em;
+                }
+
+                .land-value-driver-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 12px 0;
+                    border-bottom: 1px solid #e9ecef;
+                }
+
+                .land-value-driver-item:last-child {
+                    border-bottom: none;
+                }
+
+                .land-value-driver-impact {
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85em;
+                    font-weight: 600;
+                }
+
+                .land-value-impact-positive {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                .land-value-impact-negative {
+                    background: #f8d7da;
+                    color: #721c24;
+                }
+
+                .land-value-impact-neutral {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                }
+
+                .land-value-development-scenario {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-top: 25px;
+                }
+
+                .land-value-development-scenario h4 {
+                    margin-bottom: 15px;
+                    font-size: 1.1em;
+                }
+
+                .land-value-scenario-stat {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                }
+
+                .land-value-scenario-stat:last-child {
+                    border-bottom: none;
+                    font-weight: 600;
+                }
+
+                .land-value-toggle-unit {
+                    background: white;
+                    border: 2px solid #2c5f2d;
+                    color: #2c5f2d;
+                    padding: 8px 20px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    margin-bottom: 15px;
+                    display: inline-block;
+                }
+
+                .land-value-toggle-unit:hover {
+                    background: #2c5f2d;
+                    color: white;
+                }
+
+                @media (max-width: 1024px) {
+                    .land-value-main-content {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .land-value-inputs-section {
+                        border-right: none;
+                        border-bottom: 1px solid #e9ecef;
+                        max-height: none;
+                    }
+
+                    .land-value-metrics-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .land-value-form-row {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .land-value-header h1 {
+                        font-size: 2em;
+                    }
+                }
+            </style>
+
+            <div class="land-value-container">
+                <div class="land-value-header">
+                    <h1>Land Value Estimator</h1>
+                    <p>Comprehensive Property Valuation & Development Analysis</p>
+                </div>
+
+                <div class="land-value-main-content">
+                    <div class="land-value-inputs-section">
+                        <h2 class="land-value-section-title">Property Information</h2>
+
+                        <div class="land-value-input-group">
+                            <h3>Basic Details</h3>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landLotSize">Lot Size</label>
+                                    <input type="number" id="landLotSize" value="5" min="0" step="0.01" onchange="calculateLandValue()">
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landSizeUnit">Unit</label>
+                                    <select id="landSizeUnit" onchange="calculateLandValue()">
+                                        <option value="acres">Acres</option>
+                                        <option value="sqft">Square Feet</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field full-width">
+                                    <label for="landZipCode">Zip Code (Optional)</label>
+                                    <input type="number" id="landZipCode" placeholder="12345" onchange="calculateLandValue()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-input-group">
+                            <h3>Zoning & Development</h3>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landZoning">Zoning Type</label>
+                                    <select id="landZoning" onchange="calculateLandValue()">
+                                        <option value="residential">Residential</option>
+                                        <option value="commercial">Commercial</option>
+                                        <option value="agricultural">Agricultural</option>
+                                        <option value="industrial">Industrial</option>
+                                        <option value="mixed">Mixed Use</option>
+                                    </select>
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landDensity">Density (units/acre)</label>
+                                    <input type="number" id="landDensity" value="4" min="0" step="0.1" onchange="calculateLandValue()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-input-group">
+                            <h3>Physical Characteristics</h3>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landTopography">Topography</label>
+                                    <select id="landTopography" onchange="calculateLandValue()">
+                                        <option value="flat">Flat</option>
+                                        <option value="gentle">Gentle Slope</option>
+                                        <option value="moderate">Moderate Slope</option>
+                                        <option value="steep">Steep/Hilly</option>
+                                    </select>
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landRoadAccess">Road Access</label>
+                                    <select id="landRoadAccess" onchange="calculateLandValue()">
+                                        <option value="paved">Paved Road</option>
+                                        <option value="gravel">Gravel Road</option>
+                                        <option value="dirt">Dirt Road</option>
+                                        <option value="none">No Direct Access</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landFrontage">Road Frontage (feet)</label>
+                                    <input type="number" id="landFrontage" value="200" min="0" onchange="calculateLandValue()">
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landShape">Lot Shape</label>
+                                    <select id="landShape" onchange="calculateLandValue()">
+                                        <option value="regular">Regular/Rectangular</option>
+                                        <option value="irregular">Irregular</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-input-group">
+                            <h3>Utilities & Infrastructure</h3>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landWater">Water Available</label>
+                                    <select id="landWater" onchange="calculateLandValue()">
+                                        <option value="municipal">Municipal Water</option>
+                                        <option value="well">Well Required</option>
+                                        <option value="none">None Available</option>
+                                    </select>
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landSewer">Sewer System</label>
+                                    <select id="landSewer" onchange="calculateLandValue()">
+                                        <option value="municipal">Municipal Sewer</option>
+                                        <option value="septic">Septic Required</option>
+                                        <option value="none">None Available</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landElectric">Electric Available</label>
+                                    <select id="landElectric" onchange="calculateLandValue()">
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landGas">Natural Gas</label>
+                                    <select id="landGas" onchange="calculateLandValue()">
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-input-group">
+                            <h3>Market Comparables</h3>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field full-width">
+                                    <label for="landAvgPricePerAcre">Avg. Price/Acre in Area ($)</label>
+                                    <input type="number" id="landAvgPricePerAcre" value="50000" min="0" step="1000" onchange="calculateLandValue()">
+                                </div>
+                            </div>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landMarketCondition">Market Conditions</label>
+                                    <select id="landMarketCondition" onchange="calculateLandValue()">
+                                        <option value="hot">Hot Market</option>
+                                        <option value="stable" selected>Stable</option>
+                                        <option value="cooling">Cooling</option>
+                                        <option value="slow">Slow/Buyer's Market</option>
+                                    </select>
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landDaysOnMarket">Avg. Days on Market</label>
+                                    <input type="number" id="landDaysOnMarket" value="90" min="0" onchange="calculateLandValue()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-input-group">
+                            <h3>Location Quality</h3>
+                            <div class="land-value-form-field full-width">
+                                <label for="landLocationQuality">Location Multiplier</label>
+                                <div class="land-value-slider-container">
+                                    <input type="range" id="landLocationQuality" min="70" max="150" value="100" step="5" oninput="updateLandLocationDisplay(); calculateLandValue()">
+                                    <div class="land-value-value-display" id="landLocationValue">1.00x (Average)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-input-group">
+                            <h3>Special Factors</h3>
+                            <div class="land-value-form-row">
+                                <div class="land-value-form-field">
+                                    <label for="landFloodZone">In Flood Zone</label>
+                                    <select id="landFloodZone" onchange="calculateLandValue()">
+                                        <option value="no">No</option>
+                                        <option value="yes">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="land-value-form-field">
+                                    <label for="landWetlands">Wetlands Present</label>
+                                    <select id="landWetlands" onchange="calculateLandValue()">
+                                        <option value="no">No</option>
+                                        <option value="partial">Partial</option>
+                                        <option value="significant">Significant</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="land-value-results-section">
+                        <h2 class="land-value-section-title">Valuation Results</h2>
+
+                        <button class="land-value-toggle-unit" id="landToggleUnit" onclick="toggleLandDisplayUnit()">Show per Sq Ft</button>
+
+                        <div class="land-value-result-hero">
+                            <h3>Estimated Land Value</h3>
+                            <div class="value-range" id="landValueRange">$200,000 - $275,000</div>
+                            <div class="per-unit" id="landPerUnit">$40,000 - $55,000 per acre</div>
+                            <div style="margin-top: 15px; opacity: 0.9;">
+                                <div style="font-size: 0.9em; margin-bottom: 5px;">Confidence Score</div>
+                                <div class="land-value-confidence-bar">
+                                    <div class="land-value-confidence-fill" id="landConfidenceBar" style="width: 75%;"></div>
+                                </div>
+                                <div style="margin-top: 5px; font-size: 0.9em;" id="landConfidenceText">75% - Good Data Quality</div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-metrics-grid">
+                            <div class="land-value-metric-card">
+                                <div class="label">Base Market Value</div>
+                                <div class="value" id="landBaseValue">$250,000</div>
+                            </div>
+                            <div class="land-value-metric-card">
+                                <div class="label">Adjusted Value</div>
+                                <div class="value" id="landAdjustedValue">$237,500</div>
+                            </div>
+                            <div class="land-value-metric-card">
+                                <div class="label">Value per Acre</div>
+                                <div class="value" id="landValuePerAcre">$47,500</div>
+                            </div>
+                            <div class="land-value-metric-card">
+                                <div class="label">Buildable Lots</div>
+                                <div class="value" id="landBuildableLots">20</div>
+                            </div>
+                        </div>
+
+                        <div class="land-value-drivers">
+                            <h4>Value Impact Factors</h4>
+                            <div class="land-value-driver-item">
+                                <span>Location Quality</span>
+                                <span class="land-value-driver-impact land-value-impact-neutral" id="landLocationImpact">Neutral</span>
+                            </div>
+                            <div class="land-value-driver-item">
+                                <span>Utilities Available</span>
+                                <span class="land-value-driver-impact land-value-impact-positive" id="landUtilitiesImpact">+15%</span>
+                            </div>
+                            <div class="land-value-driver-item">
+                                <span>Road Access</span>
+                                <span class="land-value-driver-impact land-value-impact-positive" id="landAccessImpact">Good</span>
+                            </div>
+                            <div class="land-value-driver-item">
+                                <span>Topography</span>
+                                <span class="land-value-driver-impact land-value-impact-neutral" id="landTopoImpact">Neutral</span>
+                            </div>
+                            <div class="land-value-driver-item">
+                                <span>Zoning Potential</span>
+                                <span class="land-value-driver-impact land-value-impact-positive" id="landZoningImpact">+10%</span>
+                            </div>
+                        </div>
+
+                        <div class="land-value-development-scenario">
+                            <h4>Development Potential Analysis</h4>
+                            <div class="land-value-scenario-stat">
+                                <span>Potential Buildable Lots:</span>
+                                <span id="landDevLots">20 lots</span>
+                            </div>
+                            <div class="land-value-scenario-stat">
+                                <span>Est. Infrastructure Cost:</span>
+                                <span id="landInfraCost">$80,000</span>
+                            </div>
+                            <div class="land-value-scenario-stat">
+                                <span>Developed Lot Value:</span>
+                                <span id="landLotValue">$25,000 each</span>
+                            </div>
+                            <div class="land-value-scenario-stat">
+                                <span>Total Development Value:</span>
+                                <span id="landTotalDevValue">$500,000</span>
+                            </div>
+                            <div class="land-value-scenario-stat">
+                                <span>Potential ROI:</span>
+                                <span id="landDevROI">110%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                let landDisplayInSqFt = false;
+
+                function formatLandCurrency(amount) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(amount);
+                }
+
+                function landAcreToSqFt(acres) {
+                    return acres * 43560;
+                }
+
+                function landSqFtToAcre(sqft) {
+                    return sqft / 43560;
+                }
+
+                function getLandSizeInAcres() {
+                    const size = parseFloat(document.getElementById('landLotSize').value) || 0;
+                    const unit = document.getElementById('landSizeUnit').value;
+                    return unit === 'acres' ? size : landSqFtToAcre(size);
+                }
+
+                function updateLandLocationDisplay() {
+                    const value = document.getElementById('landLocationQuality').value;
+                    const multiplier = (value / 100).toFixed(2);
+                    let label = 'Average';
+                    if (value >= 130) label = 'Excellent';
+                    else if (value >= 110) label = 'Above Average';
+                    else if (value <= 80) label = 'Below Average';
+
+                    document.getElementById('landLocationValue').textContent = `${multiplier}x (${label})`;
+                }
+
+                function toggleLandDisplayUnit() {
+                    landDisplayInSqFt = !landDisplayInSqFt;
+                    const btn = document.getElementById('landToggleUnit');
+                    btn.textContent = landDisplayInSqFt ? 'Show per Acre' : 'Show per Sq Ft';
+                    calculateLandValue();
+                }
+
+                function calculateLandValue() {
+                    // Get inputs
+                    const lotSizeAcres = getLandSizeInAcres();
+                    const avgPricePerAcre = parseFloat(document.getElementById('landAvgPricePerAcre').value) || 0;
+                    const locationMult = parseFloat(document.getElementById('landLocationQuality').value) / 100;
+                    const zoning = document.getElementById('landZoning').value;
+                    const topography = document.getElementById('landTopography').value;
+                    const roadAccess = document.getElementById('landRoadAccess').value;
+                    const water = document.getElementById('landWater').value;
+                    const sewer = document.getElementById('landSewer').value;
+                    const electric = document.getElementById('landElectric').value;
+                    const gas = document.getElementById('landGas').value;
+                    const marketCondition = document.getElementById('landMarketCondition').value;
+                    const floodZone = document.getElementById('landFloodZone').value;
+                    const wetlands = document.getElementById('landWetlands').value;
+                    const density = parseFloat(document.getElementById('landDensity').value) || 0;
+                    const frontage = parseFloat(document.getElementById('landFrontage').value) || 0;
+                    const shape = document.getElementById('landShape').value;
+
+                    // Base calculation
+                    let baseValue = lotSizeAcres * avgPricePerAcre;
+                    let adjustmentFactor = 1.0;
+
+                    // Location adjustment
+                    adjustmentFactor *= locationMult;
+
+                    // Topography adjustment
+                    const topoAdjustments = {
+                        'flat': 1.1,
+                        'gentle': 1.0,
+                        'moderate': 0.9,
+                        'steep': 0.75
+                    };
+                    adjustmentFactor *= topoAdjustments[topography];
+
+                    // Road access adjustment
+                    const roadAdjustments = {
+                        'paved': 1.1,
+                        'gravel': 1.0,
+                        'dirt': 0.9,
+                        'none': 0.7
+                    };
+                    adjustmentFactor *= roadAdjustments[roadAccess];
+
+                    // Utilities adjustment
+                    let utilitiesBonus = 0;
+                    if (water === 'municipal') utilitiesBonus += 0.05;
+                    else if (water === 'well') utilitiesBonus += 0.02;
+
+                    if (sewer === 'municipal') utilitiesBonus += 0.05;
+                    else if (sewer === 'septic') utilitiesBonus += 0.02;
+
+                    if (electric === 'yes') utilitiesBonus += 0.03;
+                    if (gas === 'yes') utilitiesBonus += 0.02;
+
+                    adjustmentFactor *= (1 + utilitiesBonus);
+
+                    // Zoning adjustment
+                    const zoningAdjustments = {
+                        'residential': 1.0,
+                        'commercial': 1.3,
+                        'agricultural': 0.8,
+                        'industrial': 1.2,
+                        'mixed': 1.15
+                    };
+                    adjustmentFactor *= zoningAdjustments[zoning];
+
+                    // Market condition adjustment
+                    const marketAdjustments = {
+                        'hot': 1.15,
+                        'stable': 1.0,
+                        'cooling': 0.95,
+                        'slow': 0.85
+                    };
+                    adjustmentFactor *= marketAdjustments[marketCondition];
+
+                    // Flood zone penalty
+                    if (floodZone === 'yes') adjustmentFactor *= 0.85;
+
+                    // Wetlands penalty
+                    const wetlandPenalties = {
+                        'no': 1.0,
+                        'partial': 0.95,
+                        'significant': 0.8
+                    };
+                    adjustmentFactor *= wetlandPenalties[wetlands];
+
+                    // Shape adjustment
+                    if (shape === 'irregular') adjustmentFactor *= 0.95;
+
+                    // Size premium/discount (larger parcels often have lower per-acre value)
+                    if (lotSizeAcres > 20) {
+                        adjustmentFactor *= 0.9;
+                    } else if (lotSizeAcres > 50) {
+                        adjustmentFactor *= 0.85;
+                    }
+
+                    // Calculate final values
+                    const adjustedValue = baseValue * adjustmentFactor;
+                    const lowEstimate = adjustedValue * 0.85;
+                    const highEstimate = adjustedValue * 1.15;
+
+                    // Development potential
+                    const buildableLots = Math.floor(lotSizeAcres * density);
+                    const infraCostPerLot = 4000;
+                    const totalInfraCost = buildableLots * infraCostPerLot;
+                    const avgLotValue = adjustedValue / (buildableLots || 1) * 1.5;
+                    const totalDevValue = buildableLots * avgLotValue;
+                    const devROI = ((totalDevValue - adjustedValue - totalInfraCost) / adjustedValue) * 100;
+
+                    // Confidence score
+                    let confidence = 50;
+                    if (avgPricePerAcre > 0) confidence += 20;
+                    if (frontage > 0) confidence += 10;
+                    if (electric === 'yes') confidence += 10;
+                    if (marketCondition !== '') confidence += 10;
+
+                    // Update display
+                    const perAcreValue = adjustedValue / lotSizeAcres;
+                    const perSqFtValue = perAcreValue / 43560;
+
+                    document.getElementById('landValueRange').textContent =
+                        `${formatLandCurrency(lowEstimate)} - ${formatLandCurrency(highEstimate)}`;
+
+                    if (landDisplayInSqFt && lotSizeAcres > 0) {
+                        const lowPerSqFt = (lowEstimate / landAcreToSqFt(lotSizeAcres)).toFixed(2);
+                        const highPerSqFt = (highEstimate / landAcreToSqFt(lotSizeAcres)).toFixed(2);
+                        document.getElementById('landPerUnit').textContent =
+                            `$${lowPerSqFt} - $${highPerSqFt} per sq ft`;
+                    } else if (lotSizeAcres > 0) {
+                        const lowPerAcre = (lowEstimate / lotSizeAcres).toFixed(0);
+                        const highPerAcre = (highEstimate / lotSizeAcres).toFixed(0);
+                        document.getElementById('landPerUnit').textContent =
+                            `${formatLandCurrency(lowPerAcre)} - ${formatLandCurrency(highPerAcre)} per acre`;
+                    }
+
+                    document.getElementById('landBaseValue').textContent = formatLandCurrency(baseValue);
+                    document.getElementById('landAdjustedValue').textContent = formatLandCurrency(adjustedValue);
+                    document.getElementById('landValuePerAcre').textContent = formatLandCurrency(perAcreValue);
+                    document.getElementById('landBuildableLots').textContent = buildableLots;
+
+                    // Confidence
+                    document.getElementById('landConfidenceBar').style.width = confidence + '%';
+                    let confidenceLabel = 'Limited Data';
+                    if (confidence >= 80) confidenceLabel = 'Excellent Data';
+                    else if (confidence >= 60) confidenceLabel = 'Good Data';
+                    document.getElementById('landConfidenceText').textContent = `${confidence}% - ${confidenceLabel}`;
+
+                    // Value drivers
+                    document.getElementById('landLocationImpact').textContent =
+                        locationMult >= 1.1 ? '+' + ((locationMult - 1) * 100).toFixed(0) + '%' :
+                        locationMult <= 0.9 ? ((locationMult - 1) * 100).toFixed(0) + '%' : 'Neutral';
+                    document.getElementById('landLocationImpact').className =
+                        'land-value-driver-impact ' + (locationMult >= 1.1 ? 'land-value-impact-positive' :
+                        locationMult <= 0.9 ? 'land-value-impact-negative' : 'land-value-impact-neutral');
+
+                    const utilTotal = (utilitiesBonus * 100).toFixed(0);
+                    document.getElementById('landUtilitiesImpact').textContent = '+' + utilTotal + '%';
+                    document.getElementById('landUtilitiesImpact').className =
+                        'land-value-driver-impact ' + (utilitiesBonus > 0.1 ? 'land-value-impact-positive' : 'land-value-impact-neutral');
+
+                    document.getElementById('landAccessImpact').textContent =
+                        roadAccess === 'paved' ? 'Excellent' :
+                        roadAccess === 'gravel' ? 'Good' :
+                        roadAccess === 'dirt' ? 'Fair' : 'Poor';
+                    document.getElementById('landAccessImpact').className =
+                        'land-value-driver-impact ' + (roadAccess === 'paved' ? 'land-value-impact-positive' :
+                        roadAccess === 'none' ? 'land-value-impact-negative' : 'land-value-impact-neutral');
+
+                    document.getElementById('landTopoImpact').textContent =
+                        topography === 'flat' ? '+10%' :
+                        topography === 'gentle' ? 'Neutral' :
+                        topography === 'moderate' ? '-10%' : '-25%';
+                    document.getElementById('landTopoImpact').className =
+                        'land-value-driver-impact ' + (topography === 'flat' ? 'land-value-impact-positive' :
+                        topography === 'steep' ? 'land-value-impact-negative' : 'land-value-impact-neutral');
+
+                    const zoningBonus = ((zoningAdjustments[zoning] - 1) * 100).toFixed(0);
+                    document.getElementById('landZoningImpact').textContent =
+                        zoningBonus >= 0 ? '+' + zoningBonus + '%' : zoningBonus + '%';
+                    document.getElementById('landZoningImpact').className =
+                        'land-value-driver-impact ' + (zoningBonus >= 10 ? 'land-value-impact-positive' : 'land-value-impact-neutral');
+
+                    // Development scenario
+                    document.getElementById('landDevLots').textContent = buildableLots + ' lots';
+                    document.getElementById('landInfraCost').textContent = formatLandCurrency(totalInfraCost);
+                    document.getElementById('landLotValue').textContent = formatLandCurrency(avgLotValue) + ' each';
+                    document.getElementById('landTotalDevValue').textContent = formatLandCurrency(totalDevValue);
+                    document.getElementById('landDevROI').textContent = devROI.toFixed(0) + '%';
+                }
+
+                // Initialize land value calculator
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateLandLocationDisplay();
+                    calculateLandValue();
                 });
             </script>
         </div>
