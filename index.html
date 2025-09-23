@@ -2421,6 +2421,39 @@ Generated: ${new Date().toLocaleDateString()}`;
                     color: #1a472a;
                 }
 
+                .seller-finance-zero-interest {
+                    background: #e8f5e8;
+                    border: 2px solid #22c55e;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin-top: 25px;
+                }
+
+                .seller-finance-zero-interest h4 {
+                    color: #1a472a;
+                    margin-bottom: 15px;
+                    font-size: 1.1em;
+                }
+
+                .seller-finance-zero-interest-scenario {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 0;
+                    border-bottom: 1px solid #d1fae5;
+                    font-weight: 600;
+                }
+
+                .seller-finance-zero-interest-scenario:last-of-type {
+                    border-bottom: none;
+                }
+
+                .seller-finance-zero-interest-benefits {
+                    margin-top: 15px;
+                    padding-top: 15px;
+                    border-top: 1px solid #d1fae5;
+                }
+
                 .seller-finance-amortization {
                     background: white;
                     border-radius: 12px;
@@ -2726,6 +2759,25 @@ Generated: ${new Date().toLocaleDateString()}`;
                             </div>
                         </div>
 
+                        <div class="seller-finance-zero-interest">
+                            <h4>💡 0% Interest Option</h4>
+                            <div class="seller-finance-zero-interest-content">
+                                <div class="seller-finance-zero-interest-scenario">
+                                    <span>Required Down Payment for 0% Interest:</span>
+                                    <span id="sfZeroInterestDown">Calculate to see requirements</span>
+                                </div>
+                                <div class="seller-finance-zero-interest-scenario">
+                                    <span>Loan Term for 0% Interest:</span>
+                                    <span id="sfZeroInterestTerm">Calculate to see requirements</span>
+                                </div>
+                                <div class="seller-finance-zero-interest-benefits">
+                                    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">
+                                        <strong>Benefits:</strong> Simpler structure, no interest calculations, pure principal payments, easier for sellers to understand
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="seller-finance-amortization">
                             <h4>First Year Amortization Schedule</h4>
                             <table class="seller-finance-amortization-table">
@@ -2959,6 +3011,12 @@ Generated: ${new Date().toLocaleDateString()}`;
                         `;
                         tableBody.appendChild(tr);
                     });
+
+                    // Calculate 0% interest scenario for Terms Mode
+                    if (!isPaymentMode && propertyPrice > 0) {
+                        // In Terms Mode, use current monthly payment to calculate 0% scenario
+                        calculateZeroInterestScenario(propertyPrice, monthlyPayment);
+                    }
                 }
 
                 // Mode switching functionality
@@ -3015,101 +3073,111 @@ Generated: ${new Date().toLocaleDateString()}`;
                         return;
                     }
 
-                    let scenarios = [];
+                    try {
+                        let scenarios = [];
 
-                    // Check if user specified a down payment
-                    if (optionalDownPayment && optionalDownPayment !== '') {
-                        const specificDownPayment = parseFloat(optionalDownPayment);
-                        const downPercent = (specificDownPayment / purchasePrice * 100);
+                        // Check if user specified a down payment
+                        if (optionalDownPayment && optionalDownPayment !== '') {
+                            const specificDownPayment = parseFloat(optionalDownPayment);
+                            const downPercent = (specificDownPayment / purchasePrice * 100);
 
-                        // Test different loan terms with the specified down payment
-                        scenarios = [
-                            { downPayment: specificDownPayment, downPercent: downPercent, termYears: 20 },
-                            { downPayment: specificDownPayment, downPercent: downPercent, termYears: 25 },
-                            { downPayment: specificDownPayment, downPercent: downPercent, termYears: 30 }
-                        ];
-                    } else {
-                        // Test multiple down payment scenarios
-                        scenarios = [
-                            { downPercent: 15, termYears: 30 },
-                            { downPercent: 20, termYears: 30 },
-                            { downPercent: 25, termYears: 25 },
-                            { downPercent: 25, termYears: 30 },
-                            { downPercent: 30, termYears: 20 },
-                            { downPercent: 30, termYears: 25 }
-                        ].map(s => ({
-                            ...s,
-                            downPayment: purchasePrice * (s.downPercent / 100)
-                        }));
-                    }
+                            // Test different loan terms with the specified down payment
+                            scenarios = [
+                                { downPayment: specificDownPayment, downPercent: downPercent, termYears: 20 },
+                                { downPayment: specificDownPayment, downPercent: downPercent, termYears: 25 },
+                                { downPayment: specificDownPayment, downPercent: downPercent, termYears: 30 }
+                            ];
+                        } else {
+                            // Test multiple down payment scenarios
+                            scenarios = [
+                                { downPercent: 15, termYears: 30 },
+                                { downPercent: 20, termYears: 30 },
+                                { downPercent: 25, termYears: 25 },
+                                { downPercent: 25, termYears: 30 },
+                                { downPercent: 30, termYears: 20 },
+                                { downPercent: 30, termYears: 25 }
+                            ].map(s => ({
+                                ...s,
+                                downPayment: purchasePrice * (s.downPercent / 100)
+                            }));
+                        }
 
-                    let bestScenario = null;
-                    let bestRate = 99;
-                    const viableScenarios = [];
+                        let bestScenario = null;
+                        let bestRate = 99;
+                        const viableScenarios = [];
 
-                    scenarios.forEach(scenario => {
-                        const financedAmount = purchasePrice - scenario.downPayment;
-                        const requiredRate = findRequiredInterestRate(financedAmount, monthlyPayment, scenario.termYears * 12);
+                        scenarios.forEach(scenario => {
+                            const financedAmount = purchasePrice - scenario.downPayment;
+                            const requiredRate = findRequiredInterestRate(financedAmount, monthlyPayment, scenario.termYears * 12);
 
-                        if (requiredRate > 0 && requiredRate < 20) { // Reasonable rate range
-                            viableScenarios.push({
-                                ...scenario,
-                                financedAmount,
-                                requiredRate
-                            });
-
-                            // Track best (lowest rate) scenario
-                            if (requiredRate < bestRate) {
-                                bestRate = requiredRate;
-                                bestScenario = {
+                            if (requiredRate > 0 && requiredRate < 20) { // Reasonable rate range
+                                viableScenarios.push({
                                     ...scenario,
                                     financedAmount,
                                     requiredRate
-                                };
+                                });
+
+                                // Track best (lowest rate) scenario
+                                if (requiredRate < bestRate) {
+                                    bestRate = requiredRate;
+                                    bestScenario = {
+                                        ...scenario,
+                                        financedAmount,
+                                        requiredRate
+                                    };
+                                }
                             }
+                        });
+
+                        if (bestScenario) {
+                            // Update displays with best scenario
+                            document.getElementById('sfCalculatedRate').textContent = bestScenario.requiredRate.toFixed(2) + '%';
+                            document.getElementById('sfCalculatedFinanced').textContent = formatSFCurrency(bestScenario.financedAmount);
+                            document.getElementById('sfCalculatedDownPayment').textContent =
+                                formatSFCurrency(bestScenario.downPayment) + ` (${bestScenario.downPercent.toFixed(1)}%)`;
+                            document.getElementById('sfCalculatedLoanTerm').textContent = bestScenario.termYears + ' years';
+
+                            // Update detailed mode fields with best scenario
+                            document.getElementById('sfPropertyPrice').value = purchasePrice;
+                            document.getElementById('sfDownPayment').value = bestScenario.downPayment;
+                            document.getElementById('sfInterestRate').value = bestScenario.requiredRate.toFixed(2);
+                            document.getElementById('sfLoanTerm').value = bestScenario.termYears;
+                            document.getElementById('sfAmortization').value = bestScenario.termYears;
+                            document.getElementById('sfBalloonPayment').value = 0;
+
+                            // Update scenarios display
+                            updateScenariosDisplay(viableScenarios, monthlyPayment);
+
+                            // Check deal viability
+                            updateDealViability(bestScenario.requiredRate, bestScenario.financedAmount);
+
+                            // Run the full calculation to update results
+                            calculateSellerFinanceMetrics();
+
+                            // Calculate 0% interest scenario
+                            calculateZeroInterestScenario(purchasePrice, monthlyPayment);
+                        } else {
+                            // No viable scenarios found
+                            document.getElementById('sfCalculatedRate').textContent = 'N/A';
+                            document.getElementById('sfCalculatedFinanced').textContent = 'N/A';
+                            document.getElementById('sfCalculatedDownPayment').textContent = 'N/A';
+                            document.getElementById('sfCalculatedLoanTerm').textContent = 'N/A';
+
+                            const viabilityDiv = document.getElementById('sfDealViability');
+                            viabilityDiv.style.background = '#fee2e2';
+                            viabilityDiv.style.borderColor = '#ef4444';
+                            viabilityDiv.style.color = '#dc2626';
+                            viabilityDiv.innerHTML = '❌ Payment too low for viable seller financing terms';
+
+                            // Clear scenarios
+                            document.getElementById('sfScenarios').innerHTML =
+                                '<div style="grid-column: 1/-1; text-align: center; color: #6c757d; padding: 20px;">No viable scenarios found with current inputs</div>';
+
+                            // Still calculate 0% interest scenario even when no viable scenarios found
+                            calculateZeroInterestScenario(purchasePrice, monthlyPayment);
                         }
-                    });
-
-                    if (bestScenario) {
-                        // Update displays with best scenario
-                        document.getElementById('sfCalculatedRate').textContent = bestScenario.requiredRate.toFixed(2) + '%';
-                        document.getElementById('sfCalculatedFinanced').textContent = formatSFCurrency(bestScenario.financedAmount);
-                        document.getElementById('sfCalculatedDownPayment').textContent =
-                            formatSFCurrency(bestScenario.downPayment) + ` (${bestScenario.downPercent.toFixed(1)}%)`;
-                        document.getElementById('sfCalculatedLoanTerm').textContent = bestScenario.termYears + ' years';
-
-                        // Update detailed mode fields with best scenario
-                        document.getElementById('sfPropertyPrice').value = purchasePrice;
-                        document.getElementById('sfDownPayment').value = bestScenario.downPayment;
-                        document.getElementById('sfInterestRate').value = bestScenario.requiredRate.toFixed(2);
-                        document.getElementById('sfLoanTerm').value = bestScenario.termYears;
-                        document.getElementById('sfAmortization').value = bestScenario.termYears;
-                        document.getElementById('sfBalloonPayment').value = 0;
-
-                        // Update scenarios display
-                        updateScenariosDisplay(viableScenarios, monthlyPayment);
-
-                        // Check deal viability
-                        updateDealViability(bestScenario.requiredRate, bestScenario.financedAmount);
-
-                        // Run the full calculation to update results
-                        calculateSellerFinanceMetrics();
-                    } else {
-                        // No viable scenarios found
-                        document.getElementById('sfCalculatedRate').textContent = 'N/A';
-                        document.getElementById('sfCalculatedFinanced').textContent = 'N/A';
-                        document.getElementById('sfCalculatedDownPayment').textContent = 'N/A';
-                        document.getElementById('sfCalculatedLoanTerm').textContent = 'N/A';
-
-                        const viabilityDiv = document.getElementById('sfDealViability');
-                        viabilityDiv.style.background = '#fee2e2';
-                        viabilityDiv.style.borderColor = '#ef4444';
-                        viabilityDiv.style.color = '#dc2626';
-                        viabilityDiv.innerHTML = '❌ Payment too low for viable seller financing terms';
-
-                        // Clear scenarios
-                        document.getElementById('sfScenarios').innerHTML =
-                            '<div style="grid-column: 1/-1; text-align: center; color: #6c757d; padding: 20px;">No viable scenarios found with current inputs</div>';
+                    } catch (error) {
+                        console.error('Error in calculateFromSimpleMode:', error);
                     }
                 }
 
@@ -3221,6 +3289,65 @@ Generated: ${new Date().toLocaleDateString()}`;
                         viabilityDiv.style.borderColor = '#ef4444';
                         viabilityDiv.style.color = '#dc2626';
                         viabilityDiv.innerHTML = `❌ Rate is ${(calculatedRate - marketRate).toFixed(1)}% above market - too expensive`;
+                    }
+                }
+
+                // Calculate 0% interest scenario suggestions
+                function calculateZeroInterestScenario(purchasePrice, targetMonthlyPayment) {
+                    if (purchasePrice <= 0 || targetMonthlyPayment <= 0) {
+                        document.getElementById('sfZeroInterestDown').textContent = 'Enter valid inputs';
+                        document.getElementById('sfZeroInterestTerm').textContent = 'Enter valid inputs';
+                        return;
+                    }
+
+                    // Calculate minimum down payment needed for various loan terms at 0% interest
+                    const termOptions = [10, 15, 20, 25, 30]; // years
+                    let bestOption = null;
+                    let lowestDownPayment = purchasePrice; // Start with 100% down as worst case
+
+                    termOptions.forEach(termYears => {
+                        const termMonths = termYears * 12;
+                        // At 0% interest, monthly payment = financed amount / months
+                        const maxFinancedAmount = targetMonthlyPayment * termMonths;
+                        const requiredDownPayment = purchasePrice - maxFinancedAmount;
+                        const downPercent = (requiredDownPayment / purchasePrice) * 100;
+
+                        // Only consider realistic scenarios (down payment between 0% and 100%)
+                        if (requiredDownPayment >= 0 && requiredDownPayment <= purchasePrice) {
+                            if (requiredDownPayment < lowestDownPayment) {
+                                lowestDownPayment = requiredDownPayment;
+                                bestOption = {
+                                    downPayment: requiredDownPayment,
+                                    downPercent: downPercent,
+                                    termYears: termYears,
+                                    financedAmount: maxFinancedAmount
+                                };
+                            }
+                        }
+                    });
+
+                    if (bestOption) {
+                        // Display the best 0% interest option
+                        document.getElementById('sfZeroInterestDown').textContent =
+                            `${formatSFCurrency(bestOption.downPayment)} (${bestOption.downPercent.toFixed(1)}%)`;
+                        document.getElementById('sfZeroInterestTerm').textContent =
+                            `${bestOption.termYears} years (${formatSFCurrency(bestOption.financedAmount)} financed)`;
+                    } else {
+                        // No viable 0% interest scenario
+                        const maxFinanceableAt30yr = targetMonthlyPayment * 30 * 12;
+                        const minDownFor0Percent = purchasePrice - maxFinanceableAt30yr;
+
+                        if (minDownFor0Percent > purchasePrice) {
+                            document.getElementById('sfZeroInterestDown').textContent =
+                                'Payment too low for 0% financing';
+                            document.getElementById('sfZeroInterestTerm').textContent =
+                                'Consider higher monthly payment';
+                        } else {
+                            document.getElementById('sfZeroInterestDown').textContent =
+                                `${formatSFCurrency(minDownFor0Percent)} (${((minDownFor0Percent/purchasePrice)*100).toFixed(1)}%)`;
+                            document.getElementById('sfZeroInterestTerm').textContent =
+                                '30 years (maximum term)';
+                        }
                     }
                 }
 
