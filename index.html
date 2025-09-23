@@ -133,6 +133,9 @@
                     <button onclick="switchTab('assignment-fee')" id="tab-assignment-fee" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         💰 Assignment Fee Calculator
                     </button>
+                    <button onclick="switchTab('csv-duplicate-finder')" id="tab-csv-duplicate-finder" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🔍 CSV Duplicate Finder
+                    </button>
                     <button onclick="switchTab('coming-soon-1')" id="tab-coming-soon-1" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         🗺️ Zip Code Finder
                     </button>
@@ -1055,6 +1058,870 @@ Generated: ${new Date().toLocaleDateString()}`;
                         document.body.removeChild(textArea);
                         alert('Contract details copied to clipboard!');
                     });
+                }
+            </script>
+        </div>
+
+        <!-- CSV Duplicate Finder Tab -->
+        <div id="content-csv-duplicate-finder" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">🔍 CSV Duplicate Finder</h2>
+                <button onclick="clearCSVFinder()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear All
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>Smart CSV Cross-Reference Tool:</strong> Upload two CSV files (e.g., tax delinquents & code violations) to find properties that appear in both lists. Advanced matching finds similar addresses even when data is in different columns or formats.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- File Upload Section -->
+                <div class="space-y-6">
+                    <!-- File 1 Upload -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📋 First CSV File</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">File Name/Description</label>
+                                <input type="text" id="csv1-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="e.g., Tax Delinquents">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Upload CSV File</label>
+                                <input type="file" id="csv1-file" accept=".csv" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="handleFileUpload(1)">
+                            </div>
+                            <div id="csv1-status" class="text-sm text-gray-500"></div>
+                            <div id="csv1-preview" class="hidden">
+                                <h4 class="font-semibold text-gray-700 mb-2">Preview (first 3 rows):</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full text-xs border border-gray-200">
+                                        <thead id="csv1-headers" class="bg-gray-50"></thead>
+                                        <tbody id="csv1-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File 2 Upload -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📋 Second CSV File</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">File Name/Description</label>
+                                <input type="text" id="csv2-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="e.g., Code Violations">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Upload CSV File</label>
+                                <input type="file" id="csv2-file" accept=".csv" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="handleFileUpload(2)">
+                            </div>
+                            <div id="csv2-status" class="text-sm text-gray-500"></div>
+                            <div id="csv2-preview" class="hidden">
+                                <h4 class="font-semibold text-gray-700 mb-2">Preview (first 3 rows):</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full text-xs border border-gray-200">
+                                        <thead id="csv2-headers" class="bg-gray-50"></thead>
+                                        <tbody id="csv2-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matching Settings -->
+                <div class="space-y-6">
+                    <!-- Match Configuration -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⚙️ Matching Settings</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Address Matching Sensitivity</label>
+                                <select id="match-sensitivity" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                                    <option value="exact">Exact Match Only</option>
+                                    <option value="high" selected>High Sensitivity (Recommended)</option>
+                                    <option value="medium">Medium Sensitivity</option>
+                                    <option value="low">Low Sensitivity (More Matches)</option>
+                                </select>
+                                <div class="text-xs text-gray-500 mt-1">High sensitivity finds "123 Main St" and "123 Main Street"</div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Additional Match Fields</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="match-owner" class="mr-2" checked>
+                                        <label class="text-sm text-gray-700">Match Owner Names</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="match-parcel" class="mr-2" checked>
+                                        <label class="text-sm text-gray-700">Match Parcel/Tax IDs</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="match-zip" class="mr-2" checked>
+                                        <label class="text-sm text-gray-700">Require Same ZIP Code</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Minimum Match Score</label>
+                                <input type="range" id="match-threshold" min="60" max="100" value="80" class="w-full">
+                                <div class="flex justify-between text-xs text-gray-500">
+                                    <span>60% (More Matches)</span>
+                                    <span id="threshold-value">80%</span>
+                                    <span>100% (Exact Only)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Button -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <button id="find-matches-btn" onclick="findMatches()" disabled class="w-full bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            🔍 Find Matching Entries
+                        </button>
+                        <div class="text-xs text-gray-500 mt-2 text-center">Upload both CSV files to enable matching</div>
+                    </div>
+
+                    <!-- Progress -->
+                    <div id="matching-progress" class="bg-white rounded-lg shadow p-6 hidden">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⏳ Processing...</h3>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                            <div id="progress-bar" class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div id="progress-text" class="text-sm text-gray-600 text-center">Initializing...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="hidden">
+                <!-- Match Summary -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Match Results</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="total-matches">0</div>
+                            <div class="text-sm text-gray-600">Total Matches</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" id="high-confidence">0</div>
+                            <div class="text-sm text-gray-600">High Confidence</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-yellow-600" id="medium-confidence">0</div>
+                            <div class="text-sm text-gray-600">Medium Confidence</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-600" id="processing-time">0s</div>
+                            <div class="text-sm text-gray-600">Processing Time</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">💾 Export Options</h3>
+                    <div class="flex gap-4 flex-wrap">
+                        <button onclick="exportMatches('csv')" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            📄 Export CSV
+                        </button>
+                        <button onclick="exportMatches('excel')" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            📊 Export Excel
+                        </button>
+                        <button onclick="exportMatches('detailed')" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                            📋 Detailed Report
+                        </button>
+                        <button onclick="copyMatchList()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium">
+                            📋 Copy to Clipboard
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Matches Table -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">🎯 Matching Entries</h3>
+                        <div class="flex gap-2">
+                            <select id="confidence-filter" onchange="filterMatches()" class="px-3 py-2 border border-gray-300 rounded">
+                                <option value="all">All Matches</option>
+                                <option value="high">High Confidence Only</option>
+                                <option value="medium">Medium+ Confidence</option>
+                            </select>
+                            <button onclick="toggleMatchDetails()" id="toggle-details" class="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200">
+                                Show Details
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table id="matches-table" class="min-w-full text-sm border border-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Confidence</th>
+                                    <th class="px-4 py-2 text-left">Address/Property</th>
+                                    <th class="px-4 py-2 text-left">File 1 Data</th>
+                                    <th class="px-4 py-2 text-left">File 2 Data</th>
+                                    <th class="px-4 py-2 text-left">Match Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matches-body">
+                                <!-- Matches will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JavaScript for CSV Duplicate Finder -->
+            <script>
+                let csv1Data = null;
+                let csv2Data = null;
+                let matchResults = [];
+                let showingDetails = false;
+
+                // Update threshold display
+                document.getElementById('match-threshold').addEventListener('input', function() {
+                    document.getElementById('threshold-value').textContent = this.value + '%';
+                });
+
+                function clearCSVFinder() {
+                    // Clear file inputs
+                    document.getElementById('csv1-file').value = '';
+                    document.getElementById('csv2-file').value = '';
+                    document.getElementById('csv1-name').value = '';
+                    document.getElementById('csv2-name').value = '';
+
+                    // Clear data
+                    csv1Data = null;
+                    csv2Data = null;
+                    matchResults = [];
+
+                    // Hide previews and results
+                    document.getElementById('csv1-preview').classList.add('hidden');
+                    document.getElementById('csv2-preview').classList.add('hidden');
+                    document.getElementById('results-section').classList.add('hidden');
+                    document.getElementById('matching-progress').classList.add('hidden');
+
+                    // Clear status messages
+                    document.getElementById('csv1-status').textContent = '';
+                    document.getElementById('csv2-status').textContent = '';
+
+                    // Disable find button
+                    document.getElementById('find-matches-btn').disabled = true;
+                }
+
+                function handleFileUpload(fileNumber) {
+                    const fileInput = document.getElementById(`csv${fileNumber}-file`);
+                    const statusDiv = document.getElementById(`csv${fileNumber}-status`);
+                    const previewDiv = document.getElementById(`csv${fileNumber}-preview`);
+
+                    if (!fileInput.files[0]) return;
+
+                    const file = fileInput.files[0];
+                    statusDiv.textContent = 'Reading file...';
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const csvText = e.target.result;
+                            const lines = csvText.split('\n').filter(line => line.trim());
+
+                            if (lines.length < 2) {
+                                statusDiv.textContent = 'Error: File must have at least a header row and one data row';
+                                statusDiv.className = 'text-sm text-red-500';
+                                return;
+                            }
+
+                            // Parse CSV
+                            const headers = parseCSVLine(lines[0]);
+                            const rows = lines.slice(1, Math.min(lines.length, 4)).map(line => parseCSVLine(line));
+
+                            // Store data
+                            const fullData = lines.slice(1).map(line => parseCSVLine(line));
+                            if (fileNumber === 1) {
+                                csv1Data = { headers, data: fullData };
+                            } else {
+                                csv2Data = { headers, data: fullData };
+                            }
+
+                            // Show preview
+                            displayPreview(fileNumber, headers, rows);
+                            statusDiv.textContent = `✅ Loaded ${fullData.length} rows with ${headers.length} columns`;
+                            statusDiv.className = 'text-sm text-green-600';
+
+                            // Check if both files are loaded
+                            if (csv1Data && csv2Data) {
+                                document.getElementById('find-matches-btn').disabled = false;
+                            }
+
+                        } catch (error) {
+                            statusDiv.textContent = `Error: ${error.message}`;
+                            statusDiv.className = 'text-sm text-red-500';
+                        }
+                    };
+
+                    reader.readAsText(file);
+                }
+
+                function parseCSVLine(line) {
+                    const result = [];
+                    let current = '';
+                    let inQuotes = false;
+
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            result.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+
+                    result.push(current.trim());
+                    return result;
+                }
+
+                function displayPreview(fileNumber, headers, rows) {
+                    const headersDiv = document.getElementById(`csv${fileNumber}-headers`);
+                    const bodyDiv = document.getElementById(`csv${fileNumber}-body`);
+                    const previewDiv = document.getElementById(`csv${fileNumber}-preview`);
+
+                    // Clear previous content
+                    headersDiv.innerHTML = '';
+                    bodyDiv.innerHTML = '';
+
+                    // Add headers
+                    const headerRow = document.createElement('tr');
+                    headers.forEach(header => {
+                        const th = document.createElement('th');
+                        th.className = 'px-2 py-1 text-left border';
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                    headersDiv.appendChild(headerRow);
+
+                    // Add data rows
+                    rows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        row.forEach(cell => {
+                            const td = document.createElement('td');
+                            td.className = 'px-2 py-1 border';
+                            td.textContent = cell || '';
+                            tr.appendChild(td);
+                        });
+                        bodyDiv.appendChild(tr);
+                    });
+
+                    previewDiv.classList.remove('hidden');
+                }
+
+                async function findMatches() {
+                    if (!csv1Data || !csv2Data) {
+                        alert('Please upload both CSV files first');
+                        return;
+                    }
+
+                    // Show progress
+                    const progressDiv = document.getElementById('matching-progress');
+                    const progressBar = document.getElementById('progress-bar');
+                    const progressText = document.getElementById('progress-text');
+                    progressDiv.classList.remove('hidden');
+
+                    const startTime = Date.now();
+                    matchResults = [];
+
+                    // Get settings
+                    const sensitivity = document.getElementById('match-sensitivity').value;
+                    const threshold = parseInt(document.getElementById('match-threshold').value);
+                    const matchOwner = document.getElementById('match-owner').checked;
+                    const matchParcel = document.getElementById('match-parcel').checked;
+                    const matchZip = document.getElementById('match-zip').checked;
+
+                    const totalComparisons = csv1Data.data.length * csv2Data.data.length;
+                    let completed = 0;
+
+                    progressText.textContent = 'Comparing entries...';
+
+                    // Process in chunks to avoid blocking UI
+                    for (let i = 0; i < csv1Data.data.length; i++) {
+                        for (let j = 0; j < csv2Data.data.length; j++) {
+                            const match = compareRows(
+                                csv1Data.data[i], csv1Data.headers,
+                                csv2Data.data[j], csv2Data.headers,
+                                sensitivity, matchOwner, matchParcel, matchZip
+                            );
+
+                            if (match.score >= threshold) {
+                                matchResults.push({
+                                    ...match,
+                                    file1Row: csv1Data.data[i],
+                                    file2Row: csv2Data.data[j],
+                                    file1Headers: csv1Data.headers,
+                                    file2Headers: csv2Data.headers
+                                });
+                            }
+
+                            completed++;
+
+                            // Update progress every 100 comparisons
+                            if (completed % 100 === 0) {
+                                const progress = (completed / totalComparisons) * 100;
+                                progressBar.style.width = progress + '%';
+                                progressText.textContent = `Processed ${completed.toLocaleString()} of ${totalComparisons.toLocaleString()} comparisons...`;
+
+                                // Allow UI to update
+                                await new Promise(resolve => setTimeout(resolve, 1));
+                            }
+                        }
+                    }
+
+                    // Complete progress
+                    progressBar.style.width = '100%';
+                    const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    progressText.textContent = `Found ${matchResults.length} matches in ${processingTime} seconds`;
+
+                    // Hide progress after 2 seconds and show results
+                    setTimeout(() => {
+                        progressDiv.classList.add('hidden');
+                        displayResults(processingTime);
+                    }, 2000);
+                }
+
+                function compareRows(row1, headers1, row2, headers2, sensitivity, matchOwner, matchParcel, matchZip) {
+                    const matches = [];
+                    let totalScore = 0;
+                    let matchedFields = 0;
+
+                    // Find address fields
+                    const addressFields1 = findAddressFields(headers1);
+                    const addressFields2 = findAddressFields(headers2);
+
+                    // Compare addresses
+                    for (let field1 of addressFields1) {
+                        for (let field2 of addressFields2) {
+                            const val1 = row1[field1.index] || '';
+                            const val2 = row2[field2.index] || '';
+
+                            if (val1 && val2) {
+                                const score = calculateAddressMatch(val1, val2, sensitivity);
+                                if (score > 0) {
+                                    matches.push({
+                                        field1: field1.name,
+                                        field2: field2.name,
+                                        value1: val1,
+                                        value2: val2,
+                                        score: score,
+                                        type: 'address'
+                                    });
+                                    totalScore += score;
+                                    matchedFields++;
+                                }
+                            }
+                        }
+                    }
+
+                    // Compare owner names if enabled
+                    if (matchOwner) {
+                        const ownerFields1 = findOwnerFields(headers1);
+                        const ownerFields2 = findOwnerFields(headers2);
+
+                        for (let field1 of ownerFields1) {
+                            for (let field2 of ownerFields2) {
+                                const val1 = row1[field1.index] || '';
+                                const val2 = row2[field2.index] || '';
+
+                                if (val1 && val2) {
+                                    const score = calculateNameMatch(val1, val2);
+                                    if (score > 60) {
+                                        matches.push({
+                                            field1: field1.name,
+                                            field2: field2.name,
+                                            value1: val1,
+                                            value2: val2,
+                                            score: score,
+                                            type: 'owner'
+                                        });
+                                        totalScore += score * 0.7; // Weight owner matches slightly less
+                                        matchedFields++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Compare parcel IDs if enabled
+                    if (matchParcel) {
+                        const parcelFields1 = findParcelFields(headers1);
+                        const parcelFields2 = findParcelFields(headers2);
+
+                        for (let field1 of parcelFields1) {
+                            for (let field2 of parcelFields2) {
+                                const val1 = row1[field1.index] || '';
+                                const val2 = row2[field2.index] || '';
+
+                                if (val1 && val2) {
+                                    const score = calculateExactMatch(val1, val2);
+                                    if (score > 90) {
+                                        matches.push({
+                                            field1: field1.name,
+                                            field2: field2.name,
+                                            value1: val1,
+                                            value2: val2,
+                                            score: score,
+                                            type: 'parcel'
+                                        });
+                                        totalScore += score * 1.2; // Weight parcel matches higher
+                                        matchedFields++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    const avgScore = matchedFields > 0 ? totalScore / matchedFields : 0;
+
+                    return {
+                        score: Math.round(avgScore),
+                        matches: matches,
+                        matchedFields: matchedFields,
+                        confidence: avgScore >= 90 ? 'high' : avgScore >= 75 ? 'medium' : 'low'
+                    };
+                }
+
+                function findAddressFields(headers) {
+                    const addressKeywords = ['address', 'addr', 'street', 'st', 'location', 'property', 'site'];
+                    return headers.map((header, index) => ({ name: header, index }))
+                        .filter(field => addressKeywords.some(keyword =>
+                            field.name.toLowerCase().includes(keyword)));
+                }
+
+                function findOwnerFields(headers) {
+                    const ownerKeywords = ['owner', 'name', 'taxpayer', 'person', 'entity'];
+                    return headers.map((header, index) => ({ name: header, index }))
+                        .filter(field => ownerKeywords.some(keyword =>
+                            field.name.toLowerCase().includes(keyword)));
+                }
+
+                function findParcelFields(headers) {
+                    const parcelKeywords = ['parcel', 'tax', 'id', 'pin', 'account', 'number'];
+                    return headers.map((header, index) => ({ name: header, index }))
+                        .filter(field => parcelKeywords.some(keyword =>
+                            field.name.toLowerCase().includes(keyword)));
+                }
+
+                function calculateAddressMatch(addr1, addr2, sensitivity) {
+                    // Normalize addresses
+                    const norm1 = normalizeAddress(addr1);
+                    const norm2 = normalizeAddress(addr2);
+
+                    if (norm1 === norm2) return 100;
+
+                    // Calculate similarity based on sensitivity
+                    const similarity = calculateStringSimilarity(norm1, norm2);
+
+                    switch (sensitivity) {
+                        case 'exact':
+                            return similarity >= 100 ? 100 : 0;
+                        case 'high':
+                            return similarity >= 85 ? similarity : 0;
+                        case 'medium':
+                            return similarity >= 75 ? similarity : 0;
+                        case 'low':
+                            return similarity >= 65 ? similarity : 0;
+                        default:
+                            return similarity >= 80 ? similarity : 0;
+                    }
+                }
+
+                function normalizeAddress(address) {
+                    return address.toLowerCase()
+                        .replace(/[^\w\s]/g, ' ') // Remove punctuation
+                        .replace(/\bstreet\b/g, 'st')
+                        .replace(/\bavenue\b/g, 'ave')
+                        .replace(/\bblvd\b/g, 'boulevard')
+                        .replace(/\brd\b/g, 'road')
+                        .replace(/\bdr\b/g, 'drive')
+                        .replace(/\bct\b/g, 'court')
+                        .replace(/\bln\b/g, 'lane')
+                        .replace(/\bpl\b/g, 'place')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                }
+
+                function calculateNameMatch(name1, name2) {
+                    const norm1 = name1.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+                    const norm2 = name2.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+                    return calculateStringSimilarity(norm1, norm2);
+                }
+
+                function calculateExactMatch(val1, val2) {
+                    const norm1 = val1.replace(/[^\w]/g, '').toLowerCase();
+                    const norm2 = val2.replace(/[^\w]/g, '').toLowerCase();
+
+                    return norm1 === norm2 ? 100 : 0;
+                }
+
+                function calculateStringSimilarity(str1, str2) {
+                    const longer = str1.length > str2.length ? str1 : str2;
+                    const shorter = str1.length > str2.length ? str2 : str1;
+
+                    if (longer.length === 0) return 100;
+
+                    const distance = levenshteinDistance(longer, shorter);
+                    return Math.round(((longer.length - distance) / longer.length) * 100);
+                }
+
+                function levenshteinDistance(str1, str2) {
+                    const matrix = [];
+
+                    for (let i = 0; i <= str2.length; i++) {
+                        matrix[i] = [i];
+                    }
+
+                    for (let j = 0; j <= str1.length; j++) {
+                        matrix[0][j] = j;
+                    }
+
+                    for (let i = 1; i <= str2.length; i++) {
+                        for (let j = 1; j <= str1.length; j++) {
+                            if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                                matrix[i][j] = matrix[i - 1][j - 1];
+                            } else {
+                                matrix[i][j] = Math.min(
+                                    matrix[i - 1][j - 1] + 1,
+                                    matrix[i][j - 1] + 1,
+                                    matrix[i - 1][j] + 1
+                                );
+                            }
+                        }
+                    }
+
+                    return matrix[str2.length][str1.length];
+                }
+
+                function displayResults(processingTime) {
+                    const resultsSection = document.getElementById('results-section');
+
+                    // Calculate statistics
+                    const highConfidence = matchResults.filter(m => m.confidence === 'high').length;
+                    const mediumConfidence = matchResults.filter(m => m.confidence === 'medium').length;
+
+                    // Update summary
+                    document.getElementById('total-matches').textContent = matchResults.length.toLocaleString();
+                    document.getElementById('high-confidence').textContent = highConfidence.toLocaleString();
+                    document.getElementById('medium-confidence').textContent = mediumConfidence.toLocaleString();
+                    document.getElementById('processing-time').textContent = processingTime + 's';
+
+                    // Populate matches table
+                    populateMatchesTable();
+
+                    resultsSection.classList.remove('hidden');
+                }
+
+                function populateMatchesTable() {
+                    const tbody = document.getElementById('matches-body');
+                    tbody.innerHTML = '';
+
+                    const filter = document.getElementById('confidence-filter').value;
+                    let filteredMatches = matchResults;
+
+                    if (filter === 'high') {
+                        filteredMatches = matchResults.filter(m => m.confidence === 'high');
+                    } else if (filter === 'medium') {
+                        filteredMatches = matchResults.filter(m => m.confidence !== 'low');
+                    }
+
+                    filteredMatches.forEach((match, index) => {
+                        const tr = document.createElement('tr');
+                        tr.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+
+                        // Confidence badge
+                        const confidenceColor = match.confidence === 'high' ? 'bg-green-100 text-green-800' :
+                                               match.confidence === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                               'bg-gray-100 text-gray-800';
+
+                        // Find best address match
+                        const addressMatch = match.matches.find(m => m.type === 'address') || match.matches[0];
+
+                        tr.innerHTML = `
+                            <td class="px-4 py-2">
+                                <span class="px-2 py-1 rounded text-xs font-medium ${confidenceColor}">
+                                    ${match.confidence.toUpperCase()}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 font-medium">${addressMatch ? addressMatch.value1 : 'No address found'}</td>
+                            <td class="px-4 py-2">
+                                <div class="text-xs text-gray-600">${document.getElementById('csv1-name').value || 'File 1'}</div>
+                                <div>${showingDetails ? formatRowDetails(match.file1Row, match.file1Headers) : formatRowSummary(match.file1Row, match.file1Headers)}</div>
+                            </td>
+                            <td class="px-4 py-2">
+                                <div class="text-xs text-gray-600">${document.getElementById('csv2-name').value || 'File 2'}</div>
+                                <div>${showingDetails ? formatRowDetails(match.file2Row, match.file2Headers) : formatRowSummary(match.file2Row, match.file2Headers)}</div>
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <div class="font-bold">${match.score}%</div>
+                                <div class="text-xs text-gray-500">${match.matchedFields} fields</div>
+                            </td>
+                        `;
+
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                function formatRowSummary(row, headers) {
+                    // Show first 3 non-empty fields
+                    const nonEmpty = row.map((val, i) => val ? `${headers[i]}: ${val}` : null)
+                                       .filter(v => v)
+                                       .slice(0, 3);
+                    return nonEmpty.join('<br>');
+                }
+
+                function formatRowDetails(row, headers) {
+                    // Show all non-empty fields
+                    const nonEmpty = row.map((val, i) => val ? `${headers[i]}: ${val}` : null)
+                                       .filter(v => v);
+                    return nonEmpty.join('<br>');
+                }
+
+                function filterMatches() {
+                    populateMatchesTable();
+                }
+
+                function toggleMatchDetails() {
+                    showingDetails = !showingDetails;
+                    const button = document.getElementById('toggle-details');
+                    button.textContent = showingDetails ? 'Hide Details' : 'Show Details';
+                    populateMatchesTable();
+                }
+
+                function exportMatches(format) {
+                    if (matchResults.length === 0) {
+                        alert('No matches to export');
+                        return;
+                    }
+
+                    const file1Name = document.getElementById('csv1-name').value || 'File1';
+                    const file2Name = document.getElementById('csv2-name').value || 'File2';
+
+                    if (format === 'csv') {
+                        exportCSV(file1Name, file2Name);
+                    } else if (format === 'excel') {
+                        alert('Excel export coming soon! Use CSV export for now.');
+                    } else if (format === 'detailed') {
+                        exportDetailedReport(file1Name, file2Name);
+                    }
+                }
+
+                function exportCSV(file1Name, file2Name) {
+                    const headers = ['Confidence', 'Match_Score', 'Matched_Fields'];
+
+                    // Add file 1 headers
+                    csv1Data.headers.forEach(h => headers.push(`${file1Name}_${h}`));
+
+                    // Add file 2 headers
+                    csv2Data.headers.forEach(h => headers.push(`${file2Name}_${h}`));
+
+                    let csvContent = headers.join(',') + '\n';
+
+                    matchResults.forEach(match => {
+                        const row = [
+                            match.confidence,
+                            match.score,
+                            match.matchedFields
+                        ];
+
+                        // Add file 1 data
+                        match.file1Row.forEach(cell => row.push(`"${cell}"`));
+
+                        // Add file 2 data
+                        match.file2Row.forEach(cell => row.push(`"${cell}"`));
+
+                        csvContent += row.join(',') + '\n';
+                    });
+
+                    downloadFile(csvContent, 'csv_matches.csv', 'text/csv');
+                }
+
+                function exportDetailedReport(file1Name, file2Name) {
+                    let report = `CSV Duplicate Finder - Detailed Match Report\n`;
+                    report += `Generated: ${new Date().toLocaleString()}\n`;
+                    report += `File 1: ${file1Name} (${csv1Data.data.length} rows)\n`;
+                    report += `File 2: ${file2Name} (${csv2Data.data.length} rows)\n`;
+                    report += `Total Matches Found: ${matchResults.length}\n\n`;
+
+                    const highConf = matchResults.filter(m => m.confidence === 'high').length;
+                    const medConf = matchResults.filter(m => m.confidence === 'medium').length;
+                    const lowConf = matchResults.filter(m => m.confidence === 'low').length;
+
+                    report += `Match Quality Distribution:\n`;
+                    report += `- High Confidence: ${highConf}\n`;
+                    report += `- Medium Confidence: ${medConf}\n`;
+                    report += `- Low Confidence: ${lowConf}\n\n`;
+
+                    report += `DETAILED MATCHES:\n`;
+                    report += `${'='.repeat(50)}\n\n`;
+
+                    matchResults.forEach((match, index) => {
+                        report += `Match #${index + 1} (${match.confidence.toUpperCase()} - ${match.score}%)\n`;
+                        report += `-`.repeat(30) + '\n';
+
+                        // Show matched fields
+                        match.matches.forEach(m => {
+                            report += `${m.type.toUpperCase()}: ${m.field1} = "${m.value1}" <-> ${m.field2} = "${m.value2}" (${m.score}%)\n`;
+                        });
+
+                        report += `\n${file1Name} Data:\n`;
+                        match.file1Headers.forEach((header, i) => {
+                            if (match.file1Row[i]) {
+                                report += `  ${header}: ${match.file1Row[i]}\n`;
+                            }
+                        });
+
+                        report += `\n${file2Name} Data:\n`;
+                        match.file2Headers.forEach((header, i) => {
+                            if (match.file2Row[i]) {
+                                report += `  ${header}: ${match.file2Row[i]}\n`;
+                            }
+                        });
+
+                        report += '\n' + '='.repeat(50) + '\n\n';
+                    });
+
+                    downloadFile(report, 'csv_match_report.txt', 'text/plain');
+                }
+
+                function copyMatchList() {
+                    if (matchResults.length === 0) {
+                        alert('No matches to copy');
+                        return;
+                    }
+
+                    let text = `CSV Matches (${matchResults.length} found):\n\n`;
+
+                    matchResults.forEach((match, index) => {
+                        const addressMatch = match.matches.find(m => m.type === 'address') || match.matches[0];
+                        text += `${index + 1}. ${addressMatch ? addressMatch.value1 : 'No address'} (${match.confidence} - ${match.score}%)\n`;
+                    });
+
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('Match list copied to clipboard!');
+                    });
+                }
+
+                function downloadFile(content, filename, mimeType) {
+                    const blob = new Blob([content], { type: mimeType });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
                 }
             </script>
         </div>
