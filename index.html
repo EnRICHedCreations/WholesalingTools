@@ -1937,6 +1937,7 @@ Generated: ${new Date().toLocaleDateString()}`;
 
             <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p class="text-sm text-blue-800"><strong>Intelligent Address Enhancement:</strong> Fill missing ZIP codes from addresses OR find cities from ZIP codes. Perfect for cleaning property lists with incomplete address data.</p>
+                <p class="text-sm text-blue-800"><strong>Important:</strong> Use the headers "First Name,Last Name,Property Address,City,State,Zip Code,County" or the tool will not work properly.</p>    
             </div>
 
             <!-- Mode Selection -->
@@ -2110,7 +2111,7 @@ Generated: ${new Date().toLocaleDateString()}`;
             </div>
 
             <!-- Results -->
-            <div id="results-section" class="bg-white rounded-lg shadow p-6 hidden">
+            <div id="geocoder-results-section" class="bg-white rounded-lg shadow p-6 hidden">
                 <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Results Summary</h3>
 
                 <!-- Summary Stats -->
@@ -2170,6 +2171,7 @@ Generated: ${new Date().toLocaleDateString()}`;
                 let processedData = [];
                 let geocodingInProgress = false;
                 let stopRequested = false;
+                let targetColumnIndex = -1; // Track which column index we're using for results
 
                 function selectMode(mode) {
                     geocoderMode = mode;
@@ -2214,7 +2216,7 @@ Generated: ${new Date().toLocaleDateString()}`;
                     document.getElementById('file-info').classList.add('hidden');
                     document.getElementById('column-mapping').classList.add('hidden');
                     document.getElementById('processing-section').classList.add('hidden');
-                    document.getElementById('results-section').classList.add('hidden');
+                    document.getElementById('geocoder-results-section').classList.add('hidden');
 
                     // Reset mode to ZIP
                     selectMode('zip');
@@ -2395,7 +2397,7 @@ Generated: ${new Date().toLocaleDateString()}`;
 
                     // Show processing section
                     document.getElementById('processing-section').classList.remove('hidden');
-                    document.getElementById('results-section').classList.add('hidden');
+                    document.getElementById('geocoder-results-section').classList.add('hidden');
 
                     // Initialize progress
                     updateProgress(0, 0, 0, 0);
@@ -2428,6 +2430,28 @@ Generated: ${new Date().toLocaleDateString()}`;
 
                     console.log('ZIP processing started:', { addressCol, cityCol, stateCol, dataLength: csvData.length });
 
+                    // Find existing ZIP column or determine where to add new one
+                    let zipCol = -1;
+                    const zipPatterns = ['zip', 'zipcode', 'zip code', 'postal', 'postal code'];
+                    for (let i = 0; i < headers.length; i++) {
+                        if (zipPatterns.some(pattern => headers[i].toLowerCase().includes(pattern))) {
+                            zipCol = i;
+                            break;
+                        }
+                    }
+
+                    // If no ZIP column exists, add one
+                    if (zipCol === -1) {
+                        zipCol = headers.length;
+                        headers.push('ZIP_Code');
+                        console.log('Added new ZIP_Code column at index:', zipCol);
+                    } else {
+                        console.log('Using existing ZIP column at index:', zipCol, 'Column name:', headers[zipCol]);
+                    }
+
+                    // Store the target column index for success checking
+                    targetColumnIndex = zipCol;
+
                     let successful = 0;
                     let failed = 0;
 
@@ -2439,23 +2463,24 @@ Generated: ${new Date().toLocaleDateString()}`;
                         const city = row[cityCol] || '';
                         const state = row[stateCol] || '';
 
-                        // Add new column for ZIP code if it doesn't exist
-                        if (i === 0 && row.length === headers.length) {
-                            headers.push('ZIP_Code');
+                        // Ensure row has enough columns
+                        while (row.length <= zipCol) {
+                            row.push('');
                         }
 
                         try {
                             const zipCode = await lookupZipCode(address, city, state);
-                            console.log(`ZIP Row ${i} success:`, { address, city, state, zipCode });
-                            row.push(zipCode);
+                            console.log(`ZIP Row ${i} success:`, `Address: "${address}", City: "${city}", State: "${state}", Result: "${zipCode}"`);
+                            row[zipCol] = zipCode; // Update existing column instead of pushing new
                             successful++;
                         } catch (error) {
-                            console.log(`ZIP Row ${i} failed:`, { address, city, state, error: error.message });
-                            row.push('');
+                            console.log(`ZIP Row ${i} failed:`, `Address: "${address}", City: "${city}", State: "${state}", Error: "${error.message}"`);
+                            row[zipCol] = ''; // Update existing column instead of pushing new
                             failed++;
                         }
 
                         processedData.push(row);
+                        console.log(`ZIP Row ${i} processed:`, { row, length: row.length });
                         updateProgress(i + 1, successful, failed, csvData.length);
 
                         // Rate limiting - don't overwhelm the service
@@ -2470,6 +2495,46 @@ Generated: ${new Date().toLocaleDateString()}`;
                     const addressColCity = document.getElementById('address-col-city').value;
                     const addressCol = addressColCity ? parseInt(addressColCity) : null;
 
+                    // Find existing city column
+                    let cityCol = -1;
+                    const cityPatterns = ['city', 'town', 'municipality'];
+                    for (let i = 0; i < headers.length; i++) {
+                        if (cityPatterns.some(pattern => headers[i].toLowerCase().includes(pattern))) {
+                            cityCol = i;
+                            break;
+                        }
+                    }
+
+                    // Find existing state column
+                    let stateCol = -1;
+                    const statePatterns = ['state', 'st', 'province'];
+                    for (let i = 0; i < headers.length; i++) {
+                        if (statePatterns.some(pattern => headers[i].toLowerCase().includes(pattern))) {
+                            stateCol = i;
+                            break;
+                        }
+                    }
+
+                    // Add columns if they don't exist
+                    if (cityCol === -1) {
+                        cityCol = headers.length;
+                        headers.push('City');
+                        console.log('Added new City column at index:', cityCol);
+                    } else {
+                        console.log('Using existing City column at index:', cityCol, 'Column name:', headers[cityCol]);
+                    }
+
+                    if (stateCol === -1) {
+                        stateCol = headers.length;
+                        headers.push('State');
+                        console.log('Added new State column at index:', stateCol);
+                    } else {
+                        console.log('Using existing State column at index:', stateCol, 'Column name:', headers[stateCol]);
+                    }
+
+                    // Store target column indexes for success checking (city is primary for this mode)
+                    targetColumnIndex = cityCol;
+
                     let successful = 0;
                     let failed = 0;
 
@@ -2480,20 +2545,19 @@ Generated: ${new Date().toLocaleDateString()}`;
                         const zipCode = row[zipCol] || '';
                         const address = addressCol ? (row[addressCol] || '') : '';
 
-                        // Add new columns for city and state if they don't exist
-                        if (i === 0 && row.length === headers.length) {
-                            headers.push('City');
-                            headers.push('State');
+                        // Ensure row has enough columns
+                        while (row.length <= Math.max(cityCol, stateCol)) {
+                            row.push('');
                         }
 
                         try {
                             const location = await lookupCityState(zipCode, address);
-                            row.push(location.city);
-                            row.push(location.state);
+                            row[cityCol] = location.city;
+                            row[stateCol] = location.state;
                             successful++;
                         } catch (error) {
-                            row.push('');
-                            row.push('');
+                            row[cityCol] = '';
+                            row[stateCol] = '';
                             failed++;
                         }
 
@@ -2508,9 +2572,49 @@ Generated: ${new Date().toLocaleDateString()}`;
                 async function processCountyLookup() {
                     const addressCol = parseInt(document.getElementById('address-col-county').value);
                     const countyCol = parseInt(document.getElementById('county-col').value);
-                    const stateCol = parseInt(document.getElementById('state-col-county').value);
+                    const stateColCounty = parseInt(document.getElementById('state-col-county').value);
 
-                    console.log('County processing started:', { addressCol, countyCol, stateCol, dataLength: csvData.length });
+                    console.log('County processing started:', { addressCol, countyCol, stateColCounty, dataLength: csvData.length });
+
+                    // Find existing city column
+                    let cityCol = -1;
+                    const cityPatterns = ['city', 'town', 'municipality'];
+                    for (let i = 0; i < headers.length; i++) {
+                        if (cityPatterns.some(pattern => headers[i].toLowerCase().includes(pattern))) {
+                            cityCol = i;
+                            break;
+                        }
+                    }
+
+                    // Find existing ZIP column
+                    let zipCol = -1;
+                    const zipPatterns = ['zip', 'zipcode', 'zip code', 'postal', 'postal code'];
+                    for (let i = 0; i < headers.length; i++) {
+                        if (zipPatterns.some(pattern => headers[i].toLowerCase().includes(pattern))) {
+                            zipCol = i;
+                            break;
+                        }
+                    }
+
+                    // Add columns if they don't exist
+                    if (cityCol === -1) {
+                        cityCol = headers.length;
+                        headers.push('City');
+                        console.log('Added new City column at index:', cityCol);
+                    } else {
+                        console.log('Using existing City column at index:', cityCol, 'Column name:', headers[cityCol]);
+                    }
+
+                    if (zipCol === -1) {
+                        zipCol = headers.length;
+                        headers.push('ZIP_Code');
+                        console.log('Added new ZIP_Code column at index:', zipCol);
+                    } else {
+                        console.log('Using existing ZIP column at index:', zipCol, 'Column name:', headers[zipCol]);
+                    }
+
+                    // Store target column indexes for success checking (both city and ZIP for county mode)
+                    targetColumnIndex = zipCol; // Use ZIP as primary for success checking
 
                     let successful = 0;
                     let failed = 0;
@@ -2521,26 +2625,25 @@ Generated: ${new Date().toLocaleDateString()}`;
                         const row = [...csvData[i]];
                         const address = row[addressCol] || '';
                         const county = row[countyCol] || '';
-                        const state = row[stateCol] || '';
+                        const state = row[stateColCounty] || '';
 
                         console.log(`Processing row ${i}:`, { address, county, state });
 
-                        // Add new columns for city and ZIP code if they don't exist
-                        if (i === 0 && row.length === headers.length) {
-                            headers.push('City');
-                            headers.push('ZIP_Code');
+                        // Ensure row has enough columns
+                        while (row.length <= Math.max(cityCol, zipCol)) {
+                            row.push('');
                         }
 
                         try {
                             const location = await lookupCityZipFromCounty(address, county, state);
                             console.log(`Row ${i} success:`, location);
-                            row.push(location.city);
-                            row.push(location.zipCode);
+                            row[cityCol] = location.city;
+                            row[zipCol] = location.zipCode;
                             successful++;
                         } catch (error) {
                             console.log(`Row ${i} failed:`, error.message);
-                            row.push('');
-                            row.push('');
+                            row[cityCol] = '';
+                            row[zipCol] = '';
                             failed++;
                         }
 
@@ -2578,18 +2681,20 @@ Generated: ${new Date().toLocaleDateString()}`;
 
                 // Real geocoding functions using actual APIs
                 async function lookupZipCode(address, city, state) {
-                    // Try Census Bureau first
-                    try {
-                        const censusResult = await geocodeWithCensus(address, city, state);
-                        if (censusResult) return censusResult;
-                    } catch (e) {
-                        console.log('Census API failed:', e.message);
+                    // Skip Census Bureau API for localhost (CORS blocked)
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        console.log('Skipping Census API due to CORS restrictions on localhost');
+                    } else {
+                        // Try Census Bureau first (only when not on localhost)
+                        try {
+                            const censusResult = await geocodeWithCensus(address, city, state);
+                            if (censusResult) return censusResult;
+                        } catch (e) {
+                            console.log('Census API failed:', e.message);
+                        }
                     }
 
-                    // Delay before trying next service
-                    await new Promise(resolve => setTimeout(resolve, 500));
-
-                    // Try Nominatim as backup
+                    // Try Nominatim (usually works from localhost)
                     try {
                         const nominatimResult = await geocodeWithNominatim(address, city, state);
                         if (nominatimResult) return nominatimResult;
@@ -2597,15 +2702,25 @@ Generated: ${new Date().toLocaleDateString()}`;
                         console.log('Nominatim API failed:', e.message);
                     }
 
-                    throw new Error('All geocoding services failed');
+                    return null;
                 }
 
                 async function geocodeWithCensus(address, city, state) {
                     const fullAddress = `${address}, ${city}, ${state}`;
                     const url = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(fullAddress)}&benchmark=Public_AR_Current&format=json`;
 
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Census API failed');
+                    try {
+                        const response = await fetch(url, {
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'application/json',
+                            }
+                        });
+                        if (!response.ok) throw new Error('Census API failed');
+                    } catch (corsError) {
+                        console.log('Census API CORS blocked, skipping');
+                        throw new Error('Census API blocked by CORS');
+                    }
 
                     const data = await response.json();
                     if (data?.result?.addressMatches?.length > 0) {
@@ -2614,7 +2729,7 @@ Generated: ${new Date().toLocaleDateString()}`;
                         if (zip) return zip.substring(0, 5);
                     }
 
-                    throw new Error('No address matches found');
+                    return null;
                 }
 
                 async function geocodeWithNominatim(address, city, state) {
@@ -2635,7 +2750,7 @@ Generated: ${new Date().toLocaleDateString()}`;
                         }
                     }
 
-                    throw new Error('No valid ZIP code found');
+                    return null;
                 }
 
                 async function lookupCityState(zipCode, address) {
@@ -2673,7 +2788,7 @@ Generated: ${new Date().toLocaleDateString()}`;
                         console.log('GeoNames API failed:', e.message);
                     }
 
-                    throw new Error('Reverse geocoding failed');
+                    return null;
                 }
 
                 async function lookupCityZipFromCounty(address, county, state) {
@@ -2742,33 +2857,36 @@ Generated: ${new Date().toLocaleDateString()}`;
                         };
                     }
 
-                    throw new Error('County location lookup failed');
+                    return null;
                 }
 
                 function showResults() {
-                    console.log('showResults called:', { geocoderMode, processedDataLength: processedData.length });
+                    console.log('showResults called:', {
+                        geocoderMode,
+                        processedDataLength: processedData.length,
+                        processedData: processedData,
+                        headers: headers
+                    });
 
                     const successful = processedData.filter(row => {
                         let isSuccessful = false;
                         if (geocoderMode === 'zip') {
-                            isSuccessful = row[row.length - 1] && row[row.length - 1] !== '';
+                            // Use the actual target column index instead of assuming last column
+                            isSuccessful = targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         } else if (geocoderMode === 'city') {
-                            isSuccessful = row[row.length - 2] && row[row.length - 2] !== '';
+                            // For city mode, check the target column (which is city column)
+                            isSuccessful = targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         } else if (geocoderMode === 'county') {
-                            // For county mode, check both city and ZIP code
-                            isSuccessful = row[row.length - 2] && row[row.length - 2] !== '' && row[row.length - 1] && row[row.length - 1] !== '';
+                            // For county mode, check the target column (which is ZIP column)
+                            isSuccessful = targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         }
 
-                        console.log('Row success check:', {
-                            mode: geocoderMode,
-                            row,
-                            lastElement: row[row.length - 1],
-                            secondLastElement: row[row.length - 2],
-                            isSuccessful
-                        });
+                        console.log('Row success check:', `Mode: ${geocoderMode}, TargetCol: ${targetColumnIndex}, Value: "${targetColumnIndex >= 0 ? row[targetColumnIndex] : 'N/A'}", Success: ${isSuccessful}`);
 
                         return isSuccessful;
                     }).length;
+
+                    console.log('Success calculation:', `Total: ${processedData.length}, Successful: ${successful}, Failed: ${processedData.length - successful}`);
 
                     const failed = processedData.length - successful;
                     const successRate = processedData.length > 0 ? (successful / processedData.length) * 100 : 0;
@@ -2779,17 +2897,30 @@ Generated: ${new Date().toLocaleDateString()}`;
                     document.getElementById('final-success-rate').textContent = successRate.toFixed(1) + '%';
 
                     // Update results preview
+                    console.log('Calling updateResultsPreview...');
                     updateResultsPreview();
 
                     // Show results section
-                    document.getElementById('results-section').classList.remove('hidden');
+                    console.log('Making results section visible...');
+                    const resultsSection = document.getElementById('geocoder-results-section');
+                    console.log('Results section element:', resultsSection);
+                    resultsSection.classList.remove('hidden');
+                    console.log('Results section classes after show:', resultsSection.className);
                 }
 
                 function updateResultsPreview() {
+                    console.log('updateResultsPreview called');
                     const previewTable = document.getElementById('results-preview');
+                    console.log('Preview table element:', previewTable);
+                    if (!previewTable) {
+                        console.error('ERROR: results-preview table element not found!');
+                        return;
+                    }
                     previewTable.innerHTML = '';
+                    console.log('Table cleared, building preview...');
 
                     // Create header row
+                    console.log('Creating header row with headers:', headers);
                     const headerRow = document.createElement('tr');
                     headerRow.className = 'bg-gray-50';
                     headers.forEach(header => {
@@ -2799,9 +2930,12 @@ Generated: ${new Date().toLocaleDateString()}`;
                         headerRow.appendChild(th);
                     });
                     previewTable.appendChild(headerRow);
+                    console.log('Header row added to table');
 
                     // Add first 5 processed rows
-                    processedData.slice(0, 5).forEach(row => {
+                    console.log('Adding data rows:', processedData.slice(0, 5));
+                    processedData.slice(0, 5).forEach((row, rowIndex) => {
+                        console.log(`Building row ${rowIndex}:`, row);
                         const tr = document.createElement('tr');
                         row.forEach((cell, index) => {
                             const td = document.createElement('td');
@@ -2816,7 +2950,9 @@ Generated: ${new Date().toLocaleDateString()}`;
                             tr.appendChild(td);
                         });
                         previewTable.appendChild(tr);
+                        console.log(`Row ${rowIndex} added to table`);
                     });
+                    console.log('updateResultsPreview completed successfully');
                 }
 
                 function downloadEnhancedCSV() {
@@ -2826,9 +2962,10 @@ Generated: ${new Date().toLocaleDateString()}`;
                 function downloadSuccessfulOnly() {
                     const successful = processedData.filter(row => {
                         if (geocoderMode === 'zip') {
-                            return row[row.length - 1] && row[row.length - 1] !== '';
+                            return targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         } else {
-                            return row[row.length - 2] && row[row.length - 2] !== '';
+                            // For city and county modes, use target column
+                            return targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         }
                     });
                     downloadCSV(successful, 'successful_geocodes.csv');
@@ -2837,9 +2974,10 @@ Generated: ${new Date().toLocaleDateString()}`;
                 function downloadFailedOnly() {
                     const failed = processedData.filter(row => {
                         if (geocoderMode === 'zip') {
-                            return !row[row.length - 1] || row[row.length - 1] === '';
+                            return targetColumnIndex < 0 || !row[targetColumnIndex] || row[targetColumnIndex] === '';
                         } else {
-                            return !row[row.length - 2] || row[row.length - 2] === '';
+                            // For city and county modes, use target column
+                            return targetColumnIndex < 0 || !row[targetColumnIndex] || row[targetColumnIndex] === '';
                         }
                     });
                     downloadCSV(failed, 'failed_geocodes.csv');
@@ -2865,9 +3003,10 @@ Generated: ${new Date().toLocaleDateString()}`;
                 function copyResultsSummary() {
                     const successful = processedData.filter(row => {
                         if (geocoderMode === 'zip') {
-                            return row[row.length - 1] && row[row.length - 1] !== '';
+                            return targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         } else {
-                            return row[row.length - 2] && row[row.length - 2] !== '';
+                            // For city and county modes, use target column
+                            return targetColumnIndex >= 0 && row[targetColumnIndex] && row[targetColumnIndex] !== '';
                         }
                     }).length;
 
