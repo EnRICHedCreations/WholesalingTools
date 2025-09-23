@@ -2484,9 +2484,25 @@ Generated: ${new Date().toLocaleDateString()}`;
                     <p>Analyze Deal Structure, Payments & ROI for Owner Financing</p>
                 </div>
 
+                <!-- Mode Toggle -->
+                <div style="background: white; padding: 20px; border-bottom: 1px solid #e9ecef; text-align: center;">
+                    <div style="display: inline-flex; background: #f8f9fa; border-radius: 25px; padding: 4px; margin-bottom: 10px;">
+                        <button id="sf-detailed-mode" onclick="switchSellerFinanceMode('detailed')" style="padding: 8px 20px; border: none; border-radius: 20px; background: #22c55e; color: white; font-weight: 500; cursor: pointer; transition: all 0.3s;">
+                            📊 Terms Mode
+                        </button>
+                        <button id="sf-simple-mode" onclick="switchSellerFinanceMode('simple')" style="padding: 8px 20px; border: none; border-radius: 20px; background: transparent; color: #6c757d; font-weight: 500; cursor: pointer; transition: all 0.3s;">
+                            💰 Payment Mode
+                        </button>
+                    </div>
+                    <div style="font-size: 0.9em; color: #6c757d;">
+                        <span id="sf-mode-description">Configure all loan terms manually for complete control</span>
+                    </div>
+                </div>
+
                 <div class="seller-finance-main-content">
-                    <div class="seller-finance-inputs-section">
-                        <h2 class="seller-finance-section-title">Deal Structure</h2>
+                    <!-- Terms Mode Inputs -->
+                    <div class="seller-finance-inputs-section" id="sf-detailed-inputs">
+                        <h2 class="seller-finance-section-title">Terms Configuration</h2>
 
                         <div class="seller-finance-input-group">
                             <h3>Property & Financing Terms</h3>
@@ -2561,6 +2577,107 @@ Generated: ${new Date().toLocaleDateString()}`;
                                     <label for="sfCashDiscount">Cash Sale Discount (%)</label>
                                     <input type="number" id="sfCashDiscount" value="5" min="0" max="20" step="0.5">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Mode Inputs -->
+                    <div class="seller-finance-inputs-section" id="sf-simple-inputs" style="display: none;">
+                        <h2 class="seller-finance-section-title">Payment-Based Calculator</h2>
+
+                        <div class="seller-finance-input-group">
+                            <h3>Deal Inputs</h3>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfSimplePurchasePrice">Purchase Price ($)</label>
+                                    <input type="number" id="sfSimplePurchasePrice" value="400000" min="0" onchange="calculateFromSimpleMode()">
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label for="sfSimpleMonthlyPayment">Desired Monthly Payment ($)</label>
+                                    <input type="number" id="sfSimpleMonthlyPayment" value="2456" min="0" onchange="calculateFromSimpleMode()">
+                                </div>
+                            </div>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label for="sfSimpleOptionalDown">Down Payment ($ - Optional)</label>
+                                    <input type="number" id="sfSimpleOptionalDown" value="" min="0" placeholder="Leave blank to auto-calculate" onchange="calculateFromSimpleMode()">
+                                    <div style="font-size: 0.8em; color: #6c757d; margin-top: 4px;">Leave blank to test multiple down payment options</div>
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <!-- Empty for spacing -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="seller-finance-input-group">
+                            <h3>Auto-Calculated Loan Terms</h3>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label>Optimal Down Payment</label>
+                                    <div style="padding: 12px 15px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; font-weight: 600; color: #22c55e;">
+                                        <span id="sfCalculatedDownPayment">$100,000 (25%)</span>
+                                    </div>
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label>Calculated Interest Rate</label>
+                                    <div style="padding: 12px 15px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; font-weight: 600; color: #22c55e;">
+                                        <span id="sfCalculatedRate">6.5%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field">
+                                    <label>Optimal Loan Term</label>
+                                    <div style="padding: 12px 15px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; font-weight: 600; color: #22c55e;">
+                                        <span id="sfCalculatedLoanTerm">25 years</span>
+                                    </div>
+                                </div>
+                                <div class="seller-finance-form-field">
+                                    <label>Financed Amount</label>
+                                    <div style="padding: 12px 15px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; font-weight: 600; color: #22c55e;">
+                                        <span id="sfCalculatedFinanced">$300,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="seller-finance-form-row">
+                                <div class="seller-finance-form-field full-width">
+                                    <label>Deal Assessment</label>
+                                    <div id="sfDealViability" style="padding: 12px 15px; background: #d1fae5; border: 2px solid #22c55e; border-radius: 8px; font-weight: 600; color: #16a34a;">
+                                        ✅ Deal looks good! Terms are competitive.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="seller-finance-input-group">
+                            <h3>Multiple Scenarios</h3>
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 15px;">
+                                <div style="font-weight: 600; margin-bottom: 10px; color: #1a472a;">Best Options for Your Deal:</div>
+                                <div id="sfScenarios" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                                    <div style="padding: 8px; background: white; border-radius: 6px; border-left: 3px solid #22c55e;">
+                                        <div style="font-weight: 500;">20% Down, 30yr</div>
+                                        <div style="color: #6c757d;">6.2% @ $2,456/mo</div>
+                                    </div>
+                                    <div style="padding: 8px; background: white; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                                        <div style="font-weight: 500;">25% Down, 25yr</div>
+                                        <div style="color: #6c757d;">6.5% @ $2,456/mo</div>
+                                    </div>
+                                    <div style="padding: 8px; background: white; border-radius: 6px; border-left: 3px solid #f59e0b;">
+                                        <div style="font-weight: 500;">30% Down, 20yr</div>
+                                        <div style="color: #6c757d;">6.8% @ $2,456/mo</div>
+                                    </div>
+                                    <div style="padding: 8px; background: white; border-radius: 6px; border-left: 3px solid #8b5cf6;">
+                                        <div style="font-weight: 500;">15% Down, 30yr</div>
+                                        <div style="color: #6c757d;">6.0% @ $2,456/mo</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; padding: 15px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px;">
+                            <div style="font-weight: 600; color: #92400e; margin-bottom: 8px;">💡 How Payment Mode Works:</div>
+                            <div style="font-size: 0.9em; color: #92400e; line-height: 1.4;">
+                                Just enter <strong>purchase price</strong> and <strong>desired monthly payment</strong>. Optionally specify a down payment. The calculator automatically tests different scenarios to find the optimal combination that achieves your target payment, showing you the best option plus alternatives.
                             </div>
                         </div>
                     </div>
@@ -2746,13 +2863,21 @@ Generated: ${new Date().toLocaleDateString()}`;
                     const amortizationMonths = amortizationYears * 12;
                     const loanTermMonths = loanTerm * 12;
 
-                    // Calculate monthly payment based on amortization schedule
+                    // Check if we're in Payment Mode (simple mode is visible)
+                    const isPaymentMode = document.getElementById('sf-simple-inputs').style.display !== 'none';
                     let monthlyPayment = 0;
-                    if (monthlyRate > 0) {
-                        monthlyPayment = financedAmount * (monthlyRate * Math.pow(1 + monthlyRate, amortizationMonths)) /
-                                       (Math.pow(1 + monthlyRate, amortizationMonths) - 1);
+
+                    if (isPaymentMode) {
+                        // In Payment Mode, use the desired payment from the input
+                        monthlyPayment = parseFloat(document.getElementById('sfSimpleMonthlyPayment').value) || 0;
                     } else {
-                        monthlyPayment = financedAmount / amortizationMonths;
+                        // In Terms Mode, calculate monthly payment based on loan terms
+                        if (monthlyRate > 0) {
+                            monthlyPayment = financedAmount * (monthlyRate * Math.pow(1 + monthlyRate, amortizationMonths)) /
+                                           (Math.pow(1 + monthlyRate, amortizationMonths) - 1);
+                        } else {
+                            monthlyPayment = financedAmount / amortizationMonths;
+                        }
                     }
 
                     // Calculate remaining balance at end of loan term (for balloon)
@@ -2834,6 +2959,269 @@ Generated: ${new Date().toLocaleDateString()}`;
                         `;
                         tableBody.appendChild(tr);
                     });
+                }
+
+                // Mode switching functionality
+                function switchSellerFinanceMode(mode) {
+                    const detailedMode = document.getElementById('sf-detailed-mode');
+                    const simpleMode = document.getElementById('sf-simple-mode');
+                    const detailedInputs = document.getElementById('sf-detailed-inputs');
+                    const simpleInputs = document.getElementById('sf-simple-inputs');
+                    const modeDescription = document.getElementById('sf-mode-description');
+
+                    if (mode === 'simple') {
+                        // Switch to payment mode
+                        simpleMode.style.background = '#22c55e';
+                        simpleMode.style.color = 'white';
+                        detailedMode.style.background = 'transparent';
+                        detailedMode.style.color = '#6c757d';
+
+                        detailedInputs.style.display = 'none';
+                        simpleInputs.style.display = 'block';
+
+                        modeDescription.textContent = 'Enter purchase price and desired payment - we\'ll calculate optimal terms';
+
+                        // Calculate from payment mode
+                        calculateFromSimpleMode();
+                    } else {
+                        // Switch to terms mode
+                        detailedMode.style.background = '#22c55e';
+                        detailedMode.style.color = 'white';
+                        simpleMode.style.background = 'transparent';
+                        simpleMode.style.color = '#6c757d';
+
+                        detailedInputs.style.display = 'block';
+                        simpleInputs.style.display = 'none';
+
+                        modeDescription.textContent = 'Configure all loan terms manually for complete control';
+
+                        // Calculate from terms mode
+                        calculateSellerFinanceMetrics();
+                    }
+                }
+
+                // Simple mode calculation - reverse engineer optimal terms
+                function calculateFromSimpleMode() {
+                    const purchasePrice = parseFloat(document.getElementById('sfSimplePurchasePrice').value) || 0;
+                    const monthlyPayment = parseFloat(document.getElementById('sfSimpleMonthlyPayment').value) || 0;
+                    const optionalDownPayment = document.getElementById('sfSimpleOptionalDown').value.trim();
+
+                    if (purchasePrice <= 0 || monthlyPayment <= 0) {
+                        document.getElementById('sfCalculatedRate').textContent = '0.0%';
+                        document.getElementById('sfCalculatedFinanced').textContent = '$0';
+                        document.getElementById('sfCalculatedDownPayment').textContent = '$0 (0%)';
+                        document.getElementById('sfCalculatedLoanTerm').textContent = '0 years';
+                        updateDealViability(0, 0);
+                        return;
+                    }
+
+                    let scenarios = [];
+
+                    // Check if user specified a down payment
+                    if (optionalDownPayment && optionalDownPayment !== '') {
+                        const specificDownPayment = parseFloat(optionalDownPayment);
+                        const downPercent = (specificDownPayment / purchasePrice * 100);
+
+                        // Test different loan terms with the specified down payment
+                        scenarios = [
+                            { downPayment: specificDownPayment, downPercent: downPercent, termYears: 20 },
+                            { downPayment: specificDownPayment, downPercent: downPercent, termYears: 25 },
+                            { downPayment: specificDownPayment, downPercent: downPercent, termYears: 30 }
+                        ];
+                    } else {
+                        // Test multiple down payment scenarios
+                        scenarios = [
+                            { downPercent: 15, termYears: 30 },
+                            { downPercent: 20, termYears: 30 },
+                            { downPercent: 25, termYears: 25 },
+                            { downPercent: 25, termYears: 30 },
+                            { downPercent: 30, termYears: 20 },
+                            { downPercent: 30, termYears: 25 }
+                        ].map(s => ({
+                            ...s,
+                            downPayment: purchasePrice * (s.downPercent / 100)
+                        }));
+                    }
+
+                    let bestScenario = null;
+                    let bestRate = 99;
+                    const viableScenarios = [];
+
+                    scenarios.forEach(scenario => {
+                        const financedAmount = purchasePrice - scenario.downPayment;
+                        const requiredRate = findRequiredInterestRate(financedAmount, monthlyPayment, scenario.termYears * 12);
+
+                        if (requiredRate > 0 && requiredRate < 20) { // Reasonable rate range
+                            viableScenarios.push({
+                                ...scenario,
+                                financedAmount,
+                                requiredRate
+                            });
+
+                            // Track best (lowest rate) scenario
+                            if (requiredRate < bestRate) {
+                                bestRate = requiredRate;
+                                bestScenario = {
+                                    ...scenario,
+                                    financedAmount,
+                                    requiredRate
+                                };
+                            }
+                        }
+                    });
+
+                    if (bestScenario) {
+                        // Update displays with best scenario
+                        document.getElementById('sfCalculatedRate').textContent = bestScenario.requiredRate.toFixed(2) + '%';
+                        document.getElementById('sfCalculatedFinanced').textContent = formatSFCurrency(bestScenario.financedAmount);
+                        document.getElementById('sfCalculatedDownPayment').textContent =
+                            formatSFCurrency(bestScenario.downPayment) + ` (${bestScenario.downPercent.toFixed(1)}%)`;
+                        document.getElementById('sfCalculatedLoanTerm').textContent = bestScenario.termYears + ' years';
+
+                        // Update detailed mode fields with best scenario
+                        document.getElementById('sfPropertyPrice').value = purchasePrice;
+                        document.getElementById('sfDownPayment').value = bestScenario.downPayment;
+                        document.getElementById('sfInterestRate').value = bestScenario.requiredRate.toFixed(2);
+                        document.getElementById('sfLoanTerm').value = bestScenario.termYears;
+                        document.getElementById('sfAmortization').value = bestScenario.termYears;
+                        document.getElementById('sfBalloonPayment').value = 0;
+
+                        // Update scenarios display
+                        updateScenariosDisplay(viableScenarios, monthlyPayment);
+
+                        // Check deal viability
+                        updateDealViability(bestScenario.requiredRate, bestScenario.financedAmount);
+
+                        // Run the full calculation to update results
+                        calculateSellerFinanceMetrics();
+                    } else {
+                        // No viable scenarios found
+                        document.getElementById('sfCalculatedRate').textContent = 'N/A';
+                        document.getElementById('sfCalculatedFinanced').textContent = 'N/A';
+                        document.getElementById('sfCalculatedDownPayment').textContent = 'N/A';
+                        document.getElementById('sfCalculatedLoanTerm').textContent = 'N/A';
+
+                        const viabilityDiv = document.getElementById('sfDealViability');
+                        viabilityDiv.style.background = '#fee2e2';
+                        viabilityDiv.style.borderColor = '#ef4444';
+                        viabilityDiv.style.color = '#dc2626';
+                        viabilityDiv.innerHTML = '❌ Payment too low for viable seller financing terms';
+
+                        // Clear scenarios
+                        document.getElementById('sfScenarios').innerHTML =
+                            '<div style="grid-column: 1/-1; text-align: center; color: #6c757d; padding: 20px;">No viable scenarios found with current inputs</div>';
+                    }
+                }
+
+                // Update scenarios display
+                function updateScenariosDisplay(scenarios, monthlyPayment) {
+                    const scenariosDiv = document.getElementById('sfScenarios');
+
+                    // Sort by interest rate (best first)
+                    scenarios.sort((a, b) => a.requiredRate - b.requiredRate);
+
+                    // Take top 4 scenarios
+                    const topScenarios = scenarios.slice(0, 4);
+
+                    let html = '';
+                    const colors = ['#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6'];
+
+                    topScenarios.forEach((scenario, index) => {
+                        const color = colors[index] || '#6b7280';
+                        html += `
+                            <div style="padding: 8px; background: white; border-radius: 6px; border-left: 3px solid ${color};">
+                                <div style="font-weight: 500;">${scenario.downPercent}% Down, ${scenario.termYears}yr</div>
+                                <div style="color: #6c757d;">${scenario.requiredRate.toFixed(1)}% @ ${formatSFCurrency(monthlyPayment)}/mo</div>
+                            </div>
+                        `;
+                    });
+
+                    // Fill remaining slots if needed
+                    while (topScenarios.length < 4) {
+                        html += `
+                            <div style="padding: 8px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #e5e5e5;">
+                                <div style="color: #9ca3af; font-weight: 500;">-</div>
+                                <div style="color: #9ca3af;">No scenario</div>
+                            </div>
+                        `;
+                        topScenarios.push({});
+                    }
+
+                    scenariosDiv.innerHTML = html;
+                }
+
+                // Find required interest rate using binary search
+                function findRequiredInterestRate(principal, payment, periods, balloon = 0) {
+                    if (principal <= 0 || payment <= 0 || periods <= 0) return 0;
+
+                    let lowRate = 0.01; // 1%
+                    let highRate = 30.0; // 30%
+                    let tolerance = 0.01;
+                    let maxIterations = 100;
+                    let iteration = 0;
+
+                    while (iteration < maxIterations && (highRate - lowRate) > tolerance) {
+                        let testRate = (lowRate + highRate) / 2;
+                        let monthlyRate = testRate / 100 / 12;
+
+                        let calculatedPayment;
+                        if (balloon > 0) {
+                            // With balloon payment
+                            let pvBalloon = balloon / Math.pow(1 + monthlyRate, periods);
+                            let remainingPrincipal = principal - pvBalloon;
+                            calculatedPayment = remainingPrincipal * (monthlyRate * Math.pow(1 + monthlyRate, periods)) / (Math.pow(1 + monthlyRate, periods) - 1);
+                        } else {
+                            // Standard amortizing loan
+                            calculatedPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, periods)) / (Math.pow(1 + monthlyRate, periods) - 1);
+                        }
+
+                        if (calculatedPayment < payment) {
+                            lowRate = testRate;
+                        } else {
+                            highRate = testRate;
+                        }
+                        iteration++;
+                    }
+
+                    return (lowRate + highRate) / 2;
+                }
+
+                // Update deal viability assessment
+                function updateDealViability(calculatedRate, financedAmount) {
+                    const viabilityDiv = document.getElementById('sfDealViability');
+                    const marketRate = 7.5; // Typical market rate for comparison
+
+                    if (calculatedRate <= 0) {
+                        viabilityDiv.style.background = '#fee2e2';
+                        viabilityDiv.style.borderColor = '#ef4444';
+                        viabilityDiv.style.color = '#dc2626';
+                        viabilityDiv.innerHTML = '❌ Invalid parameters - check your inputs';
+                    } else if (calculatedRate < 3.0) {
+                        viabilityDiv.style.background = '#fee2e2';
+                        viabilityDiv.style.borderColor = '#ef4444';
+                        viabilityDiv.style.color = '#dc2626';
+                        viabilityDiv.innerHTML = '⚠️ Rate too low - may not be realistic for seller';
+                    } else if (calculatedRate > 15.0) {
+                        viabilityDiv.style.background = '#fee2e2';
+                        viabilityDiv.style.borderColor = '#ef4444';
+                        viabilityDiv.style.color = '#dc2626';
+                        viabilityDiv.innerHTML = '❌ Rate too high - buyer unlikely to accept';
+                    } else if (calculatedRate <= marketRate) {
+                        viabilityDiv.style.background = '#d1fae5';
+                        viabilityDiv.style.borderColor = '#22c55e';
+                        viabilityDiv.style.color = '#16a34a';
+                        viabilityDiv.innerHTML = `✅ Excellent! Rate is ${(marketRate - calculatedRate).toFixed(1)}% below market`;
+                    } else if (calculatedRate <= marketRate + 2) {
+                        viabilityDiv.style.background = '#fef3c7';
+                        viabilityDiv.style.borderColor = '#f59e0b';
+                        viabilityDiv.style.color = '#d97706';
+                        viabilityDiv.innerHTML = `⚠️ Rate is ${(calculatedRate - marketRate).toFixed(1)}% above market - still workable`;
+                    } else {
+                        viabilityDiv.style.background = '#fee2e2';
+                        viabilityDiv.style.borderColor = '#ef4444';
+                        viabilityDiv.style.color = '#dc2626';
+                        viabilityDiv.innerHTML = `❌ Rate is ${(calculatedRate - marketRate).toFixed(1)}% above market - too expensive`;
+                    }
                 }
 
                 // Add event listeners to all seller finance input fields
