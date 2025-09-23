@@ -130,6 +130,9 @@
                     <button onclick="switchTab('deal-analysis')" id="tab-deal-analysis" class="tab-active px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         📊 Deal Analysis & Calculator
                     </button>
+                    <button onclick="switchTab('assignment-fee')" id="tab-assignment-fee" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        💰 Assignment Fee Calculator
+                    </button>
                     <button onclick="switchTab('coming-soon-1')" id="tab-coming-soon-1" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         🗺️ Zip Code Finder
                     </button>
@@ -552,6 +555,508 @@
             </div>
         </div>
 
+        </div>
+
+        <!-- Assignment Fee Calculator Tab -->
+        <div id="content-assignment-fee" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">💰 Assignment Fee Calculator</h2>
+                <button onclick="clearAssignmentFee()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Calculator
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>Professional Assignment Fee Calculator:</strong> Calculate optimal assignment fees based on ARV, repair costs, and buyer profit requirements. Ensures competitive pricing while maximizing your wholesale profit margins.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column: Inputs -->
+                <div class="space-y-6">
+                    <!-- Property Information -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🏠 Property Details</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Address</label>
+                                <input type="text" id="af-property-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123 Main St, City, State 12345">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">After Repair Value (ARV)</label>
+                                <input type="number" id="af-arv" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="250000" onchange="calculateAssignmentFee()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Your Purchase Price</label>
+                                <input type="number" id="af-purchase-price" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="150000" onchange="calculateAssignmentFee()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Estimated Repair Costs</label>
+                                <input type="number" id="af-repair-costs" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="35000" onchange="calculateAssignmentFee()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Settings -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⚙️ Advanced Settings</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Closing Costs Override</label>
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="af-override-closing" onchange="calculateAssignmentFee()">
+                                    <span class="text-sm text-gray-600">Override default 10% closing costs</span>
+                                </div>
+                                <input type="number" id="af-closing-costs-custom" class="w-full px-4 py-3 border border-gray-300 rounded-lg mt-2" placeholder="25000" disabled onchange="calculateAssignmentFee()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Buyer Profit Override</label>
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="af-override-profit" onchange="calculateAssignmentFee()">
+                                    <span class="text-sm text-gray-600">Override auto-calculated buyer profit</span>
+                                </div>
+                                <input type="number" id="af-buyer-profit-custom" class="w-full px-4 py-3 border border-gray-300 rounded-lg mt-2" placeholder="30000" disabled onchange="calculateAssignmentFee()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Market Adjustment</label>
+                                <select id="af-market-adjustment" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateAssignmentFee()">
+                                    <option value="1.0">Normal Market</option>
+                                    <option value="1.1">Hot Market (+10%)</option>
+                                    <option value="1.2">Very Hot Market (+20%)</option>
+                                    <option value="0.9">Slow Market (-10%)</option>
+                                    <option value="0.8">Cold Market (-20%)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="space-y-6">
+                    <!-- Assignment Fee Results -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💰 Assignment Fee Analysis</h3>
+
+                        <div class="text-center mb-6">
+                            <div class="text-3xl font-bold text-green-600 mb-2" id="af-assignment-fee">$0</div>
+                            <div class="text-sm text-gray-600">Recommended Assignment Fee</div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Purchase Price:</span>
+                                <span class="font-semibold" id="af-display-purchase">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Assignment Fee:</span>
+                                <span class="font-semibold text-green-600" id="af-display-fee">$0</span>
+                            </div>
+                            <div class="border-t pt-2">
+                                <div class="flex justify-between items-center font-bold">
+                                    <span class="text-gray-700">Buyer Total Cost:</span>
+                                    <span id="af-buyer-total">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buyer Profit Analysis -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🎯 Buyer Profit Breakdown</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">After Repair Value:</span>
+                                <span class="font-semibold" id="af-display-arv">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Buyer Purchase Cost:</span>
+                                <span id="af-display-buyer-cost">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Repair Costs:</span>
+                                <span id="af-display-repairs">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Closing Costs:</span>
+                                <span id="af-display-closing">$0</span>
+                            </div>
+                            <div class="border-t pt-2">
+                                <div class="flex justify-between items-center font-bold">
+                                    <span class="text-gray-700">Buyer Profit:</span>
+                                    <span class="text-green-600" id="af-display-buyer-profit">$0</span>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2" id="af-profit-rule">
+                                Profit calculated using repair-based rules
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deal Validation -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">✅ Deal Validation</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Deal Margin:</span>
+                                <span class="font-semibold" id="af-deal-margin">0%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Your ROI:</span>
+                                <span class="font-semibold" id="af-your-roi">0%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700">Buyer ROI:</span>
+                                <span class="font-semibold" id="af-buyer-roi">0%</span>
+                            </div>
+                            <div class="mt-4 p-3 rounded-lg" id="af-deal-status">
+                                <div class="text-sm font-semibold" id="af-status-text">Enter deal details to validate</div>
+                                <div class="text-xs mt-1" id="af-status-detail">Fill in all required fields above</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="mt-8 flex justify-center gap-4 flex-wrap">
+                <button onclick="exportAssignmentAnalysis()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    📄 Export Analysis
+                </button>
+                <button onclick="generateBuyerPresentation()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    📊 Generate Buyer Presentation
+                </button>
+                <button onclick="copyAssignmentContract()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                    📋 Copy Contract Details
+                </button>
+            </div>
+
+            <!-- JavaScript for Assignment Fee Calculator -->
+            <script>
+                function calculateAssignmentFee() {
+                    // Get input values
+                    const arv = parseFloat(document.getElementById('af-arv').value) || 0;
+                    const purchasePrice = parseFloat(document.getElementById('af-purchase-price').value) || 0;
+                    const repairCosts = parseFloat(document.getElementById('af-repair-costs').value) || 0;
+                    const marketAdjustment = parseFloat(document.getElementById('af-market-adjustment').value) || 1.0;
+
+                    // Calculate closing costs (10% of ARV by default)
+                    let closingCosts;
+                    if (document.getElementById('af-override-closing').checked) {
+                        closingCosts = parseFloat(document.getElementById('af-closing-costs-custom').value) || 0;
+                    } else {
+                        closingCosts = arv * 0.10;
+                    }
+
+                    // Calculate buyer profit based on repair amount rules
+                    let buyerProfit;
+                    if (document.getElementById('af-override-profit').checked) {
+                        buyerProfit = parseFloat(document.getElementById('af-buyer-profit-custom').value) || 0;
+                    } else {
+                        if (repairCosts < 30000) {
+                            buyerProfit = 30000; // Under $30k repairs: $30k profit required
+                        } else if (repairCosts >= 30000 && repairCosts <= 50000) {
+                            buyerProfit = repairCosts; // $30k-$50k repairs: Same as repair amount
+                        } else {
+                            buyerProfit = 50000; // $50k+ repairs: $50k profit required
+                        }
+                    }
+
+                    // Apply market adjustment to buyer profit
+                    buyerProfit = buyerProfit * marketAdjustment;
+
+                    // Calculate maximum buyer cost: ARV - Repairs - Closing Costs - Buyer Profit
+                    const maxBuyerCost = arv - repairCosts - closingCosts - buyerProfit;
+
+                    // Calculate assignment fee: Max Buyer Cost - Purchase Price
+                    const assignmentFee = Math.max(0, maxBuyerCost - purchasePrice);
+
+                    // Calculate buyer total cost
+                    const buyerTotal = purchasePrice + assignmentFee;
+
+                    // Calculate actual buyer profit with this assignment fee
+                    const actualBuyerProfit = arv - buyerTotal - repairCosts - closingCosts;
+
+                    // Calculate ROI metrics
+                    const dealMargin = arv > 0 ? ((arv - buyerTotal - repairCosts - closingCosts) / arv * 100) : 0;
+                    const yourROI = purchasePrice > 0 ? (assignmentFee / purchasePrice * 100) : 0;
+                    const buyerROI = buyerTotal > 0 ? (actualBuyerProfit / buyerTotal * 100) : 0;
+
+                    // Update displays
+                    document.getElementById('af-assignment-fee').textContent = formatCurrency(assignmentFee);
+                    document.getElementById('af-display-purchase').textContent = formatCurrency(purchasePrice);
+                    document.getElementById('af-display-fee').textContent = formatCurrency(assignmentFee);
+                    document.getElementById('af-buyer-total').textContent = formatCurrency(buyerTotal);
+
+                    document.getElementById('af-display-arv').textContent = formatCurrency(arv);
+                    document.getElementById('af-display-buyer-cost').textContent = formatCurrency(buyerTotal);
+                    document.getElementById('af-display-repairs').textContent = formatCurrency(repairCosts);
+                    document.getElementById('af-display-closing').textContent = formatCurrency(closingCosts);
+                    document.getElementById('af-display-buyer-profit').textContent = formatCurrency(actualBuyerProfit);
+
+                    document.getElementById('af-deal-margin').textContent = dealMargin.toFixed(1) + '%';
+                    document.getElementById('af-your-roi').textContent = yourROI.toFixed(1) + '%';
+                    document.getElementById('af-buyer-roi').textContent = buyerROI.toFixed(1) + '%';
+
+                    // Update profit rule explanation
+                    let profitRule = '';
+                    if (repairCosts < 30000) {
+                        profitRule = 'Under $30k repairs: $30k buyer profit required';
+                    } else if (repairCosts >= 30000 && repairCosts <= 50000) {
+                        profitRule = '$30k-$50k repairs: Profit equals repair amount';
+                    } else {
+                        profitRule = 'Over $50k repairs: $50k buyer profit required';
+                    }
+                    document.getElementById('af-profit-rule').textContent = profitRule;
+
+                    // Update deal validation status
+                    updateDealStatus(assignmentFee, dealMargin, buyerROI, actualBuyerProfit);
+                }
+
+                function updateDealStatus(assignmentFee, dealMargin, buyerROI, buyerProfit) {
+                    const statusDiv = document.getElementById('af-deal-status');
+                    const statusText = document.getElementById('af-status-text');
+                    const statusDetail = document.getElementById('af-status-detail');
+
+                    if (assignmentFee <= 0) {
+                        statusDiv.className = 'mt-4 p-3 rounded-lg bg-red-100 border border-red-300';
+                        statusText.textContent = '❌ Deal Not Viable';
+                        statusDetail.textContent = 'Assignment fee is $0 or negative. Adjust purchase price or repair estimates.';
+                    } else if (buyerProfit < 20000) {
+                        statusDiv.className = 'mt-4 p-3 rounded-lg bg-yellow-100 border border-yellow-300';
+                        statusText.textContent = '⚠️ Low Buyer Profit';
+                        statusDetail.textContent = 'Buyer profit below $20k may be difficult to sell. Consider adjusting.';
+                    } else if (dealMargin < 15) {
+                        statusDiv.className = 'mt-4 p-3 rounded-lg bg-yellow-100 border border-yellow-300';
+                        statusText.textContent = '⚠️ Tight Margins';
+                        statusDetail.textContent = 'Deal margin below 15%. Ensure numbers are accurate.';
+                    } else if (assignmentFee > 50000) {
+                        statusDiv.className = 'mt-4 p-3 rounded-lg bg-blue-100 border border-blue-300';
+                        statusText.textContent = '🎯 High-Value Deal';
+                        statusDetail.textContent = 'Excellent assignment fee! Verify ARV and repair estimates.';
+                    } else {
+                        statusDiv.className = 'mt-4 p-3 rounded-lg bg-green-100 border border-green-300';
+                        statusText.textContent = '✅ Good Deal';
+                        statusDetail.textContent = 'Solid assignment fee with healthy buyer profit margins.';
+                    }
+                }
+
+                function formatCurrency(amount) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(amount);
+                }
+
+                // Toggle custom input fields
+                document.getElementById('af-override-closing').addEventListener('change', function() {
+                    document.getElementById('af-closing-costs-custom').disabled = !this.checked;
+                    calculateAssignmentFee();
+                });
+
+                document.getElementById('af-override-profit').addEventListener('change', function() {
+                    document.getElementById('af-buyer-profit-custom').disabled = !this.checked;
+                    calculateAssignmentFee();
+                });
+
+                function clearAssignmentFee() {
+                    // Clear all inputs
+                    const inputs = document.querySelectorAll('#content-assignment-fee input, #content-assignment-fee select');
+                    inputs.forEach(input => {
+                        if (input.type === 'checkbox') {
+                            input.checked = false;
+                        } else {
+                            input.value = '';
+                        }
+                    });
+
+                    // Disable custom fields
+                    document.getElementById('af-closing-costs-custom').disabled = true;
+                    document.getElementById('af-buyer-profit-custom').disabled = true;
+
+                    // Reset displays
+                    document.getElementById('af-assignment-fee').textContent = '$0';
+                    document.getElementById('af-display-purchase').textContent = '$0';
+                    document.getElementById('af-display-fee').textContent = '$0';
+                    document.getElementById('af-buyer-total').textContent = '$0';
+                    document.getElementById('af-display-arv').textContent = '$0';
+                    document.getElementById('af-display-buyer-cost').textContent = '$0';
+                    document.getElementById('af-display-repairs').textContent = '$0';
+                    document.getElementById('af-display-closing').textContent = '$0';
+                    document.getElementById('af-display-buyer-profit').textContent = '$0';
+                    document.getElementById('af-deal-margin').textContent = '0%';
+                    document.getElementById('af-your-roi').textContent = '0%';
+                    document.getElementById('af-buyer-roi').textContent = '0%';
+                    document.getElementById('af-profit-rule').textContent = 'Profit calculated using repair-based rules';
+
+                    // Reset status
+                    const statusDiv = document.getElementById('af-deal-status');
+                    statusDiv.className = 'mt-4 p-3 rounded-lg bg-gray-100 border border-gray-300';
+                    document.getElementById('af-status-text').textContent = 'Enter deal details to validate';
+                    document.getElementById('af-status-detail').textContent = 'Fill in all required fields above';
+                }
+
+                function exportAssignmentAnalysis() {
+                    const address = document.getElementById('af-property-address').value || 'Property Analysis';
+                    const arv = document.getElementById('af-arv').value || '0';
+                    const purchasePrice = document.getElementById('af-purchase-price').value || '0';
+                    const repairCosts = document.getElementById('af-repair-costs').value || '0';
+                    const assignmentFee = document.getElementById('af-assignment-fee').textContent;
+                    const buyerProfit = document.getElementById('af-display-buyer-profit').textContent;
+                    const dealMargin = document.getElementById('af-deal-margin').textContent;
+
+                    const analysis = `ASSIGNMENT FEE ANALYSIS
+Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+
+PROPERTY INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+Address: ${address}
+After Repair Value (ARV): $${arv}
+Purchase Price: $${purchasePrice}
+Estimated Repair Costs: $${repairCosts}
+
+ASSIGNMENT FEE CALCULATION
+═══════════════════════════════════════════════════════════════════════════════
+Recommended Assignment Fee: ${assignmentFee}
+Buyer Total Investment: ${document.getElementById('af-buyer-total').textContent}
+Buyer Projected Profit: ${buyerProfit}
+
+DEAL METRICS
+═══════════════════════════════════════════════════════════════════════════════
+Deal Margin: ${dealMargin}
+Your ROI: ${document.getElementById('af-your-roi').textContent}
+Buyer ROI: ${document.getElementById('af-buyer-roi').textContent}
+
+PROFIT CALCULATION RULES
+═══════════════════════════════════════════════════════════════════════════════
+${document.getElementById('af-profit-rule').textContent}
+
+DEAL VALIDATION
+═══════════════════════════════════════════════════════════════════════════════
+Status: ${document.getElementById('af-status-text').textContent}
+Notes: ${document.getElementById('af-status-detail').textContent}
+
+BREAKDOWN
+═══════════════════════════════════════════════════════════════════════════════
+After Repair Value: ${document.getElementById('af-display-arv').textContent}
+Less: Repair Costs: ${document.getElementById('af-display-repairs').textContent}
+Less: Closing Costs: ${document.getElementById('af-display-closing').textContent}
+Less: Buyer Profit: ${buyerProfit}
+Equals: Max Buyer Cost: ${document.getElementById('af-display-buyer-cost').textContent}
+Less: Your Purchase: ${document.getElementById('af-display-purchase').textContent}
+Equals: Assignment Fee: ${document.getElementById('af-display-fee').textContent}
+
+Generated by Enriched Property Solutions LLC - Assignment Fee Calculator`;
+
+                    const blob = new Blob([analysis], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${address.replace(/[^a-zA-Z0-9]/g, '_')}_Assignment_Analysis_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function generateBuyerPresentation() {
+                    const address = document.getElementById('af-property-address').value || 'Investment Property';
+                    const arv = document.getElementById('af-arv').value || '0';
+                    const buyerCost = document.getElementById('af-buyer-total').textContent;
+                    const repairCosts = document.getElementById('af-repair-costs').value || '0';
+                    const buyerProfit = document.getElementById('af-display-buyer-profit').textContent;
+                    const buyerROI = document.getElementById('af-buyer-roi').textContent;
+
+                    const presentation = `INVESTMENT OPPORTUNITY PRESENTATION
+${address}
+
+EXECUTIVE SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+Investment Property: ${address}
+Total Investment Required: ${buyerCost}
+Projected Profit: ${buyerProfit}
+Projected ROI: ${buyerROI}
+
+INVESTMENT BREAKDOWN
+═══════════════════════════════════════════════════════════════════════════════
+Purchase Price: ${buyerCost}
+Estimated Rehab Cost: $${repairCosts}
+Closing Costs: ${document.getElementById('af-display-closing').textContent}
+Total Investment: ${(parseFloat(buyerCost.replace(/[$,]/g, '')) + parseFloat(repairCosts) + parseFloat(document.getElementById('af-display-closing').textContent.replace(/[$,]/g, ''))).toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}
+
+PROFIT ANALYSIS
+═══════════════════════════════════════════════════════════════════════════════
+After Repair Value: $${arv}
+Total Investment: ${(parseFloat(buyerCost.replace(/[$,]/g, '')) + parseFloat(repairCosts) + parseFloat(document.getElementById('af-display-closing').textContent.replace(/[$,]/g, ''))).toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0})}
+Projected Profit: ${buyerProfit}
+Return on Investment: ${buyerROI}
+
+DEAL HIGHLIGHTS
+═══════════════════════════════════════════════════════════════════════════════
+✓ Profitable investment opportunity
+✓ Clear profit margins and ROI projections
+✓ Detailed cost analysis provided
+✓ Ready for immediate purchase
+
+NEXT STEPS
+═══════════════════════════════════════════════════════════════════════════════
+1. Review investment details
+2. Conduct property inspection if desired
+3. Verify repair cost estimates
+4. Execute purchase agreement
+5. Close on property
+
+Contact Information: [Your contact details here]
+
+Generated by Enriched Property Solutions LLC - Investment Opportunity Presentation`;
+
+                    const blob = new Blob([presentation], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${address.replace(/[^a-zA-Z0-9]/g, '_')}_Buyer_Presentation_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function copyAssignmentContract() {
+                    const address = document.getElementById('af-property-address').value || '[Property Address]';
+                    const purchasePrice = document.getElementById('af-purchase-price').value || '0';
+                    const assignmentFee = document.getElementById('af-assignment-fee').textContent.replace(/[$,]/g, '');
+                    const buyerTotal = document.getElementById('af-buyer-total').textContent.replace(/[$,]/g, '');
+
+                    const contractDetails = `ASSIGNMENT CONTRACT DETAILS
+
+Property: ${address}
+Original Purchase Price: $${purchasePrice}
+Assignment Fee: $${assignmentFee}
+Total Buyer Investment: $${buyerTotal}
+
+Contract Terms:
+- Assignment of purchase agreement
+- Assignment fee: $${assignmentFee}
+- Buyer assumes all original contract terms
+- Closing date: [Insert closing date]
+- Earnest money: [Insert amount]
+
+Generated: ${new Date().toLocaleDateString()}`;
+
+                    navigator.clipboard.writeText(contractDetails).then(() => {
+                        alert('Contract details copied to clipboard!');
+                    }).catch(() => {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = contractDetails;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        alert('Contract details copied to clipboard!');
+                    });
+                }
+            </script>
         </div>
 
         <!-- Zip Code Finder Tab -->
