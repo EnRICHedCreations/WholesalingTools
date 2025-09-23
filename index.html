@@ -148,6 +148,18 @@
                     <button onclick="switchTab('land-value')" id="tab-land-value" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         🌍 Land Value Estimator
                     </button>
+                    <button onclick="switchTab('novation-calculator')" id="tab-novation-calculator" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🔬 Novation Calculator
+                    </button>
+                    <button onclick="switchTab('lead-scorer')" id="tab-lead-scorer" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🎯 Lead Scorer
+                    </button>
+                    <button onclick="switchTab('hedge-fund-calculator')" id="tab-hedge-fund-calculator" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🏦 Hedge Fund Calculator
+                    </button>
+                    <button onclick="switchTab('seller-psychology')" id="tab-seller-psychology" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        🎭 Seller Psychology
+                    </button>
                 </nav>
             </div>
         </div>
@@ -3207,6 +3219,2864 @@
                     updateLandLocationDisplay();
                     calculateLandValue();
                 });
+            </script>
+        </div>
+
+        <!-- Novation Calculator Tab -->
+        <div id="content-novation-calculator" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">🔬 Novation Calculator</h2>
+                <button onclick="clearNovationCalculator()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Calculator
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>What is Novation?</strong> A novation replaces an existing obligation with a new one. In real estate, this involves taking over the seller's existing mortgage payments while securing the property through a separate purchase agreement.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column: Property & Loan Details -->
+                <div class="space-y-6">
+                    <!-- Property Information -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🏠 Property Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Address</label>
+                                <input type="text" id="novation-property-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123 Main St, City, State">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Current Market Value</label>
+                                <input type="number" id="novation-market-value" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="250000" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Estimated Repair Costs</label>
+                                <input type="number" id="novation-repair-costs" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="15000" onchange="calculateNovation()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Existing Loan Details -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💰 Existing Loan Details</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Current Loan Balance</label>
+                                <input type="number" id="novation-loan-balance" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="180000" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Monthly Payment (P&I)</label>
+                                <input type="number" id="novation-monthly-payment" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1250" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Interest Rate (%)</label>
+                                <input type="number" id="novation-interest-rate" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="3.5" step="0.1" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Years Remaining</label>
+                                <input type="number" id="novation-years-remaining" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="25" onchange="calculateNovation()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Financial Analysis -->
+                <div class="space-y-6">
+                    <!-- Deal Analysis -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Deal Analysis</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">Market Value:</span>
+                                <span class="text-lg font-bold text-gray-900" id="novation-display-market-value">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">Loan Balance:</span>
+                                <span class="text-lg font-bold text-red-600" id="novation-display-loan-balance">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">Repair Costs:</span>
+                                <span class="text-lg font-bold text-red-600" id="novation-display-repair-costs">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <span class="font-semibold text-green-800">Instant Equity:</span>
+                                <span class="text-xl font-bold text-green-600" id="novation-instant-equity">$0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Cash Flow -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💵 Monthly Cash Flow</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Expected Monthly Rent</label>
+                                <input type="number" id="novation-monthly-rent" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1800" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Taxes (Monthly)</label>
+                                <input type="number" id="novation-property-taxes" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="300" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Insurance (Monthly)</label>
+                                <input type="number" id="novation-insurance" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="150" onchange="calculateNovation()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Maintenance/Vacancy (Monthly)</label>
+                                <input type="number" id="novation-maintenance" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200" onchange="calculateNovation()">
+                            </div>
+
+                            <div class="border-t pt-4">
+                                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg mb-2">
+                                    <span class="font-medium text-gray-700">Monthly Income:</span>
+                                    <span class="text-lg font-bold text-green-600" id="novation-monthly-income">$0</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg mb-2">
+                                    <span class="font-medium text-gray-700">Monthly Expenses:</span>
+                                    <span class="text-lg font-bold text-red-600" id="novation-monthly-expenses">$0</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <span class="font-semibold text-blue-800">Net Cash Flow:</span>
+                                    <span class="text-xl font-bold" id="novation-net-cash-flow">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📈 Key Metrics</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-2xl font-bold text-blue-600" id="novation-cash-on-cash">0%</div>
+                                <div class="text-sm text-gray-600">Cash-on-Cash ROI</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-2xl font-bold text-green-600" id="novation-cap-rate">0%</div>
+                                <div class="text-sm text-gray-600">Cap Rate</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-2xl font-bold text-purple-600" id="novation-ltv">0%</div>
+                                <div class="text-sm text-gray-600">Loan-to-Value</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-2xl font-bold text-orange-600" id="novation-dscr">0.00</div>
+                                <div class="text-sm text-gray-600">Debt Service Coverage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Assessment -->
+            <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4 text-yellow-800">⚠️ Risk Assessment & Legal Considerations</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-yellow-800 mb-2">Key Risks:</h4>
+                        <ul class="text-sm text-yellow-700 space-y-1">
+                            <li>• Due-on-sale clause may trigger loan acceleration</li>
+                            <li>• Original borrower remains liable for the debt</li>
+                            <li>• Insurance and title complications</li>
+                            <li>• Potential violations of lender agreements</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-yellow-800 mb-2">Recommended Actions:</h4>
+                        <ul class="text-sm text-yellow-700 space-y-1">
+                            <li>• Consult with real estate attorney</li>
+                            <li>• Review all loan documents carefully</li>
+                            <li>• Consider proper insurance coverage</li>
+                            <li>• Establish clear agreements with seller</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="mt-6 flex justify-center">
+                <button onclick="exportNovationAnalysis()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    📄 Export Analysis Report
+                </button>
+            </div>
+
+            <!-- JavaScript for Novation Calculator -->
+            <script>
+                function calculateNovation() {
+                    // Get input values
+                    const marketValue = parseFloat(document.getElementById('novation-market-value').value) || 0;
+                    const repairCosts = parseFloat(document.getElementById('novation-repair-costs').value) || 0;
+                    const loanBalance = parseFloat(document.getElementById('novation-loan-balance').value) || 0;
+                    const monthlyPayment = parseFloat(document.getElementById('novation-monthly-payment').value) || 0;
+                    const interestRate = parseFloat(document.getElementById('novation-interest-rate').value) || 0;
+                    const yearsRemaining = parseFloat(document.getElementById('novation-years-remaining').value) || 0;
+                    const monthlyRent = parseFloat(document.getElementById('novation-monthly-rent').value) || 0;
+                    const propertyTaxes = parseFloat(document.getElementById('novation-property-taxes').value) || 0;
+                    const insurance = parseFloat(document.getElementById('novation-insurance').value) || 0;
+                    const maintenance = parseFloat(document.getElementById('novation-maintenance').value) || 0;
+
+                    // Calculate instant equity
+                    const instantEquity = marketValue - loanBalance - repairCosts;
+
+                    // Calculate monthly cash flow
+                    const monthlyIncome = monthlyRent;
+                    const monthlyExpenses = monthlyPayment + propertyTaxes + insurance + maintenance;
+                    const netCashFlow = monthlyIncome - monthlyExpenses;
+
+                    // Calculate key metrics
+                    const annualCashFlow = netCashFlow * 12;
+                    const totalInvestment = repairCosts; // Assuming minimal down payment in novation
+                    const cashOnCashROI = totalInvestment > 0 ? (annualCashFlow / totalInvestment) * 100 : 0;
+                    const capRate = marketValue > 0 ? (annualCashFlow / marketValue) * 100 : 0;
+                    const ltv = marketValue > 0 ? (loanBalance / marketValue) * 100 : 0;
+                    const dscr = monthlyPayment > 0 ? monthlyIncome / monthlyPayment : 0;
+
+                    // Update displays
+                    document.getElementById('novation-display-market-value').textContent = '$' + marketValue.toLocaleString();
+                    document.getElementById('novation-display-loan-balance').textContent = '$' + loanBalance.toLocaleString();
+                    document.getElementById('novation-display-repair-costs').textContent = '$' + repairCosts.toLocaleString();
+                    document.getElementById('novation-instant-equity').textContent = '$' + instantEquity.toLocaleString();
+
+                    document.getElementById('novation-monthly-income').textContent = '$' + monthlyIncome.toLocaleString();
+                    document.getElementById('novation-monthly-expenses').textContent = '$' + monthlyExpenses.toLocaleString();
+
+                    // Color code cash flow
+                    const cashFlowElement = document.getElementById('novation-net-cash-flow');
+                    cashFlowElement.textContent = '$' + netCashFlow.toLocaleString();
+                    if (netCashFlow > 0) {
+                        cashFlowElement.className = 'text-xl font-bold text-green-600';
+                    } else {
+                        cashFlowElement.className = 'text-xl font-bold text-red-600';
+                    }
+
+                    document.getElementById('novation-cash-on-cash').textContent = cashOnCashROI.toFixed(1) + '%';
+                    document.getElementById('novation-cap-rate').textContent = capRate.toFixed(1) + '%';
+                    document.getElementById('novation-ltv').textContent = ltv.toFixed(1) + '%';
+                    document.getElementById('novation-dscr').textContent = dscr.toFixed(2);
+                }
+
+                function clearNovationCalculator() {
+                    // Clear all input fields
+                    const inputs = document.querySelectorAll('#content-novation-calculator input');
+                    inputs.forEach(input => input.value = '');
+
+                    // Reset all displays
+                    document.getElementById('novation-display-market-value').textContent = '$0';
+                    document.getElementById('novation-display-loan-balance').textContent = '$0';
+                    document.getElementById('novation-display-repair-costs').textContent = '$0';
+                    document.getElementById('novation-instant-equity').textContent = '$0';
+                    document.getElementById('novation-monthly-income').textContent = '$0';
+                    document.getElementById('novation-monthly-expenses').textContent = '$0';
+                    document.getElementById('novation-net-cash-flow').textContent = '$0';
+                    document.getElementById('novation-net-cash-flow').className = 'text-xl font-bold';
+                    document.getElementById('novation-cash-on-cash').textContent = '0%';
+                    document.getElementById('novation-cap-rate').textContent = '0%';
+                    document.getElementById('novation-ltv').textContent = '0%';
+                    document.getElementById('novation-dscr').textContent = '0.00';
+                }
+
+                function exportNovationAnalysis() {
+                    const propertyAddress = document.getElementById('novation-property-address').value || 'Property Address Not Specified';
+                    const marketValue = parseFloat(document.getElementById('novation-market-value').value) || 0;
+                    const loanBalance = parseFloat(document.getElementById('novation-loan-balance').value) || 0;
+                    const repairCosts = parseFloat(document.getElementById('novation-repair-costs').value) || 0;
+                    const monthlyRent = parseFloat(document.getElementById('novation-monthly-rent').value) || 0;
+                    const monthlyPayment = parseFloat(document.getElementById('novation-monthly-payment').value) || 0;
+
+                    const instantEquity = marketValue - loanBalance - repairCosts;
+                    const monthlyIncome = monthlyRent;
+                    const monthlyExpenses = monthlyPayment +
+                        (parseFloat(document.getElementById('novation-property-taxes').value) || 0) +
+                        (parseFloat(document.getElementById('novation-insurance').value) || 0) +
+                        (parseFloat(document.getElementById('novation-maintenance').value) || 0);
+                    const netCashFlow = monthlyIncome - monthlyExpenses;
+
+                    const reportContent = `NOVATION DEAL ANALYSIS REPORT
+Generated: ${new Date().toLocaleDateString()}
+
+PROPERTY INFORMATION
+Address: ${propertyAddress}
+Market Value: $${marketValue.toLocaleString()}
+Repair Costs: $${repairCosts.toLocaleString()}
+
+EXISTING LOAN DETAILS
+Current Balance: $${loanBalance.toLocaleString()}
+Monthly Payment: $${monthlyPayment.toLocaleString()}
+Interest Rate: ${document.getElementById('novation-interest-rate').value}%
+Years Remaining: ${document.getElementById('novation-years-remaining').value}
+
+FINANCIAL ANALYSIS
+Instant Equity: $${instantEquity.toLocaleString()}
+Monthly Rent: $${monthlyIncome.toLocaleString()}
+Total Monthly Expenses: $${monthlyExpenses.toLocaleString()}
+Net Cash Flow: $${netCashFlow.toLocaleString()}
+
+KEY METRICS
+Cash-on-Cash ROI: ${document.getElementById('novation-cash-on-cash').textContent}
+Cap Rate: ${document.getElementById('novation-cap-rate').textContent}
+Loan-to-Value: ${document.getElementById('novation-ltv').textContent}
+Debt Service Coverage: ${document.getElementById('novation-dscr').textContent}
+
+RISK DISCLAIMER
+This analysis is for educational purposes only. Novation strategies involve significant legal and financial risks including potential due-on-sale clause violations. Always consult with qualified legal and financial professionals before proceeding.
+
+Generated by Enriched Property Solutions LLC - Wholesaling Tools`;
+
+                    const blob = new Blob([reportContent], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Novation_Analysis_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+            </script>
+        </div>
+
+        <!-- Motivated Seller Lead Scorer Tab -->
+        <div id="content-lead-scorer" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">🎯 Motivated Seller Lead Scorer</h2>
+                <button onclick="clearLeadScorer()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Scorer
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>How it works:</strong> This tool analyzes multiple data points to score leads based on seller motivation and deal potential. Higher scores indicate better prospects for wholesale deals.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Property Information -->
+                <div class="space-y-6">
+                    <!-- Basic Property Info -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🏠 Property Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Address</label>
+                                <input type="text" id="lead-property-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123 Main St, City, State">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Type</label>
+                                <select id="lead-property-type" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Type</option>
+                                    <option value="single-family">Single Family Home</option>
+                                    <option value="multi-family">Multi-Family (2-4 units)</option>
+                                    <option value="condo">Condominium</option>
+                                    <option value="townhouse">Townhouse</option>
+                                    <option value="vacant-land">Vacant Land</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Estimated Value</label>
+                                <input type="number" id="lead-estimated-value" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="250000" onchange="calculateLeadScore()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Year Built</label>
+                                <input type="number" id="lead-year-built" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1995" onchange="calculateLeadScore()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distress Indicators -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⚠️ Distress Indicators</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-foreclosure" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Pre-foreclosure/NOD filed</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-tax-liens" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Tax liens/delinquent taxes</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-code-violations" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Code violations</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-vacant" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Property appears vacant</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-probate" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Probate/estate sale</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-divorce" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Divorce proceeding</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="lead-bankruptcy" class="mr-2" onchange="calculateLeadScore()">
+                                <span class="text-sm">Bankruptcy filing</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column: Market & Timing -->
+                <div class="space-y-6">
+                    <!-- Market Factors -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Market Factors</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Days on Market (if listed)</label>
+                                <input type="number" id="lead-days-on-market" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="0" onchange="calculateLeadScore()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Number of Price Reductions</label>
+                                <input type="number" id="lead-price-reductions" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="0" onchange="calculateLeadScore()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Neighborhood Condition</label>
+                                <select id="lead-neighborhood" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Condition</option>
+                                    <option value="excellent">Excellent</option>
+                                    <option value="good">Good</option>
+                                    <option value="average">Average</option>
+                                    <option value="declining">Declining</option>
+                                    <option value="poor">Poor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Condition</label>
+                                <select id="lead-property-condition" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Condition</option>
+                                    <option value="excellent">Excellent</option>
+                                    <option value="good">Good</option>
+                                    <option value="fair">Fair</option>
+                                    <option value="poor">Poor</option>
+                                    <option value="distressed">Distressed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seller Motivation -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💭 Seller Motivation</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Urgency Level</label>
+                                <select id="lead-urgency" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Urgency</option>
+                                    <option value="immediate">Immediate (< 30 days)</option>
+                                    <option value="urgent">Urgent (1-3 months)</option>
+                                    <option value="moderate">Moderate (3-6 months)</option>
+                                    <option value="flexible">Flexible (6+ months)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Seller Situation</label>
+                                <select id="lead-seller-situation" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Situation</option>
+                                    <option value="job-loss">Job loss/income reduction</option>
+                                    <option value="relocation">Job relocation</option>
+                                    <option value="medical">Medical emergency</option>
+                                    <option value="inheritance">Inherited property</option>
+                                    <option value="investment">Investment property</option>
+                                    <option value="downsizing">Downsizing</option>
+                                    <option value="retirement">Retirement</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Flexibility on Price</label>
+                                <select id="lead-price-flexibility" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Flexibility</option>
+                                    <option value="very-flexible">Very flexible</option>
+                                    <option value="somewhat-flexible">Somewhat flexible</option>
+                                    <option value="firm">Price is firm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Competition & Score -->
+                <div class="space-y-6">
+                    <!-- Competition Analysis -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🏃 Competition Analysis</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Other Wholesaler Activity</label>
+                                <select id="lead-competition" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Level</option>
+                                    <option value="none">No competition detected</option>
+                                    <option value="low">Low competition</option>
+                                    <option value="moderate">Moderate competition</option>
+                                    <option value="high">High competition</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Previous Contact Attempts</label>
+                                <input type="number" id="lead-contact-attempts" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="0" onchange="calculateLeadScore()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Lead Source</label>
+                                <select id="lead-source" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateLeadScore()">
+                                    <option value="">Select Source</option>
+                                    <option value="public-records">Public records</option>
+                                    <option value="direct-mail">Direct mail response</option>
+                                    <option value="cold-call">Cold call</option>
+                                    <option value="referral">Referral</option>
+                                    <option value="online">Online marketing</option>
+                                    <option value="networking">Networking</option>
+                                    <option value="driving-for-dollars">Driving for dollars</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lead Score Display -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🎯 Lead Score</h3>
+                        <div class="text-center mb-6">
+                            <div class="text-6xl font-bold mb-2" id="lead-total-score">0</div>
+                            <div class="text-lg font-medium text-gray-600" id="lead-score-rating">No Rating</div>
+                            <div class="w-full bg-gray-200 rounded-full h-4 mt-4">
+                                <div class="h-4 rounded-full transition-all duration-500" id="lead-score-bar" style="width: 0%; background: linear-gradient(to right, #ef4444, #f59e0b, #10b981);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Score Breakdown -->
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Distress Factors:</span>
+                                <span class="font-semibold" id="distress-score">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Market Factors:</span>
+                                <span class="font-semibold" id="market-score">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Motivation:</span>
+                                <span class="font-semibold" id="motivation-score">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Competition:</span>
+                                <span class="font-semibold" id="competition-score">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Priority Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⚡ Priority Actions</h3>
+                        <div id="priority-actions" class="space-y-2 text-sm">
+                            <p class="text-gray-500">Complete the form to see recommended actions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Interpretation Guide -->
+            <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">📋 Score Interpretation Guide</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="text-center p-4 bg-red-100 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600">0-25</div>
+                        <div class="text-sm font-medium text-red-800">Low Priority</div>
+                        <div class="text-xs text-red-600 mt-1">Follow up in 30+ days</div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-100 rounded-lg">
+                        <div class="text-2xl font-bold text-yellow-600">26-50</div>
+                        <div class="text-sm font-medium text-yellow-800">Medium Priority</div>
+                        <div class="text-xs text-yellow-600 mt-1">Follow up in 2-3 weeks</div>
+                    </div>
+                    <div class="text-center p-4 bg-blue-100 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">51-75</div>
+                        <div class="text-sm font-medium text-blue-800">High Priority</div>
+                        <div class="text-xs text-blue-600 mt-1">Follow up in 1 week</div>
+                    </div>
+                    <div class="text-center p-4 bg-green-100 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">76-100</div>
+                        <div class="text-sm font-medium text-green-800">Urgent</div>
+                        <div class="text-xs text-green-600 mt-1">Contact immediately</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="mt-6 flex justify-center gap-4">
+                <button onclick="exportLeadScore()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    📄 Export Lead Report
+                </button>
+                <button onclick="addToFollowUp()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    📅 Add to Follow-up List
+                </button>
+            </div>
+
+            <!-- JavaScript for Lead Scorer -->
+            <script>
+                function calculateLeadScore() {
+                    let totalScore = 0;
+                    let distressScore = 0;
+                    let marketScore = 0;
+                    let motivationScore = 0;
+                    let competitionScore = 0;
+
+                    // Distress Indicators (0-30 points)
+                    if (document.getElementById('lead-foreclosure').checked) distressScore += 8;
+                    if (document.getElementById('lead-tax-liens').checked) distressScore += 6;
+                    if (document.getElementById('lead-code-violations').checked) distressScore += 4;
+                    if (document.getElementById('lead-vacant').checked) distressScore += 5;
+                    if (document.getElementById('lead-probate').checked) distressScore += 7;
+                    if (document.getElementById('lead-divorce').checked) distressScore += 6;
+                    if (document.getElementById('lead-bankruptcy').checked) distressScore += 8;
+
+                    // Market Factors (0-25 points)
+                    const daysOnMarket = parseInt(document.getElementById('lead-days-on-market').value) || 0;
+                    if (daysOnMarket > 180) marketScore += 8;
+                    else if (daysOnMarket > 90) marketScore += 5;
+                    else if (daysOnMarket > 30) marketScore += 3;
+
+                    const priceReductions = parseInt(document.getElementById('lead-price-reductions').value) || 0;
+                    marketScore += Math.min(priceReductions * 3, 9);
+
+                    const neighborhood = document.getElementById('lead-neighborhood').value;
+                    const neighborhoodScores = { 'poor': 5, 'declining': 4, 'average': 2, 'good': 1, 'excellent': 0 };
+                    marketScore += neighborhoodScores[neighborhood] || 0;
+
+                    const propertyCondition = document.getElementById('lead-property-condition').value;
+                    const conditionScores = { 'distressed': 6, 'poor': 4, 'fair': 2, 'good': 1, 'excellent': 0 };
+                    marketScore += conditionScores[propertyCondition] || 0;
+
+                    // Seller Motivation (0-30 points)
+                    const urgency = document.getElementById('lead-urgency').value;
+                    const urgencyScores = { 'immediate': 12, 'urgent': 8, 'moderate': 4, 'flexible': 1 };
+                    motivationScore += urgencyScores[urgency] || 0;
+
+                    const situation = document.getElementById('lead-seller-situation').value;
+                    const situationScores = {
+                        'job-loss': 10, 'medical': 9, 'inheritance': 8, 'relocation': 6,
+                        'investment': 5, 'downsizing': 4, 'retirement': 3, 'other': 2
+                    };
+                    motivationScore += situationScores[situation] || 0;
+
+                    const flexibility = document.getElementById('lead-price-flexibility').value;
+                    const flexibilityScores = { 'very-flexible': 8, 'somewhat-flexible': 4, 'firm': 1 };
+                    motivationScore += flexibilityScores[flexibility] || 0;
+
+                    // Competition Analysis (0-15 points)
+                    const competition = document.getElementById('lead-competition').value;
+                    const competitionScores = { 'none': 8, 'low': 5, 'moderate': 2, 'high': 0 };
+                    competitionScore += competitionScores[competition] || 0;
+
+                    const contactAttempts = parseInt(document.getElementById('lead-contact-attempts').value) || 0;
+                    if (contactAttempts === 0) competitionScore += 4;
+                    else if (contactAttempts <= 2) competitionScore += 2;
+
+                    const source = document.getElementById('lead-source').value;
+                    const sourceScores = {
+                        'referral': 3, 'direct-mail': 2, 'networking': 2, 'public-records': 1,
+                        'driving-for-dollars': 1, 'online': 1, 'cold-call': 0
+                    };
+                    competitionScore += sourceScores[source] || 0;
+
+                    // Calculate total score
+                    totalScore = distressScore + marketScore + motivationScore + competitionScore;
+
+                    // Update displays
+                    document.getElementById('lead-total-score').textContent = totalScore;
+                    document.getElementById('distress-score').textContent = distressScore;
+                    document.getElementById('market-score').textContent = marketScore;
+                    document.getElementById('motivation-score').textContent = motivationScore;
+                    document.getElementById('competition-score').textContent = competitionScore;
+
+                    // Update score rating and color
+                    let rating = '';
+                    let color = '';
+                    if (totalScore >= 76) {
+                        rating = 'URGENT - Contact Immediately';
+                        color = 'text-green-600';
+                    } else if (totalScore >= 51) {
+                        rating = 'HIGH PRIORITY';
+                        color = 'text-blue-600';
+                    } else if (totalScore >= 26) {
+                        rating = 'MEDIUM PRIORITY';
+                        color = 'text-yellow-600';
+                    } else {
+                        rating = 'LOW PRIORITY';
+                        color = 'text-red-600';
+                    }
+
+                    document.getElementById('lead-score-rating').textContent = rating;
+                    document.getElementById('lead-score-rating').className = `text-lg font-medium ${color}`;
+                    document.getElementById('lead-total-score').className = `text-6xl font-bold mb-2 ${color}`;
+
+                    // Update progress bar
+                    const percentage = Math.min(totalScore, 100);
+                    document.getElementById('lead-score-bar').style.width = percentage + '%';
+
+                    // Update priority actions
+                    updatePriorityActions(totalScore, distressScore, motivationScore);
+                }
+
+                function updatePriorityActions(totalScore, distressScore, motivationScore) {
+                    const actionsDiv = document.getElementById('priority-actions');
+                    let actions = [];
+
+                    if (totalScore >= 76) {
+                        actions.push('🚨 Call within 24 hours');
+                        actions.push('📧 Send immediate follow-up email');
+                        actions.push('🏠 Schedule property visit ASAP');
+                        if (distressScore > 15) actions.push('⚡ Consider cash offer');
+                    } else if (totalScore >= 51) {
+                        actions.push('📞 Call within 3-5 days');
+                        actions.push('📬 Send targeted direct mail');
+                        actions.push('🔍 Research comparable sales');
+                        if (motivationScore > 15) actions.push('💰 Prepare multiple offer scenarios');
+                    } else if (totalScore >= 26) {
+                        actions.push('📅 Schedule follow-up in 2 weeks');
+                        actions.push('📊 Monitor for status changes');
+                        actions.push('🎯 Add to nurture campaign');
+                    } else {
+                        actions.push('📈 Re-evaluate in 30+ days');
+                        actions.push('🔄 Add to long-term follow-up');
+                        actions.push('📝 Look for trigger events');
+                    }
+
+                    actionsDiv.innerHTML = actions.map(action => `<p class="flex items-center text-sm"><span class="mr-2">${action.split(' ')[0]}</span>${action.substring(2)}</p>`).join('');
+                }
+
+                function clearLeadScorer() {
+                    // Clear all inputs
+                    const inputs = document.querySelectorAll('#content-lead-scorer input, #content-lead-scorer select');
+                    inputs.forEach(input => {
+                        if (input.type === 'checkbox') {
+                            input.checked = false;
+                        } else {
+                            input.value = '';
+                        }
+                    });
+
+                    // Reset displays
+                    document.getElementById('lead-total-score').textContent = '0';
+                    document.getElementById('lead-score-rating').textContent = 'No Rating';
+                    document.getElementById('lead-score-rating').className = 'text-lg font-medium text-gray-600';
+                    document.getElementById('lead-total-score').className = 'text-6xl font-bold mb-2';
+                    document.getElementById('distress-score').textContent = '0';
+                    document.getElementById('market-score').textContent = '0';
+                    document.getElementById('motivation-score').textContent = '0';
+                    document.getElementById('competition-score').textContent = '0';
+                    document.getElementById('lead-score-bar').style.width = '0%';
+                    document.getElementById('priority-actions').innerHTML = '<p class="text-gray-500">Complete the form to see recommended actions</p>';
+                }
+
+                function exportLeadScore() {
+                    const address = document.getElementById('lead-property-address').value || 'Address Not Specified';
+                    const totalScore = document.getElementById('lead-total-score').textContent;
+                    const rating = document.getElementById('lead-score-rating').textContent;
+
+                    const reportContent = `MOTIVATED SELLER LEAD SCORE REPORT
+Generated: ${new Date().toLocaleDateString()}
+
+PROPERTY INFORMATION
+Address: ${address}
+Property Type: ${document.getElementById('lead-property-type').value}
+Estimated Value: $${(document.getElementById('lead-estimated-value').value || 0).toLocaleString()}
+Year Built: ${document.getElementById('lead-year-built').value}
+
+LEAD SCORE ANALYSIS
+Total Score: ${totalScore}/100
+Priority Rating: ${rating}
+
+SCORE BREAKDOWN
+Distress Factors: ${document.getElementById('distress-score').textContent}
+Market Factors: ${document.getElementById('market-score').textContent}
+Seller Motivation: ${document.getElementById('motivation-score').textContent}
+Competition Analysis: ${document.getElementById('competition-score').textContent}
+
+PRIORITY ACTIONS
+${Array.from(document.querySelectorAll('#priority-actions p')).map(p => p.textContent).join('\n')}
+
+NEXT STEPS
+${totalScore >= 76 ? 'URGENT: Contact immediately within 24 hours' :
+  totalScore >= 51 ? 'HIGH: Follow up within 1 week' :
+  totalScore >= 26 ? 'MEDIUM: Follow up within 2-3 weeks' :
+  'LOW: Follow up in 30+ days'}
+
+Generated by Enriched Property Solutions LLC - Lead Scorer Tool`;
+
+                    const blob = new Blob([reportContent], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Lead_Score_${address.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function addToFollowUp() {
+                    const address = document.getElementById('lead-property-address').value || 'Address Not Specified';
+                    const score = document.getElementById('lead-total-score').textContent;
+                    const rating = document.getElementById('lead-score-rating').textContent;
+
+                    alert(`Lead Added to Follow-up List!\n\nProperty: ${address}\nScore: ${score}/100\nPriority: ${rating}\n\nThis feature can be integrated with your CRM system.`);
+                }
+            </script>
+        </div>
+
+        <!-- Hedge Fund Package Calculator Tab -->
+        <div id="content-hedge-fund-calculator" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">🏦 Hedge Fund Package Calculator</h2>
+                <button onclick="clearHedgeFundCalculator()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Calculator
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>Institutional Package Builder:</strong> Structure property portfolios for hedge fund and institutional investor presentations. Calculate volume discounts, due diligence timelines, and ROI projections that meet institutional investment criteria.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Left Column: Portfolio Configuration -->
+                <div class="space-y-6">
+                    <!-- Package Overview -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📦 Portfolio Package Overview</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Package Name</label>
+                                <input type="text" id="hf-package-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Southeast Residential Portfolio Q4-2024">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Target Market</label>
+                                <select id="hf-target-market" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateHedgeFund()">
+                                    <option value="">Select Market</option>
+                                    <option value="southeast">Southeast Markets</option>
+                                    <option value="midwest">Midwest Markets</option>
+                                    <option value="southwest">Southwest Markets</option>
+                                    <option value="northeast">Northeast Markets</option>
+                                    <option value="national">National Portfolio</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Number of Properties</label>
+                                <input type="number" id="hf-property-count" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="25" onchange="calculateHedgeFund()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Package Type</label>
+                                <select id="hf-package-type" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateHedgeFund()">
+                                    <option value="">Select Type</option>
+                                    <option value="rental-ready">Rental Ready</option>
+                                    <option value="light-rehab">Light Rehab Required</option>
+                                    <option value="heavy-rehab">Heavy Rehab Required</option>
+                                    <option value="mixed">Mixed Condition</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Metrics -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💰 Financial Metrics</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Total Package Value</label>
+                                <input type="number" id="hf-total-value" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="5000000" onchange="calculateHedgeFund()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Average Property Value</label>
+                                <input type="number" id="hf-avg-property-value" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="200000" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Total Renovation Budget</label>
+                                <input type="number" id="hf-renovation-budget" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="500000" onchange="calculateHedgeFund()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Expected Annual Rent Roll</label>
+                                <input type="number" id="hf-annual-rent" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="600000" onchange="calculateHedgeFund()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Institutional Requirements -->
+                <div class="space-y-6">
+                    <!-- Volume Discounts -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Volume Discount Structure</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Base Discount (%)</label>
+                                <input type="number" id="hf-base-discount" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="5" step="0.1" onchange="calculateHedgeFund()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Volume Tier Bonus (%)</label>
+                                <select id="hf-volume-bonus" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateHedgeFund()">
+                                    <option value="0">No Bonus (1-10 properties)</option>
+                                    <option value="2">2% Bonus (11-25 properties)</option>
+                                    <option value="5">5% Bonus (26-50 properties)</option>
+                                    <option value="8">8% Bonus (51-100 properties)</option>
+                                    <option value="12">12% Bonus (100+ properties)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Cash Closing Bonus (%)</label>
+                                <input type="number" id="hf-cash-bonus" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="2" step="0.1" onchange="calculateHedgeFund()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Quick Close Bonus (< 30 days) (%)</label>
+                                <input type="number" id="hf-quick-close-bonus" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="1" step="0.1" onchange="calculateHedgeFund()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Due Diligence Timeline -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⏱️ Due Diligence Timeline</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Inspection Period (Days)</label>
+                                <select id="hf-inspection-period" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateHedgeFund()">
+                                    <option value="15">15 Days (Premium)</option>
+                                    <option value="30">30 Days (Standard)</option>
+                                    <option value="45">45 Days (Extended)</option>
+                                    <option value="60">60 Days (Comprehensive)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Financing Contingency (Days)</label>
+                                <input type="number" id="hf-financing-days" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="45" onchange="calculateHedgeFund()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Total Closing Timeline (Days)</label>
+                                <input type="number" id="hf-closing-timeline" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="60" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Earnest Money (%)</label>
+                                <select id="hf-earnest-money" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculateHedgeFund()">
+                                    <option value="0.5">0.5% (Minimum)</option>
+                                    <option value="1">1% (Standard)</option>
+                                    <option value="2">2% (Premium)</option>
+                                    <option value="3">3% (High Confidence)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package Analysis Results -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Pricing Analysis -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">💵 Pricing Analysis</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Original Package Value:</span>
+                            <span class="text-lg font-bold text-gray-900" id="hf-original-value">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Total Discounts:</span>
+                            <span class="text-lg font-bold text-red-600" id="hf-total-discounts">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <span class="font-semibold text-green-800">Final Package Price:</span>
+                            <span class="text-xl font-bold text-green-600" id="hf-final-price">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <span class="font-semibold text-blue-800">Total Savings:</span>
+                            <span class="text-xl font-bold text-blue-600" id="hf-total-savings">$0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROI Projections -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">📈 ROI Projections</h3>
+                    <div class="space-y-4">
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600" id="hf-gross-yield">0%</div>
+                            <div class="text-sm text-gray-600">Gross Rental Yield</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600" id="hf-net-yield">0%</div>
+                            <div class="text-sm text-gray-600">Net Yield (After Renovation)</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-600" id="hf-cap-rate">0%</div>
+                            <div class="text-sm text-gray-600">Estimated Cap Rate</div>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-orange-600" id="hf-irr">0%</div>
+                            <div class="text-sm text-gray-600">Projected 5-Year IRR</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Package Metrics -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Package Metrics</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Avg Price/Property:</span>
+                            <span class="text-lg font-bold text-gray-900" id="hf-avg-price-property">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Renovation/Property:</span>
+                            <span class="text-lg font-bold text-gray-900" id="hf-renovation-per-property">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Annual Rent/Property:</span>
+                            <span class="text-lg font-bold text-gray-900" id="hf-rent-per-property">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="font-medium text-gray-700">Earnest Money Required:</span>
+                            <span class="text-lg font-bold text-gray-900" id="hf-earnest-amount">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Institutional Requirements Checklist -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">✅ Institutional Requirements Checklist</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Documentation Required:</h4>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li class="flex items-center"><span class="mr-2">📋</span>Property condition reports</li>
+                            <li class="flex items-center"><span class="mr-2">🏠</span>Title reports (preliminary)</li>
+                            <li class="flex items-center"><span class="mr-2">💰</span>Rent roll projections</li>
+                            <li class="flex items-center"><span class="mr-2">📊</span>Market analysis reports</li>
+                            <li class="flex items-center"><span class="mr-2">🔧</span>Renovation cost estimates</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Package Standards:</h4>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li class="flex items-center"><span class="mr-2" id="min-properties-check">❌</span>Minimum 10 properties</li>
+                            <li class="flex items-center"><span class="mr-2" id="value-threshold-check">❌</span>$2M+ total value</li>
+                            <li class="flex items-center"><span class="mr-2" id="yield-threshold-check">❌</span>6%+ gross yield</li>
+                            <li class="flex items-center"><span class="mr-2" id="geography-check">❌</span>Geographic concentration</li>
+                            <li class="flex items-center"><span class="mr-2" id="timeline-check">❌</span>Reasonable due diligence</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Competitive Advantages:</h4>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            <li class="flex items-center"><span class="mr-2" id="volume-discount-check">❌</span>Volume discount applied</li>
+                            <li class="flex items-center"><span class="mr-2" id="cash-bonus-check">❌</span>Cash closing incentive</li>
+                            <li class="flex items-center"><span class="mr-2" id="quick-close-check">❌</span>Quick close bonus</li>
+                            <li class="flex items-center"><span class="mr-2" id="assignable-check">✅</span>Assignable contracts</li>
+                            <li class="flex items-center"><span class="mr-2" id="track-record-check">✅</span>Proven wholesaler track record</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export and Presentation Tools -->
+            <div class="mt-6 flex justify-center gap-4 flex-wrap">
+                <button onclick="exportHedgeFundPackage()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    📄 Export Package Summary
+                </button>
+                <button onclick="generatePitchDeck()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    📊 Generate Pitch Deck
+                </button>
+                <button onclick="calculateDueDiligence()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                    🔍 Due Diligence Checklist
+                </button>
+                <button onclick="contactInvestors()" class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium">
+                    📞 Investor Contact List
+                </button>
+            </div>
+
+            <!-- JavaScript for Hedge Fund Calculator -->
+            <script>
+                function calculateHedgeFund() {
+                    // Get input values
+                    const propertyCount = parseInt(document.getElementById('hf-property-count').value) || 0;
+                    const totalValue = parseFloat(document.getElementById('hf-total-value').value) || 0;
+                    const renovationBudget = parseFloat(document.getElementById('hf-renovation-budget').value) || 0;
+                    const annualRent = parseFloat(document.getElementById('hf-annual-rent').value) || 0;
+                    const baseDiscount = parseFloat(document.getElementById('hf-base-discount').value) || 0;
+                    const volumeBonus = parseFloat(document.getElementById('hf-volume-bonus').value) || 0;
+                    const cashBonus = parseFloat(document.getElementById('hf-cash-bonus').value) || 0;
+                    const quickCloseBonus = parseFloat(document.getElementById('hf-quick-close-bonus').value) || 0;
+                    const inspectionPeriod = parseInt(document.getElementById('hf-inspection-period').value) || 30;
+                    const financingDays = parseInt(document.getElementById('hf-financing-days').value) || 45;
+                    const earnestMoney = parseFloat(document.getElementById('hf-earnest-money').value) || 1;
+
+                    // Calculate derived values
+                    const avgPropertyValue = propertyCount > 0 ? totalValue / propertyCount : 0;
+                    const totalDiscountPercent = baseDiscount + volumeBonus + cashBonus + quickCloseBonus;
+                    const totalDiscountAmount = totalValue * (totalDiscountPercent / 100);
+                    const finalPrice = totalValue - totalDiscountAmount;
+                    const totalInvestment = finalPrice + renovationBudget;
+                    const closingTimeline = Math.max(inspectionPeriod, financingDays);
+                    const earnestAmount = finalPrice * (earnestMoney / 100);
+
+                    // Calculate ROI metrics
+                    const grossYield = totalValue > 0 ? (annualRent / totalValue) * 100 : 0;
+                    const netYield = totalInvestment > 0 ? (annualRent / totalInvestment) * 100 : 0;
+                    const capRate = netYield * 0.8; // Assume 20% expense ratio
+                    const projectedIRR = capRate + 3; // Simplified IRR estimation
+
+                    // Calculate per-property metrics
+                    const avgPricePerProperty = propertyCount > 0 ? finalPrice / propertyCount : 0;
+                    const renovationPerProperty = propertyCount > 0 ? renovationBudget / propertyCount : 0;
+                    const rentPerProperty = propertyCount > 0 ? annualRent / propertyCount : 0;
+
+                    // Update displays
+                    document.getElementById('hf-avg-property-value').value = avgPropertyValue.toFixed(0);
+                    document.getElementById('hf-closing-timeline').value = closingTimeline;
+
+                    document.getElementById('hf-original-value').textContent = '$' + totalValue.toLocaleString();
+                    document.getElementById('hf-total-discounts').textContent = totalDiscountPercent.toFixed(1) + '%';
+                    document.getElementById('hf-final-price').textContent = '$' + finalPrice.toLocaleString();
+                    document.getElementById('hf-total-savings').textContent = '$' + totalDiscountAmount.toLocaleString();
+
+                    document.getElementById('hf-gross-yield').textContent = grossYield.toFixed(1) + '%';
+                    document.getElementById('hf-net-yield').textContent = netYield.toFixed(1) + '%';
+                    document.getElementById('hf-cap-rate').textContent = capRate.toFixed(1) + '%';
+                    document.getElementById('hf-irr').textContent = projectedIRR.toFixed(1) + '%';
+
+                    document.getElementById('hf-avg-price-property').textContent = '$' + avgPricePerProperty.toLocaleString();
+                    document.getElementById('hf-renovation-per-property').textContent = '$' + renovationPerProperty.toLocaleString();
+                    document.getElementById('hf-rent-per-property').textContent = '$' + rentPerProperty.toLocaleString();
+                    document.getElementById('hf-earnest-amount').textContent = '$' + earnestAmount.toLocaleString();
+
+                    // Update institutional requirements checklist
+                    updateInstitutionalChecklist(propertyCount, totalValue, grossYield, totalDiscountPercent, cashBonus, quickCloseBonus);
+                }
+
+                function updateInstitutionalChecklist(propertyCount, totalValue, grossYield, totalDiscountPercent, cashBonus, quickCloseBonus) {
+                    // Check minimum properties
+                    document.getElementById('min-properties-check').textContent = propertyCount >= 10 ? '✅' : '❌';
+
+                    // Check value threshold
+                    document.getElementById('value-threshold-check').textContent = totalValue >= 2000000 ? '✅' : '❌';
+
+                    // Check yield threshold
+                    document.getElementById('yield-threshold-check').textContent = grossYield >= 6 ? '✅' : '❌';
+
+                    // Check geography (simplified - assume concentrated if single market selected)
+                    const targetMarket = document.getElementById('hf-target-market').value;
+                    document.getElementById('geography-check').textContent = targetMarket && targetMarket !== 'national' ? '✅' : '❌';
+
+                    // Check reasonable timeline
+                    const timeline = parseInt(document.getElementById('hf-closing-timeline').value) || 0;
+                    document.getElementById('timeline-check').textContent = timeline <= 60 ? '✅' : '❌';
+
+                    // Check volume discount
+                    document.getElementById('volume-discount-check').textContent = totalDiscountPercent > 5 ? '✅' : '❌';
+
+                    // Check cash bonus
+                    document.getElementById('cash-bonus-check').textContent = cashBonus > 0 ? '✅' : '❌';
+
+                    // Check quick close bonus
+                    document.getElementById('quick-close-check').textContent = quickCloseBonus > 0 ? '✅' : '❌';
+                }
+
+                function clearHedgeFundCalculator() {
+                    // Clear all input fields
+                    const inputs = document.querySelectorAll('#content-hedge-fund-calculator input, #content-hedge-fund-calculator select');
+                    inputs.forEach(input => {
+                        if (input.type !== 'button') {
+                            input.value = '';
+                        }
+                    });
+
+                    // Reset all displays
+                    document.getElementById('hf-original-value').textContent = '$0';
+                    document.getElementById('hf-total-discounts').textContent = '0%';
+                    document.getElementById('hf-final-price').textContent = '$0';
+                    document.getElementById('hf-total-savings').textContent = '$0';
+                    document.getElementById('hf-gross-yield').textContent = '0%';
+                    document.getElementById('hf-net-yield').textContent = '0%';
+                    document.getElementById('hf-cap-rate').textContent = '0%';
+                    document.getElementById('hf-irr').textContent = '0%';
+                    document.getElementById('hf-avg-price-property').textContent = '$0';
+                    document.getElementById('hf-renovation-per-property').textContent = '$0';
+                    document.getElementById('hf-rent-per-property').textContent = '$0';
+                    document.getElementById('hf-earnest-amount').textContent = '$0';
+
+                    // Reset checklist
+                    const checkmarks = ['min-properties-check', 'value-threshold-check', 'yield-threshold-check',
+                                      'geography-check', 'timeline-check', 'volume-discount-check', 'cash-bonus-check', 'quick-close-check'];
+                    checkmarks.forEach(id => {
+                        document.getElementById(id).textContent = '❌';
+                    });
+                    document.getElementById('assignable-check').textContent = '✅';
+                    document.getElementById('track-record-check').textContent = '✅';
+                }
+
+                function exportHedgeFundPackage() {
+                    const packageName = document.getElementById('hf-package-name').value || 'Hedge Fund Package';
+                    const propertyCount = document.getElementById('hf-property-count').value || '0';
+                    const finalPrice = document.getElementById('hf-final-price').textContent;
+                    const grossYield = document.getElementById('hf-gross-yield').textContent;
+
+                    const reportContent = `HEDGE FUND PROPERTY PACKAGE SUMMARY
+Generated: ${new Date().toLocaleDateString()}
+
+PACKAGE OVERVIEW
+Package Name: ${packageName}
+Number of Properties: ${propertyCount}
+Target Market: ${document.getElementById('hf-target-market').value}
+Package Type: ${document.getElementById('hf-package-type').value}
+
+FINANCIAL SUMMARY
+Original Package Value: ${document.getElementById('hf-original-value').textContent}
+Total Discounts Applied: ${document.getElementById('hf-total-discounts').textContent}
+Final Package Price: ${finalPrice}
+Total Savings: ${document.getElementById('hf-total-savings').textContent}
+
+ROI PROJECTIONS
+Gross Rental Yield: ${grossYield}
+Net Yield (After Renovation): ${document.getElementById('hf-net-yield').textContent}
+Estimated Cap Rate: ${document.getElementById('hf-cap-rate').textContent}
+Projected 5-Year IRR: ${document.getElementById('hf-irr').textContent}
+
+PACKAGE METRICS
+Average Price per Property: ${document.getElementById('hf-avg-price-property').textContent}
+Renovation Budget per Property: ${document.getElementById('hf-renovation-per-property').textContent}
+Annual Rent per Property: ${document.getElementById('hf-rent-per-property').textContent}
+Earnest Money Required: ${document.getElementById('hf-earnest-amount').textContent}
+
+DUE DILIGENCE TIMELINE
+Inspection Period: ${document.getElementById('hf-inspection-period').value} days
+Financing Contingency: ${document.getElementById('hf-financing-days').value} days
+Total Closing Timeline: ${document.getElementById('hf-closing-timeline').value} days
+
+COMPETITIVE ADVANTAGES
+- Volume discount pricing structure
+- Institutional-grade documentation
+- Proven wholesaler track record
+- Assignable contract terms
+- Comprehensive market analysis
+
+NEXT STEPS
+1. Review detailed property list and condition reports
+2. Conduct market analysis validation
+3. Finalize financing arrangements
+4. Execute purchase agreements
+5. Begin due diligence process
+
+Generated by Enriched Property Solutions LLC - Hedge Fund Calculator`;
+
+                    const blob = new Blob([reportContent], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${packageName.replace(/[^a-zA-Z0-9]/g, '_')}_Package_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function generatePitchDeck() {
+                    alert('Pitch Deck Generator\n\nThis feature would create a professional presentation including:\n\n• Executive Summary\n• Market Overview\n• Property Portfolio Details\n• Financial Projections\n• Risk Analysis\n• Investment Highlights\n\nIntegration with PowerPoint/Google Slides APIs would enable automated deck generation.');
+                }
+
+                function calculateDueDiligence() {
+                    const propertyCount = document.getElementById('hf-property-count').value || 0;
+                    const timeline = document.getElementById('hf-closing-timeline').value || 0;
+
+                    alert(`Due Diligence Checklist Generated\n\nFor ${propertyCount} properties with ${timeline}-day timeline:\n\n✅ Property inspections (Days 1-15)\n✅ Title searches (Days 1-20)\n✅ Market analysis validation (Days 5-25)\n✅ Financial document review (Days 10-30)\n✅ Legal document preparation (Days 20-40)\n✅ Final approval process (Days 40-${timeline})\n\nThis checklist can be exported and integrated with project management tools.`);
+                }
+
+                function contactInvestors() {
+                    alert('Institutional Investor Contact List\n\nThis feature would provide access to:\n\n🏦 Hedge Fund Contacts\n🏢 Private Equity Firms\n💰 Family Offices\n🏘️ REITs\n📊 Investment Groups\n\nFiltered by:\n• Investment size preferences\n• Geographic focus\n• Property type specialization\n• Recent acquisition activity\n\nCRM integration available for lead management.');
+                }
+            </script>
+        </div>
+
+        <!-- Seller Psychology Profiler Tab -->
+        <div id="content-seller-psychology" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">🎭 Seller Psychology Profiler</h2>
+                <button onclick="clearSellerPsychology()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Profile
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>Negotiation Intelligence:</strong> Analyze seller psychology, communication style, and motivation triggers to optimize your approach and increase deal success rates.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Left Column: Assessment Questions -->
+                <div class="space-y-6">
+                    <!-- Seller Background -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">👤 Seller Background</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Seller Name/Contact</label>
+                                <input type="text" id="sp-seller-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="John & Mary Smith">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Age Range</label>
+                                <select id="sp-age-range" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Age Range</option>
+                                    <option value="20-30">20-30 years old</option>
+                                    <option value="31-45">31-45 years old</option>
+                                    <option value="46-60">46-60 years old</option>
+                                    <option value="61-75">61-75 years old</option>
+                                    <option value="75+">75+ years old</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Educational Background</label>
+                                <select id="sp-education" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Education Level</option>
+                                    <option value="high-school">High School</option>
+                                    <option value="some-college">Some College</option>
+                                    <option value="bachelors">Bachelor's Degree</option>
+                                    <option value="advanced">Advanced Degree</option>
+                                    <option value="trade">Trade School/Technical</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Profession/Career</label>
+                                <select id="sp-profession" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Profession</option>
+                                    <option value="executive">Executive/Management</option>
+                                    <option value="professional">Professional (Doctor, Lawyer, etc.)</option>
+                                    <option value="teacher">Teacher/Education</option>
+                                    <option value="sales">Sales/Marketing</option>
+                                    <option value="healthcare">Healthcare Worker</option>
+                                    <option value="tradesman">Skilled Tradesman</option>
+                                    <option value="retired">Retired</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Communication Style Assessment -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💬 Communication Style</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Initial Contact Response</label>
+                                <select id="sp-initial-response" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Response Style</option>
+                                    <option value="immediate">Responded immediately</option>
+                                    <option value="quick">Responded within hours</option>
+                                    <option value="delayed">Took 1-2 days to respond</option>
+                                    <option value="very-delayed">Took several days to respond</option>
+                                    <option value="reluctant">Seemed reluctant to respond</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Communication Preference</label>
+                                <select id="sp-comm-preference" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Preference</option>
+                                    <option value="phone">Prefers phone calls</option>
+                                    <option value="text">Prefers text messages</option>
+                                    <option value="email">Prefers email</option>
+                                    <option value="in-person">Prefers in-person meetings</option>
+                                    <option value="mixed">No strong preference</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Speaking Style</label>
+                                <select id="sp-speaking-style" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Speaking Style</option>
+                                    <option value="direct">Direct and to the point</option>
+                                    <option value="detailed">Detailed and thorough</option>
+                                    <option value="emotional">Emotional and personal</option>
+                                    <option value="analytical">Analytical and data-focused</option>
+                                    <option value="storytelling">Tells stories and rambles</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Decision Making Speed</label>
+                                <select id="sp-decision-speed" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Decision Speed</option>
+                                    <option value="immediate">Makes decisions quickly</option>
+                                    <option value="deliberate">Takes time to think</option>
+                                    <option value="consultative">Needs to consult others</option>
+                                    <option value="anxious">Seems anxious about decisions</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Motivation & Situation -->
+                <div class="space-y-6">
+                    <!-- Motivation Triggers -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🎯 Motivation Triggers</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-financial-stress" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Financial stress/hardship</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-time-pressure" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Time pressure/urgency</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-family-situation" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Family situation changes</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-convenience" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Convenience/simplicity</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-health-issues" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Health/age-related issues</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-property-burden" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Property is a burden</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sp-investment-focus" class="mr-2" onchange="calculatePsychology()">
+                                <span class="text-sm">Investment/business minded</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Emotional State -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">😊 Emotional State</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Overall Emotional State</label>
+                                <select id="sp-emotional-state" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Emotional State</option>
+                                    <option value="stressed">Stressed/Overwhelmed</option>
+                                    <option value="optimistic">Optimistic/Positive</option>
+                                    <option value="frustrated">Frustrated/Annoyed</option>
+                                    <option value="sad">Sad/Depressed</option>
+                                    <option value="excited">Excited/Enthusiastic</option>
+                                    <option value="neutral">Neutral/Calm</option>
+                                    <option value="suspicious">Suspicious/Guarded</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Trust Level</label>
+                                <select id="sp-trust-level" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Trust Level</option>
+                                    <option value="high">High - Trusts easily</option>
+                                    <option value="moderate">Moderate - Cautious but reasonable</option>
+                                    <option value="low">Low - Very skeptical</option>
+                                    <option value="previous-bad">Had previous bad experience</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Negotiation Approach</label>
+                                <select id="sp-negotiation-style" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Negotiation Style</option>
+                                    <option value="collaborative">Collaborative - Seeks win-win</option>
+                                    <option value="competitive">Competitive - Wants to "win"</option>
+                                    <option value="accommodating">Accommodating - Avoids conflict</option>
+                                    <option value="analytical">Analytical - Wants all the facts</option>
+                                    <option value="emotional">Emotional - Makes heart-based decisions</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Situational Factors -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🏠 Situational Factors</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Ownership Duration</label>
+                                <select id="sp-ownership-duration" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Duration</option>
+                                    <option value="less-1">Less than 1 year</option>
+                                    <option value="1-5">1-5 years</option>
+                                    <option value="5-15">5-15 years</option>
+                                    <option value="15-30">15-30 years</option>
+                                    <option value="30-plus">30+ years</option>
+                                    <option value="inherited">Inherited property</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Previous Selling Experience</label>
+                                <select id="sp-selling-experience" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Experience</option>
+                                    <option value="first-time">First time seller</option>
+                                    <option value="limited">Limited experience</option>
+                                    <option value="experienced">Experienced seller</option>
+                                    <option value="investor">Real estate investor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Current Market Knowledge</label>
+                                <select id="sp-market-knowledge" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="calculatePsychology()">
+                                    <option value="">Select Knowledge Level</option>
+                                    <option value="high">High - Very informed</option>
+                                    <option value="moderate">Moderate - Some research done</option>
+                                    <option value="low">Low - Little knowledge</option>
+                                    <option value="misinformed">Misinformed about value</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Psychology Profile Results -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Psychology Type -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">🧠 Psychology Profile</h3>
+                    <div class="text-center mb-6">
+                        <div class="text-4xl mb-2" id="sp-profile-icon">🎭</div>
+                        <div class="text-xl font-bold mb-2" id="sp-profile-type">Complete Assessment</div>
+                        <div class="text-sm text-gray-600" id="sp-profile-description">Fill out the assessment to see seller profile</div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Analytical Score:</span>
+                            <span class="font-semibold" id="sp-analytical-score">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Emotional Score:</span>
+                            <span class="font-semibold" id="sp-emotional-score">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Trust Level:</span>
+                            <span class="font-semibold" id="sp-trust-score">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Urgency Level:</span>
+                            <span class="font-semibold" id="sp-urgency-score">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Communication Strategy -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">💬 Communication Strategy</h3>
+                    <div id="sp-communication-strategy" class="space-y-3 text-sm">
+                        <p class="text-gray-500">Complete assessment to see personalized communication recommendations</p>
+                    </div>
+                </div>
+
+                <!-- Negotiation Tactics -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">🎯 Negotiation Tactics</h3>
+                    <div id="sp-negotiation-tactics" class="space-y-3 text-sm">
+                        <p class="text-gray-500">Complete assessment to see recommended negotiation approach</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objection Handling & Scripts -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">🗣️ Objection Handling & Scripts</h3>
+                <div id="sp-objection-handling" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Common Objections:</h4>
+                        <div class="text-sm text-gray-700 space-y-2">
+                            <p class="text-gray-500">Complete assessment to see likely objections and responses</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Recommended Scripts:</h4>
+                        <div class="text-sm text-gray-700 space-y-2">
+                            <p class="text-gray-500">Complete assessment to see personalized conversation starters</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Follow-up Strategy -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">📅 Follow-up Strategy</h3>
+                <div id="sp-followup-strategy" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Timing:</h4>
+                        <p class="text-sm text-gray-500" id="sp-followup-timing">Complete assessment for timing recommendations</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Method:</h4>
+                        <p class="text-sm text-gray-500" id="sp-followup-method">Complete assessment for method recommendations</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Message Tone:</h4>
+                        <p class="text-sm text-gray-500" id="sp-followup-tone">Complete assessment for tone recommendations</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export and Tools -->
+            <div class="mt-6 flex justify-center gap-4 flex-wrap">
+                <button onclick="exportSellerProfile()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    📄 Export Seller Profile
+                </button>
+                <button onclick="generateNegotiationPlan()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    📋 Generate Negotiation Plan
+                </button>
+            </div>
+
+            <!-- JavaScript for Seller Psychology -->
+            <script>
+                function calculatePsychology() {
+                    console.log('calculatePsychology() called');
+
+                    // Get all input values
+                    const ageRange = document.getElementById('sp-age-range').value;
+                    const education = document.getElementById('sp-education').value;
+                    const profession = document.getElementById('sp-profession').value;
+                    const initialResponse = document.getElementById('sp-initial-response').value;
+                    const commPreference = document.getElementById('sp-comm-preference').value;
+                    const speakingStyle = document.getElementById('sp-speaking-style').value;
+                    const decisionSpeed = document.getElementById('sp-decision-speed').value;
+                    const emotionalState = document.getElementById('sp-emotional-state').value;
+                    const trustLevel = document.getElementById('sp-trust-level').value;
+                    const negotiationStyle = document.getElementById('sp-negotiation-style').value;
+                    const ownershipDuration = document.getElementById('sp-ownership-duration').value;
+                    const sellingExperience = document.getElementById('sp-selling-experience').value;
+                    const marketKnowledge = document.getElementById('sp-market-knowledge').value;
+
+                    // Check motivation triggers
+                    const motivationTriggers = [];
+                    if (document.getElementById('sp-financial-stress').checked) motivationTriggers.push('financial');
+                    if (document.getElementById('sp-time-pressure').checked) motivationTriggers.push('time');
+                    if (document.getElementById('sp-family-situation').checked) motivationTriggers.push('family');
+                    if (document.getElementById('sp-convenience').checked) motivationTriggers.push('convenience');
+                    if (document.getElementById('sp-health-issues').checked) motivationTriggers.push('health');
+                    if (document.getElementById('sp-property-burden').checked) motivationTriggers.push('burden');
+                    if (document.getElementById('sp-investment-focus').checked) motivationTriggers.push('investment');
+
+                    console.log('Input values:', { ageRange, education, profession, initialResponse, commPreference, speakingStyle, decisionSpeed, emotionalState, trustLevel, negotiationStyle, ownershipDuration, sellingExperience, marketKnowledge, motivationTriggers });
+
+                    // Calculate scores
+                    let analyticalScore = 0;
+                    let emotionalScore = 0;
+                    let trustScore = 0;
+                    let urgencyScore = 0;
+
+                    // Analytical score factors
+                    if (education === 'bachelors' || education === 'advanced') analyticalScore += 20;
+                    if (profession === 'executive' || profession === 'professional') analyticalScore += 15;
+                    if (speakingStyle === 'analytical' || speakingStyle === 'detailed') analyticalScore += 25;
+                    if (negotiationStyle === 'analytical') analyticalScore += 20;
+                    if (marketKnowledge === 'high' || marketKnowledge === 'moderate') analyticalScore += 15;
+
+                    // Emotional score factors
+                    if (speakingStyle === 'emotional' || speakingStyle === 'storytelling') emotionalScore += 25;
+                    if (emotionalState === 'stressed' || emotionalState === 'sad' || emotionalState === 'frustrated') emotionalScore += 20;
+                    if (negotiationStyle === 'emotional' || negotiationStyle === 'accommodating') emotionalScore += 20;
+                    if (motivationTriggers.includes('family') || motivationTriggers.includes('health')) emotionalScore += 15;
+                    if (ownershipDuration === '15-30' || ownershipDuration === '30-plus') emotionalScore += 15;
+
+                    // Trust score factors
+                    if (trustLevel === 'high') trustScore += 40;
+                    else if (trustLevel === 'moderate') trustScore += 25;
+                    else if (trustLevel === 'low') trustScore += 10;
+                    else if (trustLevel === 'previous-bad') trustScore += 5;
+
+                    if (initialResponse === 'immediate' || initialResponse === 'quick') trustScore += 15;
+                    if (emotionalState === 'optimistic' || emotionalState === 'excited') trustScore += 10;
+
+                    // Urgency score factors
+                    if (motivationTriggers.includes('financial') || motivationTriggers.includes('time')) urgencyScore += 25;
+                    if (emotionalState === 'stressed' || emotionalState === 'frustrated') urgencyScore += 20;
+                    if (initialResponse === 'immediate') urgencyScore += 15;
+                    if (decisionSpeed === 'immediate') urgencyScore += 20;
+                    if (decisionSpeed === 'anxious') urgencyScore += 25;
+
+                    // Determine primary psychology type
+                    let profileType = '';
+                    let profileIcon = '';
+                    let profileDescription = '';
+
+                    if (analyticalScore > emotionalScore && analyticalScore > 50) {
+                        profileType = 'The Analyzer';
+                        profileIcon = '🔍';
+                        profileDescription = 'Data-driven, logical, needs facts and proof';
+                    } else if (emotionalScore > analyticalScore && emotionalScore > 50) {
+                        profileType = 'The Emotional Decision Maker';
+                        profileIcon = '❤️';
+                        profileDescription = 'Heart-driven, personal connections matter';
+                    } else if (trustScore < 30) {
+                        profileType = 'The Skeptic';
+                        profileIcon = '🤔';
+                        profileDescription = 'Cautious, needs credibility and social proof';
+                    } else if (urgencyScore > 60) {
+                        profileType = 'The Urgent Seller';
+                        profileIcon = '⚡';
+                        profileDescription = 'Time-sensitive, motivated to act quickly';
+                    } else if (motivationTriggers.includes('convenience')) {
+                        profileType = 'The Convenience Seeker';
+                        profileIcon = '🎯';
+                        profileDescription = 'Values simplicity and ease of process';
+                    } else {
+                        profileType = 'The Balanced Seller';
+                        profileIcon = '⚖️';
+                        profileDescription = 'Moderate approach, flexible negotiation style';
+                    }
+
+                    console.log('Calculated scores:', { analyticalScore, emotionalScore, trustScore, urgencyScore });
+                    console.log('Profile determined:', { profileType, profileIcon, profileDescription });
+
+                    // Update displays
+                    document.getElementById('sp-profile-type').textContent = profileType;
+                    document.getElementById('sp-profile-icon').textContent = profileIcon;
+                    document.getElementById('sp-profile-description').textContent = profileDescription;
+                    document.getElementById('sp-analytical-score').textContent = Math.min(analyticalScore, 100) + '%';
+                    document.getElementById('sp-emotional-score').textContent = Math.min(emotionalScore, 100) + '%';
+                    document.getElementById('sp-trust-score').textContent = Math.min(trustScore, 100) + '%';
+                    document.getElementById('sp-urgency-score').textContent = Math.min(urgencyScore, 100) + '%';
+
+                    console.log('Display elements updated');
+
+                    // Generate communication strategy
+                    updateCommunicationStrategy(profileType, analyticalScore, emotionalScore, trustScore, commPreference);
+
+                    // Generate negotiation tactics
+                    updateNegotiationTactics(profileType, negotiationStyle, urgencyScore, motivationTriggers);
+
+                    // Generate objection handling
+                    updateObjectionHandling(profileType, trustScore, sellingExperience, marketKnowledge);
+
+                    // Generate follow-up strategy
+                    updateFollowupStrategy(profileType, decisionSpeed, urgencyScore, commPreference);
+                }
+
+                function updateCommunicationStrategy(profileType, analytical, emotional, trust, commPref) {
+                    const strategyDiv = document.getElementById('sp-communication-strategy');
+                    let strategies = [];
+
+                    if (profileType === 'The Analyzer') {
+                        strategies = [
+                            '📊 Lead with facts and market data',
+                            '📋 Provide written documentation',
+                            '⏰ Allow time for decision making',
+                            '🔢 Use specific numbers and comparisons'
+                        ];
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        strategies = [
+                            '🤝 Build personal rapport first',
+                            '💝 Focus on benefits to family',
+                            '📖 Share success stories',
+                            '❤️ Use empathetic language'
+                        ];
+                    } else if (profileType === 'The Skeptic') {
+                        strategies = [
+                            '⭐ Provide references and testimonials',
+                            '🏆 Highlight credentials and experience',
+                            '📄 Offer transparent documentation',
+                            '🔒 Address concerns directly'
+                        ];
+                    } else if (profileType === 'The Urgent Seller') {
+                        strategies = [
+                            '⚡ Emphasize quick closing process',
+                            '📞 Respond immediately to inquiries',
+                            '🎯 Focus on solving their time problem',
+                            '💨 Streamline paperwork and decisions'
+                        ];
+                    } else {
+                        strategies = [
+                            '⚖️ Balance facts with personal touch',
+                            '🤝 Build trust through consistency',
+                            '📋 Provide options and flexibility',
+                            '💬 Match their communication style'
+                        ];
+                    }
+
+                    strategyDiv.innerHTML = strategies.map(strategy =>
+                        `<p class="flex items-start"><span class="mr-2">${strategy.split(' ')[0]}</span>${strategy.substring(2)}</p>`
+                    ).join('');
+                }
+
+                function updateNegotiationTactics(profileType, negotiationStyle, urgency, triggers) {
+                    const tacticsDiv = document.getElementById('sp-negotiation-tactics');
+                    let tactics = [];
+
+                    if (urgency > 60) {
+                        tactics = [
+                            '💰 Lead with cash offer benefits',
+                            '📅 Emphasize quick closing timeline',
+                            '🎯 Address their urgency directly',
+                            '⚡ Create win-win solutions'
+                        ];
+                    } else if (profileType === 'The Analyzer') {
+                        tactics = [
+                            '📊 Present multiple scenarios',
+                            '🔍 Break down all costs clearly',
+                            '📈 Show market comparisons',
+                            '⏰ Allow processing time'
+                        ];
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        tactics = [
+                            '🏠 Focus on home\'s next chapter',
+                            '👪 Emphasize family benefits',
+                            '💝 Highlight peace of mind',
+                            '🤗 Use collaborative language'
+                        ];
+                    } else {
+                        tactics = [
+                            '🤝 Find mutual benefits',
+                            '📋 Offer multiple options',
+                            '⚖️ Be fair and transparent',
+                            '💬 Listen actively to concerns'
+                        ];
+                    }
+
+                    tacticsDiv.innerHTML = tactics.map(tactic =>
+                        `<p class="flex items-start"><span class="mr-2">${tactic.split(' ')[0]}</span>${tactic.substring(2)}</p>`
+                    ).join('');
+                }
+
+                function updateObjectionHandling(profileType, trust, experience, knowledge) {
+                    const objectionDiv = document.getElementById('sp-objection-handling');
+
+                    let commonObjections = [];
+                    let scripts = [];
+
+                    if (trust < 30) {
+                        commonObjections = ['"How do I know you\'re legitimate?"', '"I\'ve heard bad things about wholesalers"', '"This sounds too good to be true"'];
+                        scripts = ['"I understand your concern. Let me share some references..."', '"Here\'s my business license and recent testimonials..."', '"Would you like to speak with my previous clients?"'];
+                    } else if (profileType === 'The Analyzer') {
+                        commonObjections = ['"I need to research this more"', '"Can you prove this is a fair price?"', '"What are all the costs involved?"'];
+                        scripts = ['"Absolutely, let me provide you with market data..."', '"Here are recent comparable sales..."', '"I\'ll break down every cost for you..."'];
+                    } else {
+                        commonObjections = ['"I need to think about it"', '"Is this the best you can do?"', '"I want to get another opinion"'];
+                        scripts = ['"That\'s completely understandable..."', '"Let me see what flexibility I have..."', '"I encourage you to get a second opinion..."'];
+                    }
+
+                    objectionDiv.innerHTML = `
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Common Objections:</h4>
+                            <div class="text-sm text-gray-700 space-y-2">
+                                ${commonObjections.map(obj => `<p>• ${obj}</p>`).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Recommended Scripts:</h4>
+                            <div class="text-sm text-gray-700 space-y-2">
+                                ${scripts.map(script => `<p>• ${script}</p>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                function updateFollowupStrategy(profileType, decisionSpeed, urgency, commPref) {
+                    let timing = '';
+                    let method = '';
+                    let tone = '';
+
+                    if (urgency > 60) {
+                        timing = 'Within 24 hours';
+                        method = 'Phone call + text backup';
+                        tone = 'Urgent but helpful';
+                    } else if (decisionSpeed === 'deliberate') {
+                        timing = 'Wait 3-5 days';
+                        method = 'Email with additional info';
+                        tone = 'Patient and informative';
+                    } else if (profileType === 'The Skeptic') {
+                        timing = 'Wait 1 week';
+                        method = 'Email with social proof';
+                        tone = 'Professional and credible';
+                    } else {
+                        timing = '2-3 days';
+                        method = commPref || 'Phone call';
+                        tone = 'Friendly and helpful';
+                    }
+
+                    document.getElementById('sp-followup-timing').textContent = timing;
+                    document.getElementById('sp-followup-method').textContent = method;
+                    document.getElementById('sp-followup-tone').textContent = tone;
+                }
+
+                function clearSellerPsychology() {
+                    // Clear all inputs
+                    const inputs = document.querySelectorAll('#content-seller-psychology input, #content-seller-psychology select');
+                    inputs.forEach(input => {
+                        if (input.type === 'checkbox') {
+                            input.checked = false;
+                        } else {
+                            input.value = '';
+                        }
+                    });
+
+                    // Reset displays
+                    document.getElementById('sp-profile-type').textContent = 'Complete Assessment';
+                    document.getElementById('sp-profile-icon').textContent = '🎭';
+                    document.getElementById('sp-profile-description').textContent = 'Fill out the assessment to see seller profile';
+                    document.getElementById('sp-analytical-score').textContent = '0%';
+                    document.getElementById('sp-emotional-score').textContent = '0%';
+                    document.getElementById('sp-trust-score').textContent = '0%';
+                    document.getElementById('sp-urgency-score').textContent = '0%';
+
+                    // Reset strategy sections
+                    document.getElementById('sp-communication-strategy').innerHTML = '<p class="text-gray-500">Complete assessment to see personalized communication recommendations</p>';
+                    document.getElementById('sp-negotiation-tactics').innerHTML = '<p class="text-gray-500">Complete assessment to see recommended negotiation approach</p>';
+                    document.getElementById('sp-objection-handling').innerHTML = `
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Common Objections:</h4>
+                            <div class="text-sm text-gray-700 space-y-2">
+                                <p class="text-gray-500">Complete assessment to see likely objections and responses</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Recommended Scripts:</h4>
+                            <div class="text-sm text-gray-700 space-y-2">
+                                <p class="text-gray-500">Complete assessment to see personalized conversation starters</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('sp-followup-timing').textContent = 'Complete assessment for timing recommendations';
+                    document.getElementById('sp-followup-method').textContent = 'Complete assessment for method recommendations';
+                    document.getElementById('sp-followup-tone').textContent = 'Complete assessment for tone recommendations';
+                }
+
+                function exportSellerProfile() {
+                    const sellerName = document.getElementById('sp-seller-name').value || 'Seller Profile';
+                    const profileType = document.getElementById('sp-profile-type').textContent;
+
+                    const reportContent = `SELLER PSYCHOLOGY PROFILE
+Generated: ${new Date().toLocaleDateString()}
+
+SELLER INFORMATION
+Name: ${sellerName}
+Profile Type: ${profileType}
+Description: ${document.getElementById('sp-profile-description').textContent}
+
+PSYCHOLOGY SCORES
+Analytical Score: ${document.getElementById('sp-analytical-score').textContent}
+Emotional Score: ${document.getElementById('sp-emotional-score').textContent}
+Trust Level: ${document.getElementById('sp-trust-score').textContent}
+Urgency Level: ${document.getElementById('sp-urgency-score').textContent}
+
+COMMUNICATION STRATEGY
+${Array.from(document.querySelectorAll('#sp-communication-strategy p')).map(p => p.textContent).join('\n')}
+
+NEGOTIATION TACTICS
+${Array.from(document.querySelectorAll('#sp-negotiation-tactics p')).map(p => p.textContent).join('\n')}
+
+FOLLOW-UP STRATEGY
+Timing: ${document.getElementById('sp-followup-timing').textContent}
+Method: ${document.getElementById('sp-followup-method').textContent}
+Tone: ${document.getElementById('sp-followup-tone').textContent}
+
+OBJECTION HANDLING
+${Array.from(document.querySelectorAll('#sp-objection-handling p')).map(p => p.textContent).join('\n')}
+
+Generated by Enriched Property Solutions LLC - Seller Psychology Profiler`;
+
+                    const blob = new Blob([reportContent], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${sellerName.replace(/[^a-zA-Z0-9]/g, '_')}_Psychology_Profile_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function generateNegotiationPlan() {
+                    const sellerName = document.getElementById('sp-seller-name').value || 'Seller';
+                    const profileType = document.getElementById('sp-profile-type').textContent;
+                    const profileDescription = document.getElementById('sp-profile-description').textContent;
+                    const analyticalScore = document.getElementById('sp-analytical-score').textContent;
+                    const emotionalScore = document.getElementById('sp-emotional-score').textContent;
+                    const trustScore = document.getElementById('sp-trust-score').textContent;
+                    const urgencyScore = document.getElementById('sp-urgency-score').textContent;
+
+                    // Get selected values for plan customization
+                    const education = document.getElementById('sp-education').value;
+                    const profession = document.getElementById('sp-profession').value;
+                    const emotionalState = document.getElementById('sp-emotional-state').value;
+                    const trustLevel = document.getElementById('sp-trust-level').value;
+                    const negotiationStyle = document.getElementById('sp-negotiation-style').value;
+                    const commPreference = document.getElementById('sp-comm-preference').value;
+                    const decisionSpeed = document.getElementById('sp-decision-speed').value;
+
+                    // Check motivation triggers
+                    const motivations = [];
+                    if (document.getElementById('sp-financial-stress').checked) motivations.push('Financial Stress');
+                    if (document.getElementById('sp-time-pressure').checked) motivations.push('Time Pressure');
+                    if (document.getElementById('sp-family-situation').checked) motivations.push('Family Changes');
+                    if (document.getElementById('sp-convenience').checked) motivations.push('Convenience');
+                    if (document.getElementById('sp-health-issues').checked) motivations.push('Health Issues');
+                    if (document.getElementById('sp-property-burden').checked) motivations.push('Property Burden');
+                    if (document.getElementById('sp-investment-focus').checked) motivations.push('Investment Minded');
+
+                    let negotiationPlan = generateDetailedNegotiationPlan(sellerName, profileType, profileDescription, {
+                        analytical: analyticalScore,
+                        emotional: emotionalScore,
+                        trust: trustScore,
+                        urgency: urgencyScore
+                    }, {
+                        education, profession, emotionalState, trustLevel, negotiationStyle, commPreference, decisionSpeed, motivations
+                    });
+
+                    // Export the plan
+                    const blob = new Blob([negotiationPlan], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${sellerName.replace(/[^a-zA-Z0-9]/g, '_')}_Negotiation_Plan_${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function generateDetailedNegotiationPlan(sellerName, profileType, description, scores, details) {
+                    const plan = `COMPREHENSIVE NEGOTIATION PLAN
+Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+
+═══════════════════════════════════════════════════════════════════════════════
+SELLER PROFILE SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+Seller Name: ${sellerName}
+Psychology Profile: ${profileType}
+Profile Description: ${description}
+
+PSYCHOLOGY SCORES:
+• Analytical Tendency: ${scores.analytical}
+• Emotional Tendency: ${scores.emotional}
+• Trust Level: ${scores.trust}
+• Urgency Level: ${scores.urgency}
+
+MOTIVATION TRIGGERS: ${details.motivations.length > 0 ? details.motivations.join(', ') : 'None identified'}
+
+═══════════════════════════════════════════════════════════════════════════════
+PRE-NEGOTIATION PREPARATION
+═══════════════════════════════════════════════════════════════════════════════
+
+${generatePreNegotiationChecklist(profileType, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+NEGOTIATION STRATEGY ROADMAP
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateNegotiationRoadmap(profileType, scores, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+CONVERSATION FLOW GUIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateConversationFlow(profileType, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+KEY TALKING POINTS & MESSAGING
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateTalkingPoints(profileType, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+OBJECTION HANDLING SCRIPTS
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateObjectionScripts(profileType, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+POTENTIAL PITFALLS & RED FLAGS
+═══════════════════════════════════════════════════════════════════════════════
+
+${generatePitfalls(profileType, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+FOLLOW-UP SCHEDULE & TIMELINE
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateFollowUpSchedule(profileType, scores, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+REQUIRED DOCUMENTATION & MATERIALS
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateRequiredDocs(profileType, details)}
+
+═══════════════════════════════════════════════════════════════════════════════
+SUCCESS METRICS & TRACKING
+═══════════════════════════════════════════════════════════════════════════════
+
+${generateSuccessMetrics(profileType)}
+
+════════════════════════════════════════════════════════════════════════════════
+END OF NEGOTIATION PLAN
+Generated by Enriched Property Solutions LLC - Seller Psychology Profiler
+════════════════════════════════════════════════════════════════════════════════`;
+
+                    return plan;
+                }
+
+                function generatePreNegotiationChecklist(profileType, details) {
+                    let checklist = "ESSENTIAL PREPARATION ITEMS:\n\n";
+
+                    if (profileType === 'The Analyzer') {
+                        checklist += `☐ Gather comprehensive market data and comparables
+☐ Prepare detailed cost breakdown spreadsheets
+☐ Research property history and tax records
+☐ Compile references and testimonials
+☐ Prepare multiple offer scenarios with pros/cons
+☐ Research buyer's market knowledge level
+☐ Prepare written proposals and documentation`;
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        checklist += `☐ Research seller's personal story and property history
+☐ Prepare success stories from similar situations
+☐ Gather testimonials from families you've helped
+☐ Understand family dynamics and decision makers
+☐ Prepare empathetic talking points
+☐ Research neighborhood and community connections
+☐ Plan for extended conversation time`;
+                    } else if (profileType === 'The Skeptic') {
+                        checklist += `☐ Prepare business credentials and licenses
+☐ Gather client references and contact information
+☐ Compile recent transaction examples
+☐ Prepare transparent fee disclosures
+☐ Research any past negative experiences they may have heard
+☐ Prepare third-party validation sources
+☐ Plan for multiple touchpoints to build trust`;
+                    } else if (profileType === 'The Urgent Seller') {
+                        checklist += `☐ Prepare quick-close timeline and process
+☐ Have cash proof of funds readily available
+☐ Streamline paperwork and contracts
+☐ Prepare expedited due diligence process
+☐ Have backup solutions for potential delays
+☐ Prepare immediate next steps
+☐ Clear your schedule for rapid response`;
+                    } else {
+                        checklist += `☐ Prepare balanced mix of data and personal approach
+☐ Gather both analytical and emotional talking points
+☐ Prepare flexible negotiation options
+☐ Research seller's preferred communication style
+☐ Plan for multiple meeting formats
+☐ Prepare both written and verbal presentations
+☐ Have backup strategies for different responses`;
+                    }
+
+                    checklist += `\n\nGENERAL PREPARATION (ALL PROFILES):
+☐ Property valuation and market analysis
+☐ Cash proof of funds or lender pre-approval
+☐ Purchase agreement templates
+☐ Business cards and marketing materials
+☐ Reference list with contact information
+☐ Mobile device with calculator and note-taking app
+☐ Professional appearance and materials organized`;
+
+                    return checklist;
+                }
+
+                function generateNegotiationRoadmap(profileType, scores, details) {
+                    let roadmap = "";
+
+                    if (parseInt(scores.urgency) > 60) {
+                        roadmap += `PHASE 1: RAPID RAPPORT & PROBLEM IDENTIFICATION (5-10 minutes)
+• Acknowledge their time sensitivity immediately
+• Ask direct questions about their timeline
+• Identify the core problem driving urgency
+• Express ability to move quickly
+
+PHASE 2: SOLUTION PRESENTATION (10-15 minutes)
+• Present cash offer as immediate solution
+• Highlight quick closing timeline (7-14 days)
+• Address their specific urgent needs
+• Minimize paperwork and complexity
+
+PHASE 3: COMMITMENT & NEXT STEPS (5-10 minutes)
+• Push for same-day decision if possible
+• Schedule immediate property inspection
+• Outline next 48-72 hours
+• Exchange contact information for rapid communication`;
+                    } else if (profileType === 'The Analyzer') {
+                        roadmap += `PHASE 1: DATA-DRIVEN INTRODUCTION (15-20 minutes)
+• Present your credentials and track record
+• Share market analysis and comparable sales
+• Provide detailed explanation of your process
+• Answer analytical questions thoroughly
+
+PHASE 2: COMPREHENSIVE OFFER PRESENTATION (20-30 minutes)
+• Present multiple scenarios with detailed breakdowns
+• Show cost comparisons vs. traditional sale
+• Provide written documentation for review
+• Allow time for questions and analysis
+
+PHASE 3: DECISION FRAMEWORK (10-15 minutes)
+• Summarize key decision points
+• Provide take-away materials for review
+• Schedule follow-up meeting for decision
+• Respect their need for deliberation time`;
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        roadmap += `PHASE 1: PERSONAL CONNECTION & STORY (20-25 minutes)
+• Build personal rapport and trust
+• Listen to their story and circumstances
+• Share relevant success stories
+• Establish emotional connection to solution
+
+PHASE 2: BENEFIT-FOCUSED PRESENTATION (15-20 minutes)
+• Focus on how sale helps their family/situation
+• Emphasize peace of mind and stress relief
+• Share testimonials from similar situations
+• Address emotional concerns and fears
+
+PHASE 3: COLLABORATIVE DECISION (10-15 minutes)
+• Position as partnership, not transaction
+• Include all family decision-makers
+• Allow emotional processing time
+• Schedule comfortable follow-up timeline`;
+                    } else {
+                        roadmap += `PHASE 1: BALANCED INTRODUCTION (15-20 minutes)
+• Establish credibility with both facts and rapport
+• Present your track record and personal approach
+• Understand their priorities and preferences
+• Adapt communication style to their responses
+
+PHASE 2: FLEXIBLE PRESENTATION (20-25 minutes)
+• Mix analytical data with personal benefits
+• Provide options and flexibility
+• Address both logical and emotional concerns
+• Adjust approach based on their engagement
+
+PHASE 3: MUTUAL AGREEMENT (10-15 minutes)
+• Summarize mutual benefits
+• Address any remaining concerns
+• Provide comfortable decision timeline
+• Establish clear next steps and communication`;
+                    }
+
+                    return roadmap;
+                }
+
+                function generateConversationFlow(profileType, details) {
+                    let flow = "";
+
+                    if (profileType === 'The Analyzer') {
+                        flow = `OPENING (First 2-3 minutes):
+"Thank you for your time, [Name]. I've done some preliminary research on your property and the local market. I'd like to share what I've found and get your perspective on a few key points."
+
+DISCOVERY QUESTIONS:
+• "What factors are most important to you in evaluating an offer?"
+• "Have you researched recent sales in your neighborhood?"
+• "What timeline are you working with for the sale?"
+• "What costs or complications are you hoping to avoid?"
+
+PRESENTATION APPROACH:
+• "Based on the market data I've analyzed..."
+• "Here are three scenarios I've prepared for you..."
+• "The numbers show that..."
+• "Let me break down exactly how this works..."
+
+HANDLING QUESTIONS:
+• Provide detailed, fact-based answers
+• Reference specific data sources
+• Offer to provide additional documentation
+• Acknowledge when you need to research something
+
+CLOSING APPROACH:
+"I've provided you with all the data and analysis. What additional information do you need to make an informed decision?"`;
+
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        flow = `OPENING (First 5-7 minutes):
+"Hi [Name], thank you so much for meeting with me. Before we talk about your property, I'd love to hear a bit about your situation and what's prompting you to consider selling."
+
+DISCOVERY QUESTIONS:
+• "How long have you lived in this home?"
+• "What are your hopes for the next chapter?"
+• "How is this decision affecting your family?"
+• "What would the ideal outcome look like for you?"
+
+PRESENTATION APPROACH:
+• "I understand this is more than just a transaction for you..."
+• "Here's how we've helped families in similar situations..."
+• "This approach will give you peace of mind because..."
+• "Your family's needs are my priority..."
+
+HANDLING CONCERNS:
+• Acknowledge emotions and validate feelings
+• Share relevant success stories
+• Focus on benefits to family/situation
+• Provide reassurance and support
+
+CLOSING APPROACH:
+"It sounds like this solution addresses your main concerns. How do you feel about moving forward together?"`;
+
+                    } else if (profileType === 'The Skeptic') {
+                        flow = `OPENING (First 3-5 minutes):
+"Hello [Name]. I appreciate you taking the time to meet with me. I know there are a lot of people in real estate who don't always have sellers' best interests at heart, so I'd like to start by showing you exactly who I am and how I operate."
+
+CREDIBILITY BUILDING:
+• Present business license and credentials
+• Share client references and testimonials
+• Explain your process transparently
+• Address common industry concerns upfront
+
+DISCOVERY QUESTIONS:
+• "Have you had any negative experiences with real estate investors?"
+• "What concerns do you have about working with someone like me?"
+• "What would make you feel confident in a buyer?"
+• "What questions do you have about my process?"
+
+PRESENTATION APPROACH:
+• "Here's exactly how the process works, step by step..."
+• "You can verify everything I'm telling you by..."
+• "I encourage you to check my references..."
+• "Here are the contracts and disclosures upfront..."
+
+CLOSING APPROACH:
+"I've been completely transparent about my process and credentials. What else do you need to feel confident moving forward?"`;
+
+                    } else {
+                        flow = `OPENING (First 3-5 minutes):
+"Hi [Name], thanks for your time today. I'm here to learn about your situation and see if there's a way I can help. Can you tell me a bit about what's prompting you to consider selling?"
+
+DISCOVERY QUESTIONS:
+• "What's your ideal timeline for this process?"
+• "What aspects of selling are most important to you?"
+• "Have you considered other selling options?"
+• "What concerns do you have about the process?"
+
+PRESENTATION APPROACH:
+• Adapt based on their responses and preferences
+• Mix data with personal benefits as appropriate
+• Provide options and flexibility
+• Focus on their stated priorities
+
+CLOSING APPROACH:
+"Based on everything we've discussed, does this approach seem like a good fit for your situation?"`;
+                    }
+
+                    return flow;
+                }
+
+                function generateTalkingPoints(profileType, details) {
+                    let points = "";
+
+                    if (profileType === 'The Analyzer') {
+                        points = `PRIMARY MESSAGING THEMES:
+• Market efficiency and data-driven pricing
+• Cost savings vs. traditional sale (commissions, repairs, etc.)
+• Timeline certainty and process control
+• Risk mitigation and guaranteed closing
+
+KEY PHRASES TO USE:
+• "Based on comparable sales data..."
+• "The numbers clearly show..."
+• "This eliminates the variables of..."
+• "Here's the breakdown of costs..."
+• "Statistically speaking..."
+• "The data supports..."
+
+SUPPORTING STATISTICS:
+• Average time on market in their area
+• Typical repair costs for homes their age
+• Average commission and closing costs
+• Success rate of your past transactions
+• Market trends and predictions`;
+
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        points = `PRIMARY MESSAGING THEMES:
+• Family benefit and stress relief
+• New beginning and fresh start
+• Peace of mind and security
+• Partnership and support through transition
+
+KEY PHRASES TO USE:
+• "Your family deserves..."
+• "This gives you peace of mind..."
+• "I understand this is emotional..."
+• "We're here to support you through..."
+• "Your new chapter can begin..."
+• "This takes the burden off your shoulders..."
+
+EMOTIONAL TRIGGERS:
+• Relief from property stress
+• More time with family
+• Financial security for loved ones
+• Removing uncertainty and worry
+• Enabling new opportunities`;
+
+                    } else if (profileType === 'The Skeptic') {
+                        points = `PRIMARY MESSAGING THEMES:
+• Transparency and honesty
+• Proven track record and credibility
+• Risk reduction and guarantees
+• Third-party validation
+
+KEY PHRASES TO USE:
+• "I want to be completely transparent..."
+• "You can verify this by..."
+• "Here are my references..."
+• "I encourage you to check..."
+• "Everything is documented..."
+• "You have full protection..."
+
+CREDIBILITY BUILDERS:
+• Business license and certifications
+• Better Business Bureau rating
+• Client testimonials with contact info
+• Professional association memberships
+• Years in business and transaction history`;
+
+                    } else {
+                        points = `PRIMARY MESSAGING THEMES:
+• Flexibility and options
+• Balanced approach to their needs
+• Professional yet personal service
+• Win-win solutions
+
+KEY PHRASES TO USE:
+• "We can work together to..."
+• "I want to understand what's important to you..."
+• "There are several ways we could structure this..."
+• "Let's find the best solution for your situation..."
+• "I'm here to make this work for you..."
+
+ADAPTABLE APPROACHES:
+• Emphasize data if they ask analytical questions
+• Share stories if they express emotional concerns
+• Provide references if they seem skeptical
+• Accelerate if they show urgency`;
+                    }
+
+                    return points;
+                }
+
+                function generateObjectionScripts(profileType, details) {
+                    let scripts = "";
+
+                    if (profileType === 'The Analyzer') {
+                        scripts = `COMMON OBJECTION: "I need to research this more."
+RESPONSE: "I completely understand - you should research any major decision. Here's additional data I can provide: [list specific resources]. Would you like me to email you the comparable sales report and cost analysis spreadsheet so you can review the numbers thoroughly?"
+
+COMMON OBJECTION: "How do I know this is a fair price?"
+RESPONSE: "That's exactly the right question to ask. Let me show you the three different valuation methods I used: recent comparables, cost approach, and income approach. Here's the spreadsheet with all the data sources. Would you like to verify any of these comparables yourself?"
+
+COMMON OBJECTION: "I want to get a second opinion."
+RESPONSE: "Absolutely, you should get multiple perspectives on a decision this important. I'd recommend getting an appraisal or CMA from a local realtor. When you do, ask them to factor in the time, costs, and risks of a traditional sale that my offer eliminates."`;
+
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        scripts = `COMMON OBJECTION: "This is happening too fast."
+RESPONSE: "I understand this feels overwhelming - selling your home is one of life's biggest decisions. We can move at whatever pace feels comfortable for you. The most important thing is that you feel good about the decision. What timeline would work better for you?"
+
+COMMON OBJECTION: "I'm worried about making the wrong choice."
+RESPONSE: "That's a completely natural concern, and it shows how much you care about doing right by your family. Can I share how the Johnson family felt the same way? They were in a very similar situation, and here's what happened for them... [share relevant success story]"
+
+COMMON OBJECTION: "My family thinks I should list with a realtor."
+RESPONSE: "Your family wants what's best for you, and it's wonderful that you have their support. Have you had a chance to discuss with them the benefits of a direct sale - like avoiding months of showings, not having to do repairs, and having certainty about the closing? Would it help if I spoke with them to answer any questions?"`;
+
+                    } else if (profileType === 'The Skeptic') {
+                        scripts = `COMMON OBJECTION: "How do I know you're legitimate?"
+RESPONSE: "That's an excellent question, and you should verify anyone you're considering working with. Here's my business license, my Better Business Bureau profile, and contact information for three recent clients who've given me permission to share their experience. Would you like to call any of them right now?"
+
+COMMON OBJECTION: "I've heard bad things about real estate investors."
+RESPONSE: "Unfortunately, there are some bad actors in every industry, and real estate is no exception. That's exactly why I operate with complete transparency. Here's my contract with all terms clearly outlined, here are my fees disclosed upfront, and here's my business attorney's contact if you want independent legal advice."
+
+COMMON OBJECTION: "This sounds too good to be true."
+RESPONSE: "I appreciate your skepticism - it shows you're thinking carefully about this decision. Everything I'm proposing is standard in the real estate investment industry. Here's how the business model works and why I can make this offer... [explain business model]. What specific part seems unclear or concerning to you?"`;
+
+                    } else {
+                        scripts = `COMMON OBJECTION: "I need to think about it."
+RESPONSE: "Of course, this is a big decision and you should take the time you need. To help you think through this, what are the main factors you'll be considering? Is there any additional information I can provide that would be helpful in your decision-making process?"
+
+COMMON OBJECTION: "Is this the best you can do on price?"
+RESPONSE: "I understand you want to make sure you're getting fair value. Let me walk you through how I arrived at this number and what factors I considered. I'm always willing to discuss the offer if there are aspects of your situation I may not have fully understood. What concerns do you have about the price?"
+
+COMMON OBJECTION: "I want to get another opinion."
+RESPONSE: "That's smart - you should definitely get multiple perspectives on any major decision. I encourage you to speak with a realtor, get an appraisal, or consult with anyone else you trust. When you do, make sure to factor in all the costs and time involved with each option. I'm confident this offer will compare favorably when you consider everything."`;
+                    }
+
+                    return scripts;
+                }
+
+                function generatePitfalls(profileType, details) {
+                    let pitfalls = "";
+
+                    if (profileType === 'The Analyzer') {
+                        pitfalls = `POTENTIAL PITFALLS TO AVOID:
+
+⚠️ ANALYSIS PARALYSIS
+• Don't overwhelm with too much data at once
+• Set clear decision deadlines
+• Focus on the 3-4 most important factors
+• Summarize key points clearly
+
+⚠️ QUESTIONING YOUR CREDIBILITY
+• Be prepared with sources for all claims
+• Never exaggerate or oversell
+• Admit when you don't know something
+• Follow up with promised information quickly
+
+⚠️ GETTING LOST IN DETAILS
+• Keep big picture benefits visible
+• Use visual aids and summaries
+• Check for understanding regularly
+• Don't let minor details derail major points
+
+RED FLAGS TO WATCH FOR:
+• Asking for multiple revisions without commitment signals
+• Requesting excessive documentation (possible time-waster)
+• Comparing your offer to unrealistic retail prices
+• Involving too many advisors in the decision process`;
+
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        pitfalls = `POTENTIAL PITFALLS TO AVOID:
+
+⚠️ RUSHING THE EMOTIONAL PROCESS
+• Allow time for feelings to be expressed
+• Don't push for quick decisions
+• Respect their need to include family
+• Be patient with emotional responses
+
+⚠️ BEING TOO TRANSACTIONAL
+• Don't focus only on numbers and logistics
+• Remember this is their home, not just property
+• Acknowledge the emotional significance
+• Share your personal investment in their success
+
+⚠️ IGNORING FAMILY DYNAMICS
+• Identify all decision makers early
+• Address concerns of skeptical family members
+• Don't create family conflict with pressure
+• Ensure everyone feels heard and respected
+
+RED FLAGS TO WATCH FOR:
+• Family members strongly opposed to sale
+• Seller seems to be in emotional crisis
+• Multiple competing emotional priorities
+• Unrealistic expectations based on emotional attachment`;
+
+                    } else if (profileType === 'The Skeptic') {
+                        pitfalls = `POTENTIAL PITFALLS TO AVOID:
+
+⚠️ APPEARING PUSHY OR AGGRESSIVE
+• Let them set the pace
+• Provide information, don't pressure
+• Respect their need for verification
+• Never use high-pressure tactics
+
+⚠️ HIDING OR MINIMIZING INFORMATION
+• Disclose everything upfront
+• Explain your business model clearly
+• Address negative industry perceptions
+• Be transparent about your profit
+
+⚠️ TAKING SKEPTICISM PERSONALLY
+• Don't get defensive about questions
+• Thank them for due diligence
+• Provide evidence cheerfully
+• Stay professional and helpful
+
+RED FLAGS TO WATCH FOR:
+• Continued skepticism despite evidence
+• Requests for unreasonable guarantees
+• Involving lawyers before basic agreement
+• Past litigation history with contractors/investors`;
+
+                    } else {
+                        pitfalls = `POTENTIAL PITFALLS TO AVOID:
+
+⚠️ MISREADING THEIR COMMUNICATION STYLE
+• Pay attention to their responses
+• Adjust your approach if they seem disengaged
+• Ask how they prefer to receive information
+• Mirror their energy and pace
+
+⚠️ BEING TOO GENERIC
+• Customize your approach to their specific situation
+• Reference their particular concerns
+• Avoid one-size-fits-all presentations
+• Show you understand their unique needs
+
+⚠️ FAILING TO BUILD ENOUGH TRUST
+• Invest time in relationship building
+• Provide references and social proof
+• Follow through on all commitments
+• Be consistent in your communication
+
+RED FLAGS TO WATCH FOR:
+• Inability to identify their primary motivation
+• Conflicting signals about urgency or priorities
+• Reluctance to share basic information about situation
+• Multiple decision-making styles causing confusion`;
+                    }
+
+                    return pitfalls;
+                }
+
+                function generateFollowUpSchedule(profileType, scores, details) {
+                    let schedule = "";
+
+                    if (parseInt(scores.urgency) > 60) {
+                        schedule = `IMMEDIATE FOLLOW-UP (Same Day):
+• Send recap email within 2 hours
+• Text confirmation of next steps
+• Schedule property inspection for next business day
+• Prepare expedited paperwork
+
+24-HOUR FOLLOW-UP:
+• Call to confirm inspection appointment
+• Answer any overnight questions
+• Send digital copies of all documents
+• Confirm financing/proof of funds
+
+48-HOUR FOLLOW-UP:
+• Property inspection completed
+• Present final offer immediately
+• Push for decision within 24 hours
+• Have contracts ready for signature
+
+WEEKLY FOLLOW-UP (if delayed):
+• Check on decision timeline
+• Address any new concerns
+• Provide updated market information
+• Maintain urgency without pressure`;
+
+                    } else if (profileType === 'The Analyzer') {
+                        schedule = `48-HOUR FOLLOW-UP:
+• Email detailed offer package
+• Include all supporting documentation
+• Provide reference contact information
+• Schedule follow-up meeting for questions
+
+1-WEEK FOLLOW-UP:
+• Call to discuss any questions
+• Provide additional comparables if requested
+• Address any concerns that arose
+• Confirm timeline for their decision
+
+2-WEEK FOLLOW-UP:
+• Check on decision status
+• Offer to meet with advisors/family
+• Provide updated market analysis
+• Set firm decision deadline
+
+MONTHLY FOLLOW-UP (if no decision):
+• Send market updates
+• Check if circumstances have changed
+• Maintain relationship for future opportunities
+• Adjust offer if market conditions warrant`;
+
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        schedule = `NEXT DAY FOLLOW-UP:
+• Send warm, personal thank-you note
+• Include family-focused benefits summary
+• Share additional success stories
+• Offer to answer family questions
+
+3-DAY FOLLOW-UP:
+• Call to check on their feelings about the meeting
+• Address any emotional concerns that arose
+• Offer to meet with other family members
+• Provide references from similar families
+
+1-WEEK FOLLOW-UP:
+• Personal call to maintain relationship
+• Ask about family discussions and feedback
+• Offer flexibility on timeline or terms
+• Schedule follow-up meeting if needed
+
+BI-WEEKLY FOLLOW-UP:
+• Maintain personal connection
+• Share relevant market updates
+• Check on family situation changes
+• Be available for support and questions`;
+
+                    } else {
+                        schedule = `2-DAY FOLLOW-UP:
+• Email recap of meeting and next steps
+• Provide any requested additional information
+• Confirm their preferred communication method
+• Schedule follow-up call or meeting
+
+1-WEEK FOLLOW-UP:
+• Call to address questions and concerns
+• Adapt approach based on their feedback
+• Provide updated information as needed
+• Confirm decision timeline
+
+2-WEEK FOLLOW-UP:
+• Check on decision progress
+• Offer additional flexibility if helpful
+• Address any new concerns or questions
+• Maintain professional relationship
+
+MONTHLY FOLLOW-UP:
+• Provide market updates
+• Check if circumstances have changed
+• Maintain relationship for future opportunities
+• Adjust approach based on new information`;
+                    }
+
+                    return schedule;
+                }
+
+                function generateRequiredDocs(profileType, details) {
+                    let docs = "";
+
+                    if (profileType === 'The Analyzer') {
+                        docs = `ESSENTIAL DOCUMENTATION:
+
+📋 ANALYTICAL MATERIALS:
+• Comprehensive market analysis report
+• Comparable sales spreadsheet with sources
+• Detailed cost breakdown analysis
+• Timeline comparison chart (direct sale vs. traditional)
+• ROI calculations and projections
+• Property history and tax record summary
+
+📄 BUSINESS CREDENTIALS:
+• Business license and registration
+• Professional certifications
+• Insurance certificates
+• Financial statements or proof of funds
+• Recent transaction examples with outcomes
+• Client testimonials with contact information
+
+📊 OFFER DOCUMENTATION:
+• Formal written offer with all terms
+• Purchase agreement template
+• Disclosure forms
+• Inspection contingency details
+• Closing timeline and responsibilities
+• Wire transfer instructions and procedures`;
+
+                    } else if (profileType === 'The Emotional Decision Maker') {
+                        docs = `ESSENTIAL DOCUMENTATION:
+
+💝 RELATIONSHIP-BUILDING MATERIALS:
+• Personal bio and family information
+• Success stories from similar families
+• Photo testimonials from past clients
+• Community involvement and references
+• Personal mission statement
+• Before/after stories of families helped
+
+📄 TRUST-BUILDING DOCUMENTS:
+• Business credentials and licenses
+• Better Business Bureau profile
+• Professional association memberships
+• Client reference list with contact info
+• Awards or recognition received
+• Charitable work or community involvement
+
+📋 OFFER MATERIALS:
+• Personalized offer letter
+• Simple, clear purchase agreement
+• Family-friendly timeline explanation
+• Moving and transition resources
+• Local service provider recommendations
+• Post-sale support offerings`;
+
+                    } else if (profileType === 'The Skeptic') {
+                        docs = `ESSENTIAL DOCUMENTATION:
+
+🔒 CREDIBILITY MATERIALS:
+• Government-issued business license
+• Professional liability insurance certificate
+• Better Business Bureau rating and profile
+• State real estate license (if applicable)
+• Professional association memberships
+• Bank references and financial credentials
+
+📋 TRANSPARENCY DOCUMENTS:
+• Complete business model explanation
+• All fees and costs disclosed upfront
+• Sample contracts with terms highlighted
+• Client reference list with full contact info
+• Recent transaction examples with outcomes
+• Third-party verification sources
+
+⚖️ LEGAL PROTECTIONS:
+• Attorney contact information
+• Professional escrow company details
+• Title insurance information
+• All required legal disclosures
+• Consumer protection guarantees
+• Complaint resolution process`;
+
+                    } else {
+                        docs = `ESSENTIAL DOCUMENTATION:
+
+📄 FLEXIBLE PRESENTATION MATERIALS:
+• Business overview and credentials
+• Market analysis (detailed and summary versions)
+• Success stories and testimonials
+• Multiple offer structure options
+• Timeline flexibility examples
+• Various communication format options
+
+🎯 ADAPTABLE RESOURCES:
+• Analytical data for number-focused discussions
+• Personal stories for emotional connections
+• Credibility materials for skeptical concerns
+• Urgency-focused materials for time-sensitive needs
+• Reference materials for all personality types
+• Follow-up templates for various preferences
+
+📋 COMPREHENSIVE OFFER PACKAGE:
+• Multiple offer scenarios and options
+• Clear terms and condition explanations
+• Flexible timeline accommodations
+• Various communication and update methods
+• Support resources and assistance offerings
+• Post-sale relationship and service options`;
+                    }
+
+                    return docs;
+                }
+
+                function generateSuccessMetrics(profileType) {
+                    return `TRACKING NEGOTIATION SUCCESS:
+
+📊 IMMEDIATE METRICS (During Meeting):
+• Level of engagement and interest shown
+• Questions asked (quality and quantity)
+• Objections raised and how well addressed
+• Body language and emotional responses
+• Decision-maker involvement and buy-in
+• Timeline and next steps agreed upon
+
+📈 SHORT-TERM METRICS (1-2 weeks):
+• Response time to follow-up communications
+• Additional information requested
+• Reference checks conducted
+• Family/advisor involvement level
+• Timeline adherence and progression
+• Objection resolution success rate
+
+🎯 LONG-TERM METRICS (1 month+):
+• Final decision outcome (yes/no/delay)
+• Negotiation success rate for this profile type
+• Average time to decision for similar sellers
+• Referral generation from successful deals
+• Repeat business potential
+• Overall satisfaction scores
+
+💡 PROCESS IMPROVEMENT INDICATORS:
+• Which talking points resonated most
+• Most effective objection handling approaches
+• Optimal follow-up timing and methods
+• Most persuasive documentation/evidence
+• Communication preferences that worked best
+• Successful relationship-building techniques
+
+🔄 CONTINUOUS IMPROVEMENT:
+• Update profile assessment based on actual behavior
+• Refine approach for similar seller types
+• Document successful tactics for future use
+• Identify areas for skill development
+• Track market feedback and adjust accordingly
+• Build template improvements for next negotiation`;
+                }
+
+                function saveToContacts() {
+                    const sellerName = document.getElementById('sp-seller-name').value || 'Unknown Seller';
+                    const profileType = document.getElementById('sp-profile-type').textContent;
+                    alert(`Seller Profile Saved to Contacts!\n\nContact: ${sellerName}\nProfile: ${profileType}\n\nThis feature would:\n\n👥 Add to CRM system\n📝 Include psychology notes\n📅 Set follow-up reminders\n🎯 Track communication preferences\n📊 Monitor interaction history\n\nIntegration available with major CRM platforms.`);
+                }
             </script>
         </div>
 
