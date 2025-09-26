@@ -44,27 +44,113 @@ function showMessage(message, type) {
 // ===========================================
 
 function getARVValue() {
+    // Get the recommended ARV (conservative approach using lower of two methods)
+    const recommendedARV = parseFloat(document.getElementById('recommendedARV').textContent.replace(/[$,]/g, '')) || 0;
+    return recommendedARV;
+}
+
+function getAverageARVValue() {
     const comp1 = parseFloat(document.getElementById('comp1').value) || 0;
     const comp2 = parseFloat(document.getElementById('comp2').value) || 0;
     const comp3 = parseFloat(document.getElementById('comp3').value) || 0;
-    
+
     let avgARV = 0;
     let compCount = 0;
-    
+
     if (comp1 > 0) { avgARV += comp1; compCount++; }
     if (comp2 > 0) { avgARV += comp2; compCount++; }
     if (comp3 > 0) { avgARV += comp3; compCount++; }
-    
+
     return compCount > 0 ? avgARV / compCount : 0;
 }
 
+function getSqftARVValue() {
+    const subjectSqft = parseFloat(document.getElementById('subjectSqft').value) || 0;
+    const avgPricePerSqft = getAveragePricePerSqft();
+
+    return subjectSqft > 0 && avgPricePerSqft > 0 ? subjectSqft * avgPricePerSqft : 0;
+}
+
+function getAveragePricePerSqft() {
+    const comp1Price = parseFloat(document.getElementById('comp1').value) || 0;
+    const comp1Sqft = parseFloat(document.getElementById('comp1Sqft').value) || 0;
+    const comp2Price = parseFloat(document.getElementById('comp2').value) || 0;
+    const comp2Sqft = parseFloat(document.getElementById('comp2Sqft').value) || 0;
+    const comp3Price = parseFloat(document.getElementById('comp3').value) || 0;
+    const comp3Sqft = parseFloat(document.getElementById('comp3Sqft').value) || 0;
+
+    let totalPricePerSqft = 0;
+    let compCount = 0;
+
+    if (comp1Price > 0 && comp1Sqft > 0) {
+        totalPricePerSqft += comp1Price / comp1Sqft;
+        compCount++;
+    }
+    if (comp2Price > 0 && comp2Sqft > 0) {
+        totalPricePerSqft += comp2Price / comp2Sqft;
+        compCount++;
+    }
+    if (comp3Price > 0 && comp3Sqft > 0) {
+        totalPricePerSqft += comp3Price / comp3Sqft;
+        compCount++;
+    }
+
+    return compCount > 0 ? totalPricePerSqft / compCount : 0;
+}
+
 function calculateARV() {
-    const avgARV = getARVValue();
+    // Calculate individual price per sqft for each comp
+    calculateIndividualPricePerSqft();
+
+    // Calculate average ARV (simple average of sale prices)
+    const avgARV = getAverageARVValue();
     document.getElementById('calculatedARV').textContent = formatCurrency(avgARV);
+
+    // Calculate ARV based on $/sqft method
+    const sqftARV = getSqftARVValue();
+    document.getElementById('calculatedARVBySqft').textContent = formatCurrency(sqftARV);
+
+    // Display average price per sqft
+    const avgPricePerSqft = getAveragePricePerSqft();
+    document.getElementById('avgPricePerSqft').textContent = '$' + avgPricePerSqft.toFixed(2);
+
+    // Calculate and display recommended (conservative) ARV
+    let recommendedARV = 0;
+    if (avgARV > 0 && sqftARV > 0) {
+        // Use the lower of the two methods for conservative estimate
+        recommendedARV = Math.min(avgARV, sqftARV);
+    } else if (avgARV > 0) {
+        // Use average method if only that's available
+        recommendedARV = avgARV;
+    } else if (sqftARV > 0) {
+        // Use sqft method if only that's available
+        recommendedARV = sqftARV;
+    }
+
+    document.getElementById('recommendedARV').textContent = formatCurrency(recommendedARV);
+
+    // Update all dependent calculations
     updateProfitDisplay();
     updateRapidOfferSystem();
     calculateCustomOffer();
     calculateBuyerFocusedOffer();
+}
+
+function calculateIndividualPricePerSqft() {
+    // Calculate price per sqft for each comparable
+    const comps = [
+        { priceId: 'comp1', sqftId: 'comp1Sqft', displayId: 'comp1PricePerSqft' },
+        { priceId: 'comp2', sqftId: 'comp2Sqft', displayId: 'comp2PricePerSqft' },
+        { priceId: 'comp3', sqftId: 'comp3Sqft', displayId: 'comp3PricePerSqft' }
+    ];
+
+    comps.forEach(comp => {
+        const price = parseFloat(document.getElementById(comp.priceId).value) || 0;
+        const sqft = parseFloat(document.getElementById(comp.sqftId).value) || 0;
+        const pricePerSqft = (price > 0 && sqft > 0) ? price / sqft : 0;
+
+        document.getElementById(comp.displayId).textContent = pricePerSqft > 0 ? '$' + pricePerSqft.toFixed(2) : '$0.00';
+    });
 }
 
 // ===========================================
@@ -583,7 +669,17 @@ function clearAnalysis() {
         document.getElementById('comp1').value = '';
         document.getElementById('comp2').value = '';
         document.getElementById('comp3').value = '';
+        document.getElementById('comp1Sqft').value = '';
+        document.getElementById('comp2Sqft').value = '';
+        document.getElementById('comp3Sqft').value = '';
+        document.getElementById('subjectSqft').value = '';
         document.getElementById('calculatedARV').textContent = '$0';
+        document.getElementById('calculatedARVBySqft').textContent = '$0';
+        document.getElementById('recommendedARV').textContent = '$0';
+        document.getElementById('avgPricePerSqft').textContent = '$0.00';
+        document.getElementById('comp1PricePerSqft').textContent = '$0.00';
+        document.getElementById('comp2PricePerSqft').textContent = '$0.00';
+        document.getElementById('comp3PricePerSqft').textContent = '$0.00';
 
         // Repairs
         document.getElementById('totalRepairsInput').value = '';
