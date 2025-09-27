@@ -401,6 +401,71 @@
                 </div>
             </div>
 
+            <!-- Buyer-Focused Profit Calculator -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
+                <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedARV">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
+                            <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedRepairs">$0</div>
+                            <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Closing Costs</span>
+                            <div class="text-lg font-bold text-orange-800 mt-1" id="buyerFocusedClosing">$0</div>
+                            <div class="text-xs text-orange-500 mt-1">10% of ARV</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Buyer Profit</span>
+                            <div class="text-lg font-bold text-purple-800 mt-1" id="buyerFocusedProfit">$0</div>
+                            <div class="text-xs text-purple-500 mt-1">Based on Repair Level</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-green-600 uppercase tracking-wide">MAO</span>
+                            <div class="text-lg font-bold text-green-600 mt-1" id="buyerFocusedMAO">$0</div>
+                            <div class="text-xs text-green-500 mt-1">Max Allowable Offer</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-center">
+                            <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">LAO</span>
+                            <div class="text-lg font-bold text-blue-600 mt-1" id="buyerFocusedLAO">$0</div>
+                            <div class="text-xs text-blue-500 mt-1">MAO × 70%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <h4 class="font-semibold text-green-800 text-sm mb-2">💰 Buyer Profit Structure:</h4>
+                    <div class="text-xs text-green-700 space-y-1">
+                        <div>• <strong>Under $30k repairs:</strong> $30k buyer profit required</div>
+                        <div>• <strong>$30k-$50k repairs:</strong> Same as repair amount for profit</div>
+                        <div>• <strong>$50k-$80k repairs:</strong> $50k buyer profit required</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Rapid Offer System -->
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h3 class="text-lg font-semibold mb-4">⚡ Rapid Offer System Calculator</h3>
@@ -504,73 +569,8 @@
                     <div class="text-xs text-blue-700 space-y-1">
                         <div>• <strong>Enter your percentage</strong> - Common ranges: 65%-80% for different markets/strategies</div>
                         <div>• <strong>Calculation updates automatically</strong> - Uses your ARV and repair estimates from above</div>
-                        <div>• <strong>Compare with Rapid Offer System</strong> - Use both calculators to validate your offers</div>
+                        <div>• <strong>Compare with Buyer-Focused Calculator</strong> - Use both calculators to validate your offers</div>
                         <div>• <strong>Adjust percentage based on</strong> - Market conditions, competition, profit targets</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Buyer-Focused Profit Calculator -->
-            <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <h3 class="text-lg font-semibold mb-4">🎯 Buyer-Focused Profit Calculator</h3>
-                <p class="text-sm text-gray-600 mb-4">Formula: ARV - Repairs - Closing Cost - Buyer Profit = MAO</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div class="text-center">
-                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">ARV</span>
-                            <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedARV">$0</div>
-                            <div class="text-xs text-gray-500 mt-1">After Repair Value</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div class="text-center">
-                            <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">Repairs</span>
-                            <div class="text-lg font-bold text-gray-800 mt-1" id="buyerFocusedRepairs">$0</div>
-                            <div class="text-xs text-gray-500 mt-1">Total Repair Costs</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <div class="text-center">
-                            <span class="text-xs font-medium text-orange-600 uppercase tracking-wide">Closing Costs</span>
-                            <div class="text-lg font-bold text-orange-800 mt-1" id="buyerFocusedClosing">$0</div>
-                            <div class="text-xs text-orange-500 mt-1">10% of ARV</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <div class="text-center">
-                            <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Buyer Profit</span>
-                            <div class="text-lg font-bold text-purple-800 mt-1" id="buyerFocusedProfit">$0</div>
-                            <div class="text-xs text-purple-500 mt-1">Based on Repair Level</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="text-center">
-                            <span class="text-xs font-medium text-green-600 uppercase tracking-wide">MAO</span>
-                            <div class="text-lg font-bold text-green-600 mt-1" id="buyerFocusedMAO">$0</div>
-                            <div class="text-xs text-green-500 mt-1">Max Allowable Offer</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="text-center">
-                            <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">LAO</span>
-                            <div class="text-lg font-bold text-blue-600 mt-1" id="buyerFocusedLAO">$0</div>
-                            <div class="text-xs text-blue-500 mt-1">MAO × 70%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <h4 class="font-semibold text-green-800 text-sm mb-2">💰 Buyer Profit Structure:</h4>
-                    <div class="text-xs text-green-700 space-y-1">
-                        <div>• <strong>Under $30k repairs:</strong> $30k buyer profit required</div>
-                        <div>• <strong>$30k-$50k repairs:</strong> Same as repair amount for profit</div>
-                        <div>• <strong>$50k-$80k repairs:</strong> $50k buyer profit required</div>
                     </div>
                 </div>
             </div>
