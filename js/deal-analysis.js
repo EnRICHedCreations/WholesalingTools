@@ -442,22 +442,14 @@ function calculateTaxDelinquentDeal() {
             return;
         }
 
-        // SCENARIO B: Buyer Pays Tax Lien - Adjust MAO
-        const adjustedMAO = originalMAO - taxLien;
-
-        if (adjustedMAO <= 0) {
-            alert('Tax lien amount exceeds the MAO. This deal is not viable as structured.');
-            return;
-        }
+        // SCENARIO A: Seller Pays Tax Lien - Use Original MAO
+        // No adjustment needed since buyer just pays the MAO and seller handles taxes
 
         // Update displays
         document.getElementById('taxOriginalMAO').textContent = formatCurrency(originalMAO);
 
-        // Show MAO adjustment section
-        document.getElementById('maoAdjustmentSection').classList.remove('hidden');
-        document.getElementById('adjustmentOriginalMAO').textContent = formatCurrency(originalMAO);
-        document.getElementById('adjustmentTaxLien').textContent = formatCurrency(taxLien);
-        document.getElementById('adjustmentAdjustedMAO').textContent = formatCurrency(adjustedMAO);
+        // Hide MAO adjustment section for Scenario A
+        document.getElementById('maoAdjustmentSection').classList.add('hidden');
 
         // Define scenarios
         const scenarios = [
@@ -477,10 +469,10 @@ function calculateTaxDelinquentDeal() {
             });
         }
 
-        // Calculate scenarios using ADJUSTED MAO
+        // Calculate scenarios using ORIGINAL MAO (Scenario A)
         const calculatedResults = scenarios.map(scenario => {
-            const offer = adjustedMAO - scenario.fee;
-            const sellerNet = offer; // Seller gets clean proceeds (no tax lien deduction)
+            const offer = originalMAO - scenario.fee;
+            const sellerNet = offer - taxLien; // Seller pays tax lien from their proceeds
             const viable = sellerNet >= 0;
 
             let quality = 'Not Viable';
@@ -511,15 +503,15 @@ function calculateTaxDelinquentDeal() {
 
             let strategy = '';
             if (sellerNet < 0) {
-                strategy = 'Negative offer. Assignment fee too high for this tax burden scenario.';
+                strategy = 'Seller owes money at closing. Negotiate tax lien reduction or walk away.';
             } else if (sellerNet < 10000) {
-                strategy = 'Low seller net. Need highly motivated seller willing to accept minimal proceeds.';
+                strategy = 'Low seller net after taxes. Need highly motivated seller or tax negotiation.';
             } else if (sellerNet < 25000) {
-                strategy = 'Reasonable offer. Seller gets clean proceeds, buyer handles tax lien separately.';
+                strategy = 'Reasonable offer. Good for motivated sellers willing to clear tax debt.';
             } else if (sellerNet < 50000) {
-                strategy = 'Strong offer. Clean transaction with meaningful seller proceeds.';
+                strategy = 'Strong offer. Seller gets meaningful cash after clearing tax lien.';
             } else {
-                strategy = 'Premium offer. Excellent deal structure with high seller satisfaction.';
+                strategy = 'Premium offer. Easy close with substantial seller proceeds after taxes.';
             }
 
             return {
@@ -537,17 +529,26 @@ function calculateTaxDelinquentDeal() {
         // Sort by assignment fee
         calculatedResults.sort((a, b) => a.fee - b.fee);
 
-        // Update summary stats
-        document.getElementById('taxSummaryOriginalMAO').textContent = formatCurrency(originalMAO);
-        document.getElementById('taxSummaryLien').textContent = formatCurrency(taxLien);
-        document.getElementById('taxSummaryAdjustedMAO').textContent = formatCurrency(adjustedMAO);
+        // Update summary stats with error checking
+        const summaryMAOElement = document.getElementById('taxSummaryOriginalMAO');
+        const summaryLienElement = document.getElementById('taxSummaryLien');
+        const offerRangeElement = document.getElementById('taxOfferRange');
 
-        const minOffer = adjustedMAO - 30000;
-        const maxOffer = adjustedMAO - 10000;
-        document.getElementById('taxOfferRange').textContent = `${formatCurrency(Math.max(0, minOffer))} - ${formatCurrency(Math.max(0, maxOffer))}`;
+        if (summaryMAOElement) summaryMAOElement.textContent = formatCurrency(originalMAO);
+        if (summaryLienElement) summaryLienElement.textContent = formatCurrency(taxLien);
+
+        const minOffer = originalMAO - 30000;
+        const maxOffer = originalMAO - 10000;
+        if (offerRangeElement) {
+            offerRangeElement.textContent = `${formatCurrency(Math.max(0, minOffer))} - ${formatCurrency(Math.max(0, maxOffer))}`;
+        }
 
         // Generate scenario cards
         const cardsContainer = document.getElementById('taxScenarioCards');
+        if (!cardsContainer) {
+            console.error('taxScenarioCards container not found');
+            return;
+        }
         cardsContainer.innerHTML = '';
 
         calculatedResults.forEach(scenario => {
@@ -580,20 +581,20 @@ function calculateTaxDelinquentDeal() {
                         </div>
 
                         <div class="flex justify-between items-center py-2 border-b border-gray-300">
-                            <span class="text-sm text-gray-700 font-medium">Buyer Pays Tax Lien</span>
-                            <span class="text-lg font-bold text-blue-600">+${formatCurrency(taxLien)}</span>
+                            <span class="text-sm text-gray-700 font-medium">Minus Tax Lien</span>
+                            <span class="text-lg font-bold text-red-600">-${formatCurrency(taxLien)}</span>
                         </div>
 
                         <div class="flex justify-between items-center py-3 bg-white bg-opacity-60 rounded-lg px-3">
-                            <span class="text-sm font-bold text-gray-700">Seller Nets (Clean)</span>
+                            <span class="text-sm font-bold text-gray-700">Seller Nets</span>
                             <span class="text-xl font-bold ${scenario.sellerNet >= 0 ? 'text-green-600' : 'text-red-600'}">
                                 ${formatCurrency(scenario.sellerNet)}
                             </span>
                         </div>
 
-                        <div class="bg-blue-50 rounded px-3 py-2">
-                            <div class="text-xs text-blue-700">
-                                <strong>Buyer's Total:</strong> ${formatCurrency(scenario.offer + taxLien)} (${formatCurrency(scenario.offer)} + ${formatCurrency(taxLien)} tax lien)
+                        <div class="bg-gray-50 rounded px-3 py-2">
+                            <div class="text-xs text-gray-600">
+                                <strong>End Buyer Pays:</strong> ${formatCurrency(scenario.offer)} (your assignment fee: ${formatCurrency(scenario.fee)})
                             </div>
                         </div>
                     </div>
@@ -609,12 +610,17 @@ function calculateTaxDelinquentDeal() {
         });
 
         // Show results, hide instructions
-        document.getElementById('taxDelinquentResults').classList.remove('hidden');
-        document.getElementById('taxHowItWorks').classList.add('hidden');
+        const resultsElement = document.getElementById('taxDelinquentResults');
+        const howItWorksElement = document.getElementById('taxHowItWorks');
+
+        if (resultsElement) resultsElement.classList.remove('hidden');
+        if (howItWorksElement) howItWorksElement.classList.add('hidden');
 
     } catch (error) {
         console.error('Error in calculateTaxDelinquentDeal:', error);
-        alert('Error calculating tax delinquent deal. Please check your inputs.');
+        console.error('Error details:', error.message);
+        console.error('Stack trace:', error.stack);
+        alert(`Error calculating tax delinquent deal: ${error.message}`);
     }
 }
 
