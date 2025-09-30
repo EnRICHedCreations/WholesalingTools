@@ -410,9 +410,203 @@ function calculateBuyerFocusedOffer() {
         document.getElementById('buyerFocusedProfit').textContent = formatCurrency(requiredBuyerProfit);
         document.getElementById('buyerFocusedMAO').textContent = formatCurrency(Math.max(0, mao));
         document.getElementById('buyerFocusedLAO').textContent = formatCurrency(Math.max(0, lao));
+
+        // Update the Tax Delinquent Calculator MAO display
+        updateTaxMAODisplay();
         
     } catch (error) {
         console.error('Error in calculateBuyerFocusedOffer:', error);
+    }
+}
+
+// ===========================================
+// TAX DELINQUENT DEAL CALCULATOR
+// ===========================================
+
+function calculateTaxDelinquentDeal() {
+    try {
+        // Get MAO from the buyer-focused calculator
+        const maoText = document.getElementById('buyerFocusedMAO').textContent;
+        const mao = parseFloat(maoText.replace(/[$,]/g, '')) || 0;
+
+        const taxLien = parseFloat(document.getElementById('taxLienAmount').value) || 0;
+        const customFee = parseFloat(document.getElementById('customAssignmentFee').value) || 0;
+
+        if (mao <= 0) {
+            alert('Please ensure the Buyer-Focused Calculator above has been calculated first to generate a MAO value.');
+            return;
+        }
+
+        if (taxLien <= 0) {
+            alert('Please enter a valid Tax Delinquent amount');
+            return;
+        }
+
+        // Update the MAO display
+        document.getElementById('taxMAODisplay').textContent = formatCurrency(mao);
+
+        // Define scenarios
+        const scenarios = [
+            { fee: 10000, label: 'Minimum Fee', color: 'bg-red-50 border-red-200' },
+            { fee: 15000, label: 'Conservative', color: 'bg-yellow-50 border-yellow-200' },
+            { fee: 20000, label: 'Target Fee', color: 'bg-blue-50 border-blue-200' },
+            { fee: 25000, label: 'Aggressive', color: 'bg-purple-50 border-purple-200' },
+            { fee: 30000, label: 'Premium', color: 'bg-green-50 border-green-200' }
+        ];
+
+        // Add custom fee if provided
+        if (customFee > 0) {
+            scenarios.push({
+                fee: customFee,
+                label: 'Custom Fee',
+                color: 'bg-indigo-50 border-indigo-200'
+            });
+        }
+
+        // Calculate scenarios
+        const calculatedResults = scenarios.map(scenario => {
+            const offer = mao - scenario.fee;
+            const sellerNet = offer - taxLien;
+            const viable = sellerNet >= 0;
+
+            let quality = 'Not Viable';
+            let qualityColor = 'text-red-600';
+            let icon = '❌';
+
+            if (sellerNet < 0) {
+                quality = 'Needs Tax Negotiation';
+                qualityColor = 'text-red-600';
+                icon = '❌';
+            } else if (sellerNet >= 0 && sellerNet < 10000) {
+                quality = 'High Motivation Required';
+                qualityColor = 'text-orange-600';
+                icon = '⚠️';
+            } else if (sellerNet >= 10000 && sellerNet < 25000) {
+                quality = 'Good Deal';
+                qualityColor = 'text-yellow-600';
+                icon = '✅';
+            } else if (sellerNet >= 25000 && sellerNet < 50000) {
+                quality = 'Strong Deal';
+                qualityColor = 'text-green-600';
+                icon = '💪';
+            } else {
+                quality = 'Premium Deal';
+                qualityColor = 'text-blue-600';
+                icon = '🏆';
+            }
+
+            let strategy = '';
+            if (sellerNet < 0) {
+                strategy = 'Seller owes money. Negotiate tax lien down or walk away.';
+            } else if (sellerNet < 10000) {
+                strategy = 'Low seller net. Need highly motivated seller or tax negotiation.';
+            } else if (sellerNet < 25000) {
+                strategy = 'Reasonable offer. Good for motivated sellers.';
+            } else if (sellerNet < 50000) {
+                strategy = 'Strong offer. Seller gets meaningful cash.';
+            } else {
+                strategy = 'Premium offer. Easy close, competitive situation.';
+            }
+
+            return {
+                ...scenario,
+                offer,
+                sellerNet,
+                viable,
+                quality,
+                qualityColor,
+                icon,
+                strategy
+            };
+        });
+
+        // Sort by assignment fee
+        calculatedResults.sort((a, b) => a.fee - b.fee);
+
+        // Update summary stats
+        document.getElementById('taxSummaryMAO').textContent = formatCurrency(mao);
+        document.getElementById('taxSummaryLien').textContent = formatCurrency(taxLien);
+
+        const minOffer = mao - 30000;
+        const maxOffer = mao - 10000;
+        document.getElementById('taxOfferRange').textContent = `${formatCurrency(minOffer)} - ${formatCurrency(maxOffer)}`;
+
+        // Generate scenario cards
+        const cardsContainer = document.getElementById('taxScenarioCards');
+        cardsContainer.innerHTML = '';
+
+        calculatedResults.forEach(scenario => {
+            const cardHTML = `
+                <div class="${scenario.color} border-2 rounded-xl p-6 transition-all hover:shadow-lg">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">
+                                ${scenario.label}
+                            </h4>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">${scenario.icon}</span>
+                                <span class="text-sm font-semibold ${scenario.qualityColor}">
+                                    ${scenario.quality}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-600 mb-1">Your Fee</div>
+                            <div class="text-xl font-bold text-gray-900">
+                                ${formatCurrency(scenario.fee)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-300">
+                            <span class="text-sm text-gray-700 font-medium">Your Offer to Seller</span>
+                            <span class="text-lg font-bold text-gray-900">${formatCurrency(scenario.offer)}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center py-2 border-b border-gray-300">
+                            <span class="text-sm text-gray-700 font-medium">Minus Tax Lien</span>
+                            <span class="text-lg font-bold text-red-600">-${formatCurrency(taxLien)}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center py-3 bg-white bg-opacity-60 rounded-lg px-3">
+                            <span class="text-sm font-bold text-gray-700">Seller Nets</span>
+                            <span class="text-xl font-bold ${scenario.sellerNet >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                ${formatCurrency(scenario.sellerNet)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-300">
+                        <p class="text-xs text-gray-600">
+                            ${scenario.strategy}
+                        </p>
+                    </div>
+                </div>
+            `;
+            cardsContainer.innerHTML += cardHTML;
+        });
+
+        // Show results, hide instructions
+        document.getElementById('taxDelinquentResults').classList.remove('hidden');
+        document.getElementById('taxHowItWorks').classList.add('hidden');
+
+    } catch (error) {
+        console.error('Error in calculateTaxDelinquentDeal:', error);
+        alert('Error calculating tax delinquent deal. Please check your inputs.');
+    }
+}
+
+function updateTaxMAODisplay() {
+    // This function is called whenever the buyer-focused calculator updates
+    // to keep the tax delinquent calculator in sync
+    const maoText = document.getElementById('buyerFocusedMAO').textContent;
+    document.getElementById('taxMAODisplay').textContent = maoText;
+
+    // If user has already entered tax lien amount, recalculate automatically
+    const taxLien = parseFloat(document.getElementById('taxLienAmount').value) || 0;
+    if (taxLien > 0) {
+        calculateTaxDelinquentDeal();
     }
 }
 
@@ -754,4 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
     calculateCustomOffer();
     calculateBuyerFocusedOffer();
     updateAICalculator();
+
+    // Initialize Tax Delinquent Calculator
+    updateTaxMAODisplay();
 });
