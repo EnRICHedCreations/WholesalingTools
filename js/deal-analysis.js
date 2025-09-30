@@ -621,14 +621,50 @@ function calculateTaxDelinquentDeal() {
 function updateTaxMAODisplay() {
     // This function is called whenever the buyer-focused calculator updates
     // to keep the tax delinquent calculator in sync
-    const maoText = document.getElementById('buyerFocusedMAO').textContent;
-    document.getElementById('taxOriginalMAO').textContent = maoText;
+    try {
+        const buyerMAOElement = document.getElementById('buyerFocusedMAO');
+        const taxMAOElement = document.getElementById('taxOriginalMAO');
 
-    // If user has already entered tax lien amount, recalculate automatically
-    const taxLien = parseFloat(document.getElementById('taxLienAmount').value) || 0;
-    if (taxLien > 0) {
-        calculateTaxDelinquentDeal();
+        console.log('updateTaxMAODisplay called');
+        console.log('buyerMAOElement:', buyerMAOElement);
+        console.log('taxMAOElement:', taxMAOElement);
+
+        if (!buyerMAOElement) {
+            console.log('buyerFocusedMAO element not found');
+            return;
+        }
+
+        if (!taxMAOElement) {
+            console.log('taxOriginalMAO element not found');
+            return;
+        }
+
+        const maoText = buyerMAOElement.textContent;
+        console.log('Updating Tax MAO display with:', maoText);
+        taxMAOElement.textContent = maoText;
+
+        // If user has already entered tax lien amount, recalculate automatically
+        const taxLienElement = document.getElementById('taxLienAmount');
+        if (taxLienElement) {
+            const taxLien = parseFloat(taxLienElement.value) || 0;
+            if (taxLien > 0) {
+                console.log('Auto-recalculating tax delinquent deal with tax lien:', taxLien);
+                calculateTaxDelinquentDeal();
+            }
+        }
+    } catch (error) {
+        console.error('Error in updateTaxMAODisplay:', error);
     }
+}
+
+// Test function for debugging
+function testTaxMAOUpdate() {
+    console.log('Testing MAO update...');
+    const buyerMAO = document.getElementById('buyerFocusedMAO');
+    console.log('Buyer MAO element:', buyerMAO);
+    console.log('Buyer MAO text:', buyerMAO ? buyerMAO.textContent : 'not found');
+
+    updateTaxMAODisplay();
 }
 
 // ===========================================
@@ -970,6 +1006,8 @@ document.addEventListener('DOMContentLoaded', function() {
     calculateBuyerFocusedOffer();
     updateAICalculator();
 
-    // Initialize Tax Delinquent Calculator
-    updateTaxMAODisplay();
+    // Initialize Tax Delinquent Calculator with a small delay to ensure all elements are loaded
+    setTimeout(() => {
+        updateTaxMAODisplay();
+    }, 100);
 });
