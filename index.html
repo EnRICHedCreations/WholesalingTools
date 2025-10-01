@@ -6,6 +6,7 @@
     <title>Wholesaling Tools Dashboard - Enriched Property Solutions LLC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <style>
         /* Custom styles for Deal Analysis */
         html {
@@ -165,6 +166,9 @@
                     </button>
                     <button onclick="switchTab('seller-psychology')" id="tab-seller-psychology" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
                         🎭 Seller Psychology
+                    </button>
+                    <button onclick="switchTab('script-generator')" id="tab-script-generator" class="tab-inactive px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap">
+                        📞 Script Generator
                     </button>
                 </nav>
             </div>
@@ -9430,6 +9434,940 @@ MONTHLY FOLLOW-UP:
                     const sellerName = document.getElementById('sp-seller-name').value || 'Unknown Seller';
                     const profileType = document.getElementById('sp-profile-type').textContent;
                     alert(`Seller Profile Saved to Contacts!\n\nContact: ${sellerName}\nProfile: ${profileType}\n\nThis feature would:\n\n👥 Add to CRM system\n📝 Include psychology notes\n📅 Set follow-up reminders\n🎯 Track communication preferences\n📊 Monitor interaction history\n\nIntegration available with major CRM platforms.`);
+                }
+            </script>
+        </div>
+
+        <!-- Script Generator Tab -->
+        <div id="content-script-generator" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">📞 Cold Call Script Generator</h2>
+                <button onclick="clearScriptGenerator()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                    Clear Form
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800"><strong>Professional Script Generator:</strong> Create customized cold calling scripts using your specific deal information and property details.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Left Column: Deal Information Input -->
+                <div class="space-y-6">
+                    <!-- Property Details -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">🏠 Property Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Property Address</label>
+                                <input type="text" id="sg-property-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123 Main St, City, State 12345" onchange="generateScript()">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Seller Name</label>
+                                <input type="text" id="sg-seller-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="John Smith" onchange="generateScript()">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">ARV</label>
+                                    <input type="number" id="sg-arv" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="245000" onchange="generateScript()">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Repairs</label>
+                                    <input type="number" id="sg-repairs" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="40000" onchange="generateScript()">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Closing Costs</label>
+                                    <input type="number" id="sg-closing-costs" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="24500" onchange="generateScript()">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Contractor Profit</label>
+                                    <input type="number" id="sg-contractor-profit" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="40000" onchange="generateScript()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">MAO (Maximum Allowable Offer)</label>
+                                <input type="number" id="sg-mao" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="140500" onchange="generateScript()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deal Strategy -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">💰 Deal Strategy</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Special Circumstances</label>
+                                <select id="sg-special-circumstances" class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="generateScript()">
+                                    <option value="">Select Circumstance</option>
+                                    <option value="tax-lien">Tax Delinquent</option>
+                                    <option value="foreclosure">Pre-Foreclosure</option>
+                                    <option value="probate">Probate</option>
+                                    <option value="divorce">Divorce</option>
+                                    <option value="inheritance">Inherited Property</option>
+                                    <option value="absentee">Absentee Owner</option>
+                                    <option value="vacant">Vacant Property</option>
+                                    <option value="code-violation">Code Violations</option>
+                                    <option value="tired-landlord">Tired Landlord</option>
+                                    <option value="normal">Normal Sale</option>
+                                </select>
+                            </div>
+                            <div id="tax-lien-amount-container" class="hidden">
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Tax Lien Amount</label>
+                                <input type="number" id="sg-tax-lien-amount" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="83396" onchange="generateScript()">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Assignment Fee Range</label>
+                                    <input type="text" id="sg-assignment-fee-range" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="10000-30000" onchange="generateScript()">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-semibold mb-2">Initial Lowball Offer</label>
+                                    <input type="number" id="sg-initial-offer" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="27104" onchange="generateScript()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-semibold mb-2">Maximum Offer</label>
+                                <input type="number" id="sg-maximum-offer" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="47104" onchange="generateScript()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <button onclick="generateFullScript()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
+                            📞 Generate Complete Script
+                        </button>
+                        <p class="text-xs text-gray-500 mt-2 text-center">Creates a comprehensive cold calling script with rebuttals, objection handling, and negotiation strategy</p>
+                    </div>
+                </div>
+
+                <!-- Right Column: Script Preview -->
+                <div class="space-y-6">
+                    <!-- Script Preview -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">📋 Script Preview</h3>
+                            <button onclick="toggleFullscreen()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed" id="fullscreen-btn" disabled>
+                                🔍 View Fullscreen
+                            </button>
+                        </div>
+                        <div id="script-preview" class="border border-gray-200 rounded-lg p-4 min-h-96 bg-gray-50">
+                            <div class="text-center text-gray-500 py-8">
+                                <div class="text-4xl mb-4">📞</div>
+                                <h4 class="text-lg font-semibold mb-2">Ready to Generate Your Script</h4>
+                                <p class="text-sm">Fill in the property information on the left and click "Generate Complete Script" to create your customized cold calling script based on "The Sailor Script" methodology.</p>
+                                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <p class="text-xs text-blue-800"><strong>What you'll get:</strong></p>
+                                    <ul class="text-xs text-blue-700 mt-2 text-left">
+                                        <li>• Customized opening hook with property address</li>
+                                        <li>• Situation-specific rebuttals and objection handling</li>
+                                        <li>• Mathematical offer justification with your numbers</li>
+                                        <li>• Strategic negotiation roadmap with multiple offers</li>
+                                        <li>• Psychology-based closing techniques</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">⚡ Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="copyScriptToClipboard()" class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed" id="copy-script-btn" disabled>
+                                📋 Copy Script to Clipboard
+                            </button>
+                            <button onclick="downloadScript()" class="w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed" id="download-script-btn" disabled>
+                                💾 Download Script (.txt)
+                            </button>
+                            <button onclick="emailScript()" class="w-full bg-orange-600 text-white px-4 py-3 rounded-lg hover:bg-orange-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed" id="email-script-btn" disabled>
+                                📧 Email Script
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Script Statistics -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 Script Statistics</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-gray-900" id="script-word-count">0</div>
+                                <div class="text-xs text-gray-500">Words</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-gray-900" id="script-talk-time">0</div>
+                                <div class="text-xs text-gray-500">Minutes</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-gray-900" id="script-sections">0</div>
+                                <div class="text-xs text-gray-500">Sections</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                <div class="text-lg font-bold text-gray-900" id="script-rebuttals">0</div>
+                                <div class="text-xs text-gray-500">Rebuttals</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                let generatedScript = '';
+
+                function generateScript() {
+                    // Auto-generate preview as user types
+                    const address = document.getElementById('sg-property-address').value;
+                    const sellerName = document.getElementById('sg-seller-name').value;
+
+                    if (address && sellerName) {
+                        const previewElement = document.getElementById('script-preview');
+                        previewElement.innerHTML = `
+                            <div class="space-y-4">
+                                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <h4 class="font-semibold text-blue-900">Opening Hook Preview:</h4>
+                                    <p class="text-sm text-blue-800 mt-2">"Hey... is this ${sellerName}??? ${sellerName}? Hey this is [YOUR NAME], I'm an acquisition associate calling about that property on ${address}..."</p>
+                                </div>
+                                <div class="text-center py-4">
+                                    <button onclick="generateFullScript()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                        Generate Complete Script
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                function generateFullScript() {
+                    // Get all form values
+                    const address = document.getElementById('sg-property-address').value;
+                    const sellerName = document.getElementById('sg-seller-name').value;
+                    const arv = parseFloat(document.getElementById('sg-arv').value) || 0;
+                    const repairs = parseFloat(document.getElementById('sg-repairs').value) || 0;
+                    const closingCosts = parseFloat(document.getElementById('sg-closing-costs').value) || 0;
+                    const contractorProfit = parseFloat(document.getElementById('sg-contractor-profit').value) || 0;
+                    const mao = parseFloat(document.getElementById('sg-mao').value) || 0;
+                    const specialCircumstances = document.getElementById('sg-special-circumstances').value;
+                    const taxLienAmount = parseFloat(document.getElementById('sg-tax-lien-amount').value) || 0;
+                    const assignmentFeeRange = document.getElementById('sg-assignment-fee-range').value;
+                    const initialOffer = parseFloat(document.getElementById('sg-initial-offer').value) || 0;
+                    const maximumOffer = parseFloat(document.getElementById('sg-maximum-offer').value) || 0;
+
+                    if (!address || !sellerName || !arv) {
+                        alert('Please fill in at least Property Address, Seller Name, and ARV to generate a script.');
+                        return;
+                    }
+
+                    // Generate the complete script
+                    generatedScript = createCustomScript({
+                        address, sellerName, arv, repairs, closingCosts, contractorProfit, mao,
+                        specialCircumstances, taxLienAmount, assignmentFeeRange, initialOffer, maximumOffer
+                    });
+
+                    // Display the script
+                    document.getElementById('script-preview').innerHTML = `
+                        <div class="prose prose-sm max-w-none">
+                            <pre class="whitespace-pre-wrap text-xs bg-white p-4 border rounded">${generatedScript}</pre>
+                        </div>
+                    `;
+
+                    // Update statistics
+                    updateScriptStatistics(generatedScript);
+
+                    // Enable action buttons
+                    document.getElementById('copy-script-btn').disabled = false;
+                    document.getElementById('download-script-btn').disabled = false;
+                    document.getElementById('email-script-btn').disabled = false;
+                    document.getElementById('fullscreen-btn').disabled = false;
+                }
+
+                function createCustomScript(data) {
+                    const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
+
+                    // Add random decimals to offers
+                    const initialOfferWithDecimals = data.initialOffer + (Math.random() * 100);
+                    const maxOfferWithDecimals = data.maximumOffer + (Math.random() * 100);
+                    const midOfferWithDecimals = ((data.initialOffer + data.maximumOffer) / 2) + (Math.random() * 100);
+
+                    // Get detailed circumstance-specific content
+                    const circumstanceData = getCircumstanceSpecificContent(data.specialCircumstances, data.taxLienAmount, formatCurrency);
+
+                    function getCircumstanceSpecificContent(circumstance, taxAmount, formatCurrency) {
+                        switch(circumstance) {
+                            case 'tax-lien':
+                                return {
+                                    opening: 'You popped up on the tax delinquent list, and I specialize in helping property owners in your exact situation.',
+                                    painPoint: `you owe ${formatCurrency(taxAmount)} in back taxes on that property, and that number's only getting bigger every day with penalties and interest`,
+                                    notInterested: `But here's the thing - you owe ${formatCurrency(taxAmount)} in back taxes, and the county doesn't negotiate. Every month that passes, you're paying more in penalties and interest.`,
+                                    handleMyself: `How long have you been trying to handle this ${formatCurrency(taxAmount)} tax bill yourself? Because here's what I've learned working with folks in your situation - the county doesn't care about your circumstances, and they WILL take your property if you can't pay.`,
+                                    someoneHelping: `Are they offering you a way to pay off the ${formatCurrency(taxAmount)} immediately AND put cash in your pocket? Because that's exactly what we do.`,
+                                    painDiscovery: [
+                                        `How did you end up with ${formatCurrency(taxAmount)} in back taxes?`,
+                                        `Have you been losing sleep over this tax situation?`,
+                                        `What happens if you can't come up with ${formatCurrency(taxAmount)}?`,
+                                        `Have you looked into what the county's next steps are?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Every day you wait, that ${formatCurrency(taxAmount)} grows with penalties`,
+                                        `The county has already started the process - they don't just go away`,
+                                        `I've seen people lose their properties for less than what you owe`
+                                    ],
+                                    mathIntro: `Now I want you to understand exactly why we can pay what we can pay. We have to factor in that ${formatCurrency(taxAmount)} tax lien immediately:`
+                                };
+
+                            case 'foreclosure':
+                                return {
+                                    opening: 'You showed up on the pre-foreclosure list, and I help homeowners avoid foreclosure every day.',
+                                    painPoint: 'your property is in the foreclosure process, and time is literally running out',
+                                    notInterested: `But here's the thing - you're in foreclosure, and the bank isn't going to wait. They don't care about your situation, they just want their money.`,
+                                    handleMyself: `How long have you been trying to work with the bank on this? Because here's what I know - banks don't want your house, but they will take it if they have to.`,
+                                    someoneHelping: `Are they offering you a way to stop the foreclosure AND walk away with cash? Because that's what we specialize in.`,
+                                    painDiscovery: [
+                                        `How far behind are you on payments?`,
+                                        `When is your foreclosure date?`,
+                                        `Have you been able to sleep since this started?`,
+                                        `What's your plan if the bank takes the house?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Every day closer to foreclosure date means fewer options`,
+                                        `Once the bank takes it, you get nothing`,
+                                        `Your credit is being destroyed while we're talking`
+                                    ],
+                                    mathIntro: `Let me show you exactly what we can do to stop this foreclosure:`
+                                };
+
+                            case 'probate':
+                                return {
+                                    opening: 'You came up in the probate records, and I specialize in helping families with inherited properties.',
+                                    painPoint: 'you inherited this property and it may be creating a financial and emotional burden',
+                                    notInterested: `But here's the thing - inherited properties come with ongoing costs, taxes, and responsibilities that most families aren't prepared for.`,
+                                    handleMyself: `How long have you been dealing with this inherited property? Because here's what I've learned - most families think they can handle it themselves until the bills start piling up.`,
+                                    someoneHelping: `Are they offering you a way to close quickly without repairs, inspections, or months of uncertainty? Because that's what families in your situation need.`,
+                                    painDiscovery: [
+                                        `How long ago did you inherit this property?`,
+                                        `Are you keeping up with the taxes and maintenance?`,
+                                        `Is this causing stress within the family?`,
+                                        `What did you originally plan to do with it?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Empty properties deteriorate quickly and cost money`,
+                                        `Property taxes don't stop just because it's inherited`,
+                                        `The longer you wait, the more problems usually arise`
+                                    ],
+                                    mathIntro: `Let me show you what we can offer for your inherited property:`
+                                };
+
+                            case 'divorce':
+                                return {
+                                    opening: 'I help people going through divorce sell their properties quickly for cash.',
+                                    painPoint: 'you need to liquidate this property as part of your divorce proceedings',
+                                    notInterested: `But here's the thing - divorce proceedings don't wait, and judges want assets divided quickly and fairly.`,
+                                    handleMyself: `How long has this divorce been going on? Because here's what I know - the longer properties sit in divorce proceedings, the more complicated and expensive everything becomes.`,
+                                    someoneHelping: `Can they guarantee a quick closing that works with your legal timeline? Because that's what divorce situations require.`,
+                                    painDiscovery: [
+                                        `How long have you been going through this divorce?`,
+                                        `Is the property holding up your settlement?`,
+                                        `Are you both paying for a house neither of you wants?`,
+                                        `What did your attorney tell you about selling?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Every month you both pay for a house neither wants`,
+                                        `Judges prefer quick, clean asset division`,
+                                        `The stress of an unsold house complicates everything`
+                                    ],
+                                    mathIntro: `Here's what we can offer to help resolve your property quickly:`
+                                };
+
+                            case 'inheritance':
+                                return {
+                                    opening: 'You came up as inheriting this property, and I help families turn inherited properties into cash.',
+                                    painPoint: 'you inherited a property that may be more of a burden than a blessing',
+                                    notInterested: `But here's the thing - inherited properties come with ongoing expenses, and most people aren't prepared for the costs and responsibilities.`,
+                                    handleMyself: `How long have you owned this inherited property? Because here's what I've seen - people think they'll fix it up or rent it out, but it usually becomes more complicated than expected.`,
+                                    someoneHelping: `Can they close quickly without you having to invest any money in repairs or deal with tenants? Because that's what most inheritance situations need.`,
+                                    painDiscovery: [
+                                        `What condition is the property in?`,
+                                        `Are you paying taxes and utilities on it?`,
+                                        `Did you plan to keep it or sell it?`,
+                                        `Is it causing stress for your family?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Empty inherited properties can become money pits`,
+                                        `You're paying expenses on a property you may not even want`,
+                                        `Property conditions usually get worse, not better`
+                                    ],
+                                    mathIntro: `Let me show you what we can pay for your inherited property:`
+                                };
+
+                            case 'absentee':
+                                return {
+                                    opening: 'You came up as an out-of-area property owner, and I help absentee owners sell their properties without the hassle.',
+                                    painPoint: 'you own a property you can\'t properly manage from a distance',
+                                    notInterested: `But here's the thing - managing a property from far away is expensive and stressful, especially when problems arise.`,
+                                    handleMyself: `How long have you been managing this property from a distance? Because here's what I know - absentee ownership usually becomes more trouble than it's worth.`,
+                                    someoneHelping: `Can they handle everything locally without you having to travel or coordinate from far away? Because that's what absentee owners need.`,
+                                    painDiscovery: [
+                                        `How far away do you live from the property?`,
+                                        `When's the last time you were able to check on it?`,
+                                        `Are you dealing with tenant or maintenance issues?`,
+                                        `How much are you spending on property management?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Distance makes every problem more expensive to fix`,
+                                        `You can't properly supervise contractors or tenants`,
+                                        `Vacant properties can deteriorate quickly without oversight`
+                                    ],
+                                    mathIntro: `Here's what we can offer for your out-of-area property:`
+                                };
+
+                            case 'vacant':
+                                return {
+                                    opening: 'Your property came up as vacant, and I specialize in helping owners deal with empty properties.',
+                                    painPoint: 'you have a vacant property that\'s costing you money every month',
+                                    notInterested: `But here's the thing - vacant properties are money drains, and they usually get worse, not better.`,
+                                    handleMyself: `How long has the property been vacant? Because here's what I know - empty properties attract problems and cost more every month they sit.`,
+                                    someoneHelping: `Can they close quickly so you stop paying for an empty property? Because every month it sits vacant costs you money.`,
+                                    painDiscovery: [
+                                        `How long has it been vacant?`,
+                                        `What are you paying monthly for utilities, taxes, insurance?`,
+                                        `Have you had any break-ins or vandalism?`,
+                                        `What's your plan to get it occupied?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Vacant properties deteriorate rapidly`,
+                                        `You're paying all the costs with no income`,
+                                        `Empty houses attract crime and vandalism`
+                                    ],
+                                    mathIntro: `Let me show you what we can pay to take this vacant property off your hands:`
+                                };
+
+                            case 'code-violation':
+                                return {
+                                    opening: 'Your property came up with code violations, and I help property owners resolve these situations quickly.',
+                                    painPoint: 'you have code violations that need expensive fixes',
+                                    notInterested: `But here's the thing - code violations don't go away, and the city will keep fining you until they're fixed.`,
+                                    handleMyself: `How long have you been dealing with these code violations? Because here's what I know - cities don't negotiate, and the fines keep adding up.`,
+                                    someoneHelping: `Can they take care of all the code violations so you don't have to deal with the city anymore? Because that's exactly what we do.`,
+                                    painDiscovery: [
+                                        `What violations are you dealing with?`,
+                                        `How much will it cost to fix everything?`,
+                                        `Are you getting fined by the city?`,
+                                        `Have you gotten estimates for the repairs?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Code violation fines keep accumulating`,
+                                        `The city can force you to make expensive repairs`,
+                                        `Unresolved violations can lead to condemnation`
+                                    ],
+                                    mathIntro: `Here's what we can offer, and we'll handle all the code violations:`
+                                };
+
+                            case 'tired-landlord':
+                                return {
+                                    opening: 'You came up as a property owner, and I help tired landlords get out of the rental business.',
+                                    painPoint: 'you\'re tired of dealing with tenants, repairs, and all the headaches of being a landlord',
+                                    notInterested: `But here's the thing - being a landlord only gets more difficult and expensive over time, especially with changing laws and regulations.`,
+                                    handleMyself: `How long have you been dealing with rental properties? Because here's what I know - most landlords reach a point where the stress isn't worth the income.`,
+                                    someoneHelping: `Can they buy it with existing tenants so you don't have to deal with evictions or vacancy? Because that's what tired landlords need.`,
+                                    painDiscovery: [
+                                        `How long have you been a landlord?`,
+                                        `What problems are you dealing with?`,
+                                        `Are your tenants paying on time?`,
+                                        `How much are you spending on repairs and maintenance?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Landlord laws are getting more tenant-friendly`,
+                                        `Maintenance costs keep going up`,
+                                        `Bad tenants can destroy your investment quickly`
+                                    ],
+                                    mathIntro: `Let me show you what we can pay to get you out of the landlord business:`
+                                };
+
+                            default:
+                                return {
+                                    opening: 'I work with property owners who need quick, hassle-free sales.',
+                                    painPoint: 'your property may be a good fit for our cash buying program',
+                                    notInterested: `But here's the thing - traditional sales can take months, with inspections, appraisals, and buyers falling through.`,
+                                    handleMyself: `How long have you been thinking about selling? Because here's what I know - the right cash buyer can make things much simpler.`,
+                                    someoneHelping: `Are they offering you a guaranteed cash close without inspections or financing contingencies? Because that's what sets us apart.`,
+                                    painDiscovery: [
+                                        `What's motivating you to consider selling?`,
+                                        `Have you tried selling before?`,
+                                        `What's your timeline for selling?`,
+                                        `What would a quick, guaranteed sale mean to you?`
+                                    ],
+                                    urgencyBuilders: [
+                                        `Market conditions can change quickly`,
+                                        `The longer properties sit, the more they cost you`,
+                                        `Cash buyers move much faster than traditional sales`
+                                    ],
+                                    mathIntro: `Here's what we can offer for your property:`
+                                };
+                        }
+                    }
+
+                    return `# Cold Call Script: ${data.address} - ${data.sellerName}
+
+## Deal Summary
+- **Property:** ${data.address}
+- **Seller:** ${data.sellerName}
+- **Situation:** ${data.specialCircumstances || 'General Sale'}
+- **ARV:** ${formatCurrency(data.arv)}
+- **Repairs:** ${formatCurrency(data.repairs)}
+- **Closing Costs:** ${formatCurrency(data.closingCosts)}
+- **Contractor Profit:** ${formatCurrency(data.contractorProfit)}
+- **MAO:** ${formatCurrency(data.mao)}
+${data.specialCircumstances === 'tax-lien' ? `- **Tax Lien:** ${formatCurrency(data.taxLienAmount)}` : ''}
+- **Assignment Fee Range:** $${data.assignmentFeeRange}
+- **Initial Offer:** ${formatCurrency(initialOfferWithDecimals)}
+- **Maximum Offer:** ${formatCurrency(maxOfferWithDecimals)}
+
+---
+
+## OPENING SCRIPT
+
+**[Dial with confidence, speak slower than feels natural]**
+
+"Hey... is this ${data.sellerName}??? ${data.sellerName}? Hey this is [YOUR NAME], I'm an acquisition associate calling about that property on ${data.address}..."
+
+**[PAUSE - Let them respond]**
+
+**If they say "Yes, that's me":**
+"Perfect. Listen, ${circumstanceData.opening} I work with a local contractor partner, and we buy houses for cash specifically to help people in your situation."
+
+**[PAUSE]**
+
+"Now, I'm not sure if you're even interested in selling, but I figured I'd reach out because we've helped dozens of people get clean cash for their properties. Is this something you might be open to hearing about?"
+
+---
+
+## REBUTTAL ARSENAL
+
+### If they say "I'm not interested":
+"I totally understand, ${data.sellerName}. Most people I talk to aren't initially interested either. ${circumstanceData.notInterested} **[PAUSE]** I'm curious though... what's your plan for handling that situation?"
+
+### If they say "I want to handle it myself":
+"That makes complete sense, and I respect that. But can I ask you something? ${circumstanceData.handleMyself} **[PAUSE]**"
+
+### If they say "I already have someone helping me":
+"That's great that you have help. Mind if I ask what solution they're offering you? **[PAUSE]** ${circumstanceData.someoneHelping}"
+
+---
+
+## PAIN DISCOVERY QUESTIONS
+
+"${data.sellerName}, can I ask you a personal question? **[PAUSE]** ${circumstanceData.painDiscovery[0]} **[SHUT UP AND LISTEN]**
+
+*[Listen for their response, then follow up with these situation-specific questions]:*
+
+${circumstanceData.painDiscovery.map(q => `- ${q}`).join('\n')}
+
+**[After they share their pain, dig deeper]:**
+
+"${data.sellerName}, that sounds incredibly difficult. **[PAUSE]** Can I ask... have you been losing sleep over this? **[PAUSE]** ${circumstanceData.urgencyBuilders[0]}.
+
+What would it mean to you to just be done with all of this?"
+
+**[CRITICAL: Stay on the pain until THEY change the subject. The deeper the emotion, the more motivated they become]**
+
+---
+
+## URGENCY BUILDERS
+
+Use these throughout the conversation:
+${circumstanceData.urgencyBuilders.map(u => `• ${u}`).join('\n')}
+
+---
+
+## MATHEMATICAL JUSTIFICATION
+
+"${circumstanceData.mathIntro}
+
+**ARV (After Repair Value):** ${formatCurrency(data.arv)} - that's what it'll sell for once it's completely renovated. **Do you agree that's about right?** **[GET A YES]**
+
+**Minus Renovation Costs:** ${formatCurrency(data.repairs)} - based on current market rates for updates. **Does that sound reasonable?** **[GET A YES]**
+
+${data.specialCircumstances === 'tax-lien' ? `**Minus Tax Lien:** ${formatCurrency(data.taxLienAmount)} - we have to pay this off immediately. **You understand that, right?** **[GET A YES]**` : ''}
+
+**Minus Closing Costs:** ${formatCurrency(data.closingCosts)} - realtor commissions, title insurance, transfer taxes. **That makes sense, doesn't it?** **[GET A YES]**
+
+**Minus Contractor's Profit:** ${formatCurrency(data.contractorProfit)} - my partner's putting up all the cash and taking all the risk. **That's fair, right?** **[GET A YES]**
+
+**Your offer:** ${formatCurrency(initialOfferWithDecimals)}
+
+**[PAUSE]**
+
+"Now I know you're probably thinking there's still a gap there, and you're right. My contractor partner builds in a cushion because ${data.specialCircumstances === 'tax-lien' ? 'tax situations can be unpredictable' : 'renovations often cost more than expected'}, and sometimes ${data.specialCircumstances === 'foreclosure' ? 'foreclosure timelines change' : 'the market can be unpredictable'}. **[PAUSE]** But at least you can see this isn't just some random number we pulled out of thin air."
+
+---
+
+## NEGOTIATION STRATEGY - COMING BACK AS THE HERO
+
+**[After they object to the initial offer]:**
+
+"You know what, ${data.sellerName}? I hear what you're saying, and I really want to make this work for you. **[PAUSE]** Let me call my contractor partner right now and see if we can do better. Can you hold on for just one minute?"
+
+**[Put them on hold for 60 seconds]**
+
+"${data.sellerName}? Okay, I just got off the phone with my partner, and I had to fight for this, but he agreed to go up to **${formatCurrency(midOfferWithDecimals)}**. **[PAUSE]** That's coming directly out of his profit margin, and honestly, I had to convince him that you really need this solution."
+
+**[If they're still hesitant, final bump]:**
+
+"You know what? Let me try one more time. **[PAUSE - put them on hold again]**
+
+"${data.sellerName}, this is it - my contractor partner said **${formatCurrency(maxOfferWithDecimals)}** is his absolute final offer. He said he's barely going to make any money at this number, but he understands your situation. **[PAUSE]** This is literally walking away money for you - ${circumstanceData.urgencyBuilders[0]}. **[PAUSE]** Can we move forward with this?"
+
+---
+
+## CLOSING SEQUENCE
+
+**[Once they agree]:**
+
+"Perfect! ${data.sellerName}, I'm excited we can help you get out of this situation. **[PAUSE]** Now, here's what happens next:
+
+1. I'm going to email you a simple purchase agreement while we're still on the phone
+2. You'll need to sign it and send it back to me today to lock in this price
+3. My contractor partner will schedule a quick property walkthrough within 48 hours
+4. We can close in as little as 7 days, or longer if you need time
+
+**[PAUSE]**
+
+"What's your email address? **[GET EMAIL]**
+
+"Perfect. ${data.sellerName}, you're making the right decision. In one week, you'll have cash in your hand and never have to worry about ${data.specialCircumstances === 'tax-lien' ? 'those taxes' : data.specialCircumstances === 'foreclosure' ? 'the foreclosure' : 'this property'} again. **[PAUSE]** I'm sending that contract right now. Once you sign it, we're locked in. Sound good?"
+
+**[SEND CONTRACT IMMEDIATELY]**
+
+---
+
+## KEY PSYCHOLOGICAL NOTES FOR THIS SITUATION
+
+- **Positioning:** You're the helpful associate, contractor partner is the decision maker
+- **Pain Focus:** ${circumstanceData.painPoint}
+- **Urgency:** ${circumstanceData.urgencyBuilders[0]}
+- **Social Proof:** "We've helped dozens with this exact situation"
+- **Math Justification:** Break down every component, get agreement on each
+- **Negotiation:** Come back as hero who "fought" for better numbers
+
+---
+
+*Remember: Speak slowly, pause frequently, and never hang up first. If they're still talking, they're still interested.*`;
+                }
+
+                function updateScriptStatistics(script) {
+                    const words = script.split(/\s+/).length;
+                    const talkTime = Math.round(words / 150); // Average 150 words per minute
+                    const sections = (script.match(/^##/gm) || []).length;
+                    const rebuttals = (script.match(/### If they say/g) || []).length;
+
+                    document.getElementById('script-word-count').textContent = words.toLocaleString();
+                    document.getElementById('script-talk-time').textContent = talkTime;
+                    document.getElementById('script-sections').textContent = sections;
+                    document.getElementById('script-rebuttals').textContent = rebuttals;
+                }
+
+                function copyScriptToClipboard() {
+                    if (!generatedScript) {
+                        alert('Please generate a script first.');
+                        return;
+                    }
+
+                    navigator.clipboard.writeText(generatedScript).then(() => {
+                        alert('Script copied to clipboard!');
+                    }).catch(() => {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = generatedScript;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        alert('Script copied to clipboard!');
+                    });
+                }
+
+                function downloadScript() {
+                    if (!generatedScript) {
+                        alert('Please generate a script first.');
+                        return;
+                    }
+
+                    const sellerName = document.getElementById('sg-seller-name').value || 'Seller';
+                    const address = document.getElementById('sg-property-address').value || 'Property';
+                    const filename = `${address.replace(/[^a-zA-Z0-9]/g, '_')}_${sellerName.replace(/[^a-zA-Z0-9]/g, '_')}_Script.txt`;
+
+                    const blob = new Blob([generatedScript], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function emailScript() {
+                    if (!generatedScript) {
+                        alert('Please generate a script first.');
+                        return;
+                    }
+
+                    const subject = `Cold Call Script - ${document.getElementById('sg-property-address').value || 'Property'}`;
+                    const body = encodeURIComponent(generatedScript);
+                    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
+                }
+
+                function clearScriptGenerator() {
+                    // Clear all inputs
+                    const inputs = document.querySelectorAll('#content-script-generator input, #content-script-generator select');
+                    inputs.forEach(input => {
+                        input.value = '';
+                    });
+
+                    // Reset preview
+                    document.getElementById('script-preview').innerHTML = `
+                        <div class="text-center text-gray-500 py-8">
+                            <div class="text-4xl mb-4">📞</div>
+                            <h4 class="text-lg font-semibold mb-2">Ready to Generate Your Script</h4>
+                            <p class="text-sm">Fill in the property information on the left and click "Generate Complete Script" to create your customized cold calling script.</p>
+                        </div>
+                    `;
+
+                    // Reset statistics
+                    document.getElementById('script-word-count').textContent = '0';
+                    document.getElementById('script-talk-time').textContent = '0';
+                    document.getElementById('script-sections').textContent = '0';
+                    document.getElementById('script-rebuttals').textContent = '0';
+
+                    // Disable action buttons
+                    document.getElementById('copy-script-btn').disabled = true;
+                    document.getElementById('download-script-btn').disabled = true;
+                    document.getElementById('email-script-btn').disabled = true;
+                    document.getElementById('fullscreen-btn').disabled = true;
+
+                    // Clear generated script
+                    generatedScript = '';
+
+                    // Hide tax lien container
+                    document.getElementById('tax-lien-amount-container').classList.add('hidden');
+                }
+
+                // Show/hide tax lien amount field based on special circumstances
+                document.getElementById('sg-special-circumstances').addEventListener('change', function() {
+                    const taxLienContainer = document.getElementById('tax-lien-amount-container');
+                    if (this.value === 'tax-lien') {
+                        taxLienContainer.classList.remove('hidden');
+                    } else {
+                        taxLienContainer.classList.add('hidden');
+                    }
+                });
+
+                function toggleFullscreen() {
+                    if (!generatedScript) {
+                        alert('Please generate a script first.');
+                        return;
+                    }
+
+                    // Create fullscreen overlay
+                    const overlay = document.createElement('div');
+                    overlay.id = 'fullscreen-overlay';
+                    overlay.className = 'fixed inset-0 bg-gray-50 z-50 flex flex-col';
+
+                    // Use marked library to properly convert markdown to HTML
+                    let htmlContent;
+                    try {
+                        htmlContent = marked.parse(generatedScript);
+                    } catch (error) {
+                        console.error('Markdown parsing error:', error);
+                        htmlContent = `<pre>${generatedScript}</pre>`;
+                    }
+
+                    overlay.innerHTML = `
+                        <div class="flex justify-between items-center p-4 bg-blue-900 text-white shadow-lg">
+                            <h2 class="text-xl font-bold">📞 Cold Call Script - Professional View</h2>
+                            <div class="flex gap-2">
+                                <button onclick="printScript()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-white text-sm">
+                                    🖨️ Print
+                                </button>
+                                <button onclick="closeFullscreen()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">
+                                    ✕ Close
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-auto p-6">
+                            <div class="max-w-5xl mx-auto bg-white rounded-lg shadow-xl p-8">
+                                <div class="markdown-content">${htmlContent}</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-blue-900 text-white text-center">
+                            <p class="text-sm">💡 Tips: Press ESC to close • Scroll to read • Print button available</p>
+                        </div>
+                        <style>
+                            .markdown-content {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                                line-height: 1.7;
+                                color: #444;
+                            }
+                            .markdown-content h1, .markdown-content h2, .markdown-content h3,
+                            .markdown-content h4, .markdown-content h5, .markdown-content h6 {
+                                margin: 20px 0 10px 0;
+                                font-weight: 600;
+                                line-height: 1.3;
+                            }
+                            .markdown-content h1 { font-size: 2em; color: #2c3e50; }
+                            .markdown-content h2 { font-size: 1.7em; color: #34495e; }
+                            .markdown-content h3 { font-size: 1.4em; color: #4a5568; }
+                            .markdown-content h4 { font-size: 1.2em; color: #4a5568; }
+                            .markdown-content h5 { font-size: 1.1em; color: #4a5568; }
+                            .markdown-content h6 { font-size: 1em; color: #4a5568; }
+                            .markdown-content p {
+                                margin: 15px 0;
+                                line-height: 1.7;
+                                color: #444;
+                            }
+                            .markdown-content ul, .markdown-content ol {
+                                margin: 15px 0;
+                                padding-left: 30px;
+                            }
+                            .markdown-content li {
+                                margin: 8px 0;
+                                line-height: 1.6;
+                            }
+                            .markdown-content blockquote {
+                                border-left: 4px solid #667eea;
+                                margin: 20px 0;
+                                padding: 15px 20px;
+                                background: rgba(102, 126, 234, 0.05);
+                                font-style: italic;
+                                border-radius: 0 8px 8px 0;
+                            }
+                            .markdown-content code {
+                                background: #f1f3f4;
+                                padding: 2px 6px;
+                                border-radius: 4px;
+                                font-family: Monaco, Menlo, Consolas, monospace;
+                                font-size: 0.9em;
+                                color: #d63384;
+                            }
+                            .markdown-content pre {
+                                background: #f8f9fa;
+                                padding: 20px;
+                                border-radius: 8px;
+                                margin: 20px 0;
+                                border-left: 4px solid #667eea;
+                                overflow-x: auto;
+                            }
+                            .markdown-content pre code {
+                                background: none;
+                                padding: 0;
+                                color: #333;
+                            }
+                            .markdown-content table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 20px 0;
+                                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                                border-radius: 8px;
+                                overflow: hidden;
+                            }
+                            .markdown-content th, .markdown-content td {
+                                padding: 12px 15px;
+                                text-align: left;
+                                border-bottom: 1px solid #e0e0e0;
+                            }
+                            .markdown-content th {
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                font-weight: 600;
+                            }
+                            .markdown-content tr:hover {
+                                background: rgba(102, 126, 234, 0.05);
+                            }
+                            .markdown-content a {
+                                color: #667eea;
+                                text-decoration: none;
+                                border-bottom: 1px solid transparent;
+                                transition: all 0.3s ease;
+                            }
+                            .markdown-content a:hover {
+                                border-bottom-color: #667eea;
+                            }
+                            .markdown-content strong {
+                                font-weight: bold;
+                                color: #1f2937;
+                            }
+                            .markdown-content em {
+                                font-style: italic;
+                                color: #6b7280;
+                            }
+                            .markdown-content hr {
+                                margin: 1.5rem 0;
+                                border: none;
+                                height: 2px;
+                                background: linear-gradient(to right, #e5e7eb, #9ca3af, #e5e7eb);
+                            }
+                            @media print {
+                                .markdown-content {
+                                    font-size: 12pt;
+                                    line-height: 1.4;
+                                }
+                                .markdown-content h1 { page-break-after: avoid; }
+                                .markdown-content h2 { page-break-after: avoid; }
+                            }
+                        </style>
+                    `;
+
+                    document.body.appendChild(overlay);
+
+                    // Add ESC key listener
+                    function handleEscape(e) {
+                        if (e.key === 'Escape') {
+                            closeFullscreen();
+                        }
+                    }
+                    document.addEventListener('keydown', handleEscape);
+
+                    // Store the escape handler for cleanup
+                    overlay.escapeHandler = handleEscape;
+                }
+
+
+                function printScript() {
+                    const printContent = document.querySelector('#fullscreen-overlay .markdown-content').innerHTML;
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>Cold Call Script</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; margin: 1in; line-height: 1.4; }
+                                    h1 { color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem; }
+                                    h2 { color: #1e40af; background: #eff6ff; padding: 0.5rem; border-radius: 0.25rem; }
+                                    h3 { color: #dc2626; border-bottom: 1px solid #fecaca; }
+                                    .pause-instruction { background: #fef3c7; border: 1px solid #f59e0b; padding: 0.5rem; border-radius: 0.25rem; margin: 0.5rem 0; }
+                                    .script-dialogue { background: #ecfdf5; padding: 0.5rem; border-radius: 0.25rem; }
+                                    strong { font-weight: bold; }
+                                    em { font-style: italic; }
+                                </style>
+                            </head>
+                            <body>${printContent}</body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                }
+
+                function closeFullscreen() {
+                    const overlay = document.getElementById('fullscreen-overlay');
+                    if (overlay) {
+                        // Remove escape listener
+                        if (overlay.escapeHandler) {
+                            document.removeEventListener('keydown', overlay.escapeHandler);
+                        }
+                        document.body.removeChild(overlay);
+                    }
                 }
             </script>
         </div>
