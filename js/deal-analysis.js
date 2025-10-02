@@ -437,7 +437,7 @@ function calculateTaxDelinquentDeal() {
             return;
         }
 
-        if (taxLien <= 0) {
+        if (taxLien < 0) {
             alert('Please enter a valid Tax Delinquent amount');
             return;
         }
@@ -738,7 +738,7 @@ function updateTaxMAODisplay() {
         const taxLienElement = document.getElementById('taxLienAmount');
         if (taxLienElement) {
             const taxLien = parseFloat(taxLienElement.value) || 0;
-            if (taxLien > 0) {
+            if (taxLien >= 0) {
                 console.log('Auto-recalculating tax delinquent deal with tax lien:', taxLien);
                 calculateTaxDelinquentDeal();
             }
@@ -765,7 +765,7 @@ function handleScenarioChange() {
 
     // If user has already entered tax lien amount, recalculate automatically
     const taxLien = parseFloat(document.getElementById('taxLienAmount').value) || 0;
-    if (taxLien > 0) {
+    if (taxLien >= 0) {
         calculateTaxDelinquentDeal();
     }
 
